@@ -129,12 +129,21 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   let id=new URLSearchParams(location.search).get("u");
   if(!id){try{id=localStorage.getItem("rid");if(!id){id="u"+Math.random().toString(36).slice(2,10);localStorage.setItem("rid",id)}}catch(e){}}
   uid=id||"u"+Math.random().toString(36).slice(2,10);
-  const M=window.__FBMOCK||{a:await import(CDN+"firebase-app.js"),d:await import(CDN+"firebase-database.js")};
-  const d=M.d,rdb=d.getDatabase(M.a.initializeApp(FBC));
+  const M=window.__FBMOCK||{
+   a:await import(CDN+"firebase-app.js"),
+   d:await import(CDN+"firebase-database.js"),
+   au:await import(CDN+"firebase-auth.js")
+  };
+  const app=M.a.initializeApp(FBC);
+  const auth=M.au.getAuth(app);
+  // Identitas anonim diperlukan agar Firebase dapat mengizinkan akses berdasarkan Rules.
+  const credential=await M.au.signInAnonymously(auth);
+  uid=credential.user.uid;
+  const d=M.d,rdb=d.getDatabase(app);
   db={doc:p=>({set:o=>d.set(d.ref(rdb,map(p)),o),onSnapshot:(f,e)=>d.onValue(d.ref(rdb,map(p)),s=>{const v=s.val();f({exists:v!==null,data:()=>norm(v)})},e)}),
    collection:p=>({onSnapshot:(f,e)=>d.onValue(d.ref(rdb,p),s=>{const v=s.val()||{};f({docs:Object.keys(v).map(k=>({id:k,data:()=>v[k]}))})},e)})};
   $("#join").hidden=false;
- }catch(e){msg("Tidak bisa terhubung ke server. Periksa koneksi internet lalu muat ulang.")}
+ }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
 $("#jb").onclick=async()=>{
