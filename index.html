@@ -67,9 +67,10 @@ button.c:disabled{opacity:1}
 button.c:not(:disabled){cursor:pointer}
 .c.tk{outline:2px solid #e8b923;outline-offset:0}
 .ring .pc .c.tk{outline:0;border-color:#e8b923;border-width:1px 1px 5px}
-.ring{position:relative;width:100%;height:210px}
+.ring{position:relative;z-index:0;width:100%;height:230px}
 .ring .c{position:absolute}
 .ring .c.sm{min-width:30px}
+.ring .c.xm{width:24px;height:34px;font-size:10px;border-radius:4px}
 .ring #deck{left:50%;top:50%;transform:translate(-50%,-50%)}
 .pc{position:absolute;inset:0}
 .ring .lab{position:absolute;left:0;right:0;top:0}
@@ -115,8 +116,8 @@ details{margin-top:8px}summary{cursor:pointer}
 <div id="qe" class="act" style="justify-content:center;margin:2px 0"><button class="qb" data-e="😂">😂</button><button class="qb" data-e="😡">😡</button><button class="qb" data-e="😭">😭</button><button class="qb" data-e="👍">👍</button><button class="qb" data-e="🔥">🔥</button><button class="qb" data-e="😎">😎</button></div>
 <div id="again" class="act" hidden><button class="pri" id="ab">Lanjut</button><button class="pri sec" id="kx2">Keluar</button></div>
 </div>
-</div><div id="score" class="box" hidden></div><div id="chatbox" class="box"><b>💬 Chat</b><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div><div class="act"><button class="pri sec" id="sn">🔊 Suara: ON</button><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
-<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah dan miring. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, muncul peringatan merah di atas layar untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
+</div><div id="score" class="box" hidden></div><div id="chatbox" class="box"><b>💬 Chat</b><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div><div class="act"><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
+<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Di akhir ronde, kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja), kartu yang belum jadi mengurangi poin, lalu poin set dihitung (contoh: hidup 15 − belum jadi 20 − set 50 = −55). Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah dan miring. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, muncul peringatan merah di atas layar untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
 </main>
 <script>
 const $=s=>document.querySelector(s);
@@ -137,6 +138,11 @@ const all=cs=>{if(!cs.length)return true;const[a,...r]=cs;for(const k of[2,3])fo
 const full=cs=>cs.length>=3&&all(cs);
 const srt=cs=>cs.slice().sort((a,b)=>suit(a).localeCompare(suit(b))||rank(a)-rank(b));
 const part=cs=>{if(!cs.length)return{v:0,m:[]};const[a,...r]=cs;let p0=part(r),b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)){const p=part(r.filter(c=>!x.includes(c))),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}return b};
+const partF=(cs,ok)=>{if(!cs.length)return{v:0,m:[]};const[a,...r]=cs;const p0=partF(r,ok);let b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)&&ok(m)){const p=partF(r.filter(c=>!x.includes(c)),ok),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}return b};
+const finalLay=(hand,hasSeri)=>{const q=srt(hand),any=()=>true;if(hasSeri)return partF(q,any);
+ let b={v:-q.reduce((t,c)=>t+pts(c),0),m:[]};
+ for(const k of[3,4])for(const m of sub(q,k))if(meld(m)&&isSeri(m)){const p=partF(q.filter(c=>!m.includes(c)),any),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}
+ return b};
 const runOrd=m=>{const x=nj(m),jk=m.filter(isJ),r=x.map(rank),e=Math.max(...r),mn=Math.min(...r),n=m.length,lo=e<=10?2:11,hi=e<=10?10:13;for(let t=lo;t+n-1<=hi;t++)if(t<=mn&&t+n-1>=e){const o=[];for(let v=t;v<t+n;v++)o.push(x.find(y=>rank(y)===v)||jk.shift());return o}return m};
 const AM={};
 const arrange=cs=>{const key=cs.slice().sort().join(",");if(AM[key])return AM[key];
@@ -187,7 +193,7 @@ const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map
 
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
-const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
+const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
 const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
 (async()=>{
  try{
@@ -232,8 +238,14 @@ function start(){
 
 function fin(s,by,c){
  s.status="done";s.sc={};
- s.order.forEach(i=>{s.sc[i]=((s.laid||{})[i]||[]).reduce((t,m)=>t+meldPts(m.split(",")),0)+best(s.hands[i])});
- if(c){const b=pts(c)*10;s.sc[by]+=b;s.sc[s.lb]-=b;s.msg=nm(by)+" men-set "+nm(s.lb)+" dengan kartu set "+lbl(c)+"! +"+b+" poin untuk "+nm(by)+", −"+b+" poin untuk "+nm(s.lb)}
+ s.laid=s.laid||{};s.fb={};
+ s.order.forEach(i=>{
+  const L=(s.laid[i]||[]).slice(),hd=s.hands[i]||[],lp=L.reduce((t,m)=>t+meldPts(m.split(",")),0),F=finalLay(hd,L.some(m=>isSeri(m.split(","))));
+  const ms=F.m.map(m=>run(m)?runOrd(m):m),rest=hd.filter(c=>!ms.some(m=>m.includes(c)));
+  ms.forEach(m=>L.push(m.join(",")));s.laid[i]=L;s.hands[i]=rest;
+  const up=lp+ms.reduce((t,m)=>t+meldPts(m),0),dn=rest.reduce((t,c)=>t+pts(c),0);
+  s.sc[i]=up-dn;s.fb[i]={up,dn,st:0}});
+ if(c){const b=pts(c)*10;s.sc[by]+=b;s.sc[s.lb]-=b;s.fb[by].st=b;s.fb[s.lb].st=-b;s.msg=nm(by)+" men-set "+nm(s.lb)+" dengan kartu set "+lbl(c)+"! +"+b+" poin untuk "+nm(by)+", −"+b+" poin untuk "+nm(s.lb)}
  else s.msg="Tumpukan habis, permainan selesai";
  s.winner=c?by:s.order.reduce((a,b)=>s.sc[b]>s.sc[a]?b:a);
  s.hist=[...(s.hist||[]),{sc:Object.assign({},s.sc),names:Object.assign({},s.names),win:s.winner,vic:c?s.lb:""}];
@@ -308,16 +320,20 @@ function render(){
  const prev=O[(O.indexOf(uid)+O.length-1)%O.length],X=st.pile[st.pile.length-1];
  const cs=mine&&ph==="draw"&&st.lb===prev&&!!X&&h.some(y=>full([...h.filter(z=>z!==y),X]));
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span><div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div><div class="ml">${laid(i)}</div></div>`;
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  const op=O.filter(i=>i!==uid),pos=op.length<2?[0,op[0],0]:op.length===2?[op[0],0,op[1]]:[op[0],op[1],op[2]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
  $("#info").textContent=`Di bawah: ${st.pile.length} kartu${canTake?" · ketuk salah satu dari 5 kartu teratas untuk memakan":""}`;
  $("#dkn").textContent="Cabutan: "+st.deck.length;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
- const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||210,np=st.pile.length,rx=Math.max(40,(RW-30)/2-2),ry=(RH-42)/2-2,stp=2*Math.PI/Math.max(np,24);
- $("#pile").innerHTML=np?st.pile.map((c,i)=>{const on=canTake&&np-i<=5,th=-Math.PI/2+i*stp;return card(c,"button",on,"sm"+(on?" tk":"")+(done&&st.sx===c?" xs":""),"left:"+(RW/2+rx*Math.cos(th)-15).toFixed(1)+"px;top:"+(RH/2+ry*Math.sin(th)-21).toFixed(1)+"px")}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
+ const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
+ const pa=(RW-30)/2-1,pb=(RH-42)/2-1,PP=4*(pa+pb),dn=20,k5=Math.max(np-5,0),ds=Math.max(13,Math.min(20,(PP-5*dn)/Math.max(k5,1)));
+ const pt=L=>{L=((L%PP)+PP)%PP;const cx=RW/2,cy=RH/2;if(L<pa)return[cx+L,cy-pb];L-=pa;if(L<2*pb)return[cx+pa,cy-pb+L];L-=2*pb;if(L<2*pa)return[cx+pa-L,cy+pb];L-=2*pa;if(L<2*pb)return[cx-pa,cy+pb-L];L-=2*pb;return[cx-pa+L,cy-pb]};
+ $("#pile").innerHTML=np?st.pile.map((c,i)=>{
+  const big=np-i<=5,on=canTake&&big,xs=done&&st.sx===c,L=i<k5?i*ds:k5*ds+(i-k5)*dn,q=pt(L),w=big?30:24,hh=big?42:34,lx=q[0]-w/2,ty=q[1]-hh/2;
+  return card(c,"button",on,(big?"sm":"xm")+(on?" tk":"")+(xs?" xs":""),"left:"+lx.toFixed(1)+"px;top:"+ty.toFixed(1)+"px;z-index:"+(xs?9999:Math.round(lx+ty)))}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
  $("#mine").innerHTML=laid(uid)||'<span class="lab">Kartu hidupmu akan muncul di sini</span>';
  let s=esc(st.msg||"");
- if(done)s=s+"<br>"+O.map(i=>esc(nm(i))+": "+st.sc[i]+" poin").join(" · ")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
+ if(done)s=s+"<br>"+O.map(i=>{const f=(st.fb||{})[i];return esc(nm(i))+": "+(f?"hidup "+f.up+" − belum jadi "+f.dn+(f.st?(f.st>0?" + set ":" − set ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]+" poin"}).join("<br>")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
  else if(!O.includes(uid))s="Game sedang berjalan, kamu menonton.";
  else if(mine)s=ph==="draw"?"Giliranmu: cabut kartu"+(cs?" atau Set!":""):st.eat?"Turunkan kombinasi berisi kartu yang kamu makan ("+lbl(st.eat)+"), lalu buang 1 kartu":"Giliranmu: turunkan kombinasi (opsional), lalu buang 1 kartu (joker tidak boleh dibuang)";
  else s=esc(st.msg||"")+" · giliran "+esc(nm(st.turn));
@@ -339,8 +355,6 @@ $("#bd").onclick=()=>go("draw");$("#deck").onclick=()=>go("draw");
 $("#bs").onclick=()=>go("set");
 $("#bl").onclick=()=>go("lay",sel.slice());
 $("#bx").onclick=()=>go("drop",sel[0]);
-try{snd=localStorage.getItem("snd")!=="0"}catch(e){}
-$("#sn").textContent="🔊 Suara: "+(snd?"ON":"OFF");
 addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}},{once:true});
 function beep(k){
  if(!snd)return;
@@ -365,7 +379,6 @@ setInterval(drawChat,5000);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b)sendChat(b.dataset.e)});
 $("#cs").onclick=()=>{sendChat($("#ci").value);$("#ci").value=""};
 $("#ci").onkeydown=e=>{if(e.key==="Enter"){sendChat(e.target.value);e.target.value=""}};
-$("#sn").onclick=()=>{snd=!snd;try{localStorage.setItem("snd",snd?"1":"0")}catch(e){}$("#sn").textContent="🔊 Suara: "+(snd?"ON":"OFF");if(snd)beep("pop")};
 $("#kx3").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
 {const HD=$("#hand");
  HD.addEventListener("pointerdown",e=>{const b=e.target.closest("[data-c]");if(!b)return;drag={el:b,c:b.dataset.c,x0:e.clientX,pid:e.pointerId,on:false}});
