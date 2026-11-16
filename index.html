@@ -52,8 +52,12 @@ button.cd:not(:disabled){border-color:var(--ac)}
 button.c:disabled{opacity:1}
 button.c:not(:disabled){cursor:pointer}
 .c.tk{outline:3px solid #e8b923;outline-offset:1px}
-.pile{display:flex;flex-wrap:wrap;justify-content:center;padding-right:14px;min-height:46px;align-content:flex-start}
-.pile .c{margin-right:-14px;margin-bottom:3px}
+.ring{position:relative;width:100%;height:210px}
+.ring .c{position:absolute}
+.ring .c.sm{min-width:30px}
+.ring #deck{left:50%;top:50%;transform:translate(-50%,-50%)}
+.pc{position:absolute;inset:0}
+.ring .lab{position:absolute;left:0;right:0;top:0}
 .bk{display:flex;justify-content:center}
 .top .bk .c{margin-left:-18px}
 .side .bk{flex-direction:column;align-items:center}
@@ -64,6 +68,9 @@ button.c:not(:disabled){cursor:pointer}
 .mine{min-height:44px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .hand{display:flex;justify-content:center;padding:18px 4px 6px;min-height:96px}
 .hand .c{margin-left:var(--ov,-20px);box-shadow:-3px 0 5px rgba(0,0,0,.3)}
+.hand .c.gs{margin-left:calc(var(--ov,-20px) + 14px)}
+.hand .c.lv{border-bottom:4px solid #2ea44f}
+.hand .c.ea{outline:3px solid #ff5a4d;outline-offset:1px}
 .hand .c:first-child{margin-left:0}
 .hand .c.sl{transform:translateY(-16px);outline:2px solid #e8b923}
 .tb .msg{color:#fff;text-align:center;font-size:15px}
@@ -82,17 +89,17 @@ details{margin-top:8px}summary{cursor:pointer}
 <div id="play" hidden><div class="tb">
 <div id="sT" class="seat top"></div>
 <div class="mid"><div id="sL" class="seat side"></div>
-<div class="ctr"><div id="pile" class="pile"></div><div id="info" class="lab"></div>
-<div><button id="deck" class="c back lg" aria-label="Cabut kartu"></button><div id="dkn" class="lab"></div></div></div>
+<div class="ctr"><div id="ring" class="ring"><div id="pile" class="pc"></div><button id="deck" class="c back lg" aria-label="Cabut kartu"></button></div><div id="info" class="lab"></div><div id="dkn" class="lab"></div></div>
 <div id="sR" class="seat side"></div></div>
 <div id="mine" class="mine"></div>
 <div class="msg" id="st"></div>
 <div class="act"><button class="pri" id="bd" hidden>Cabut kartu</button><button class="pri" id="bs" hidden>Set!</button><button class="pri" id="bl" hidden>Turunkan</button><button class="pri" id="bx" hidden>Buang</button></div>
 <div id="hand" class="hand"></div>
+<div id="arr" hidden><div class="lab">Ketuk kartu untuk memilih, lalu geser ◀ ▶. Garis hijau = kartu sudah hidup.</div><div class="act"><button class="pri" id="mvl">◀</button><button class="pri" id="aut">✨ Auto-susun: ON</button><button class="pri" id="mvr">▶</button></div></div>
 <div id="again" class="act" hidden><button class="pri" id="ab">Main lagi</button></div>
 </div>
 </div></div>
-<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, dengan minimal 2 kartu biasa dalam kombinasi. Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Setelah ada 8 kartu di bawah, kartu buangan boleh dimakan: hanya dari 5 kartu teratas, dan semua kartu di atasnya ikut terambil.</p></details>
+<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, dengan minimal 2 kartu biasa dalam kombinasi. Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Setelah ada 8 kartu di bawah, kartu buangan boleh dimakan: hanya dari 5 kartu teratas, dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (pilih kartu, geser ◀ ▶) atau otomatis berkelompok saat sudah hidup.</p></details>
 </main>
 <script>
 const $=s=>document.querySelector(s);
@@ -111,18 +118,41 @@ const isSeri=m=>run(m)||(rell(m)&&rank(nj(m)[0])===14);
 const best=cs=>{if(!cs.length)return 0;const[a,...r]=cs;let b=-pts(a)+best(r);for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m))b=Math.max(b,meldPts(m)+best(r.filter(c=>!x.includes(c))))}return b};
 const all=cs=>{if(!cs.length)return true;const[a,...r]=cs;for(const k of[2,3])for(const x of sub(r,k))if(meld([a,...x])&&all(r.filter(c=>!x.includes(c))))return true;return false};
 const full=cs=>cs.length>=3&&all(cs);
+const srt=cs=>cs.slice().sort((a,b)=>suit(a).localeCompare(suit(b))||rank(a)-rank(b));
+const part=cs=>{if(!cs.length)return{v:0,m:[]};const[a,...r]=cs;let p0=part(r),b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)){const p=part(r.filter(c=>!x.includes(c))),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}return b};
+const runOrd=m=>{const x=nj(m),jk=m.filter(isJ),r=x.map(rank),e=Math.max(...r),mn=Math.min(...r),n=m.length,lo=e<=10?2:11,hi=e<=10?10:13;for(let t=lo;t+n-1<=hi;t++)if(t<=mn&&t+n-1>=e){const o=[];for(let v=t;v<t+n;v++)o.push(x.find(y=>rank(y)===v)||jk.shift());return o}return m};
+const AM={};
+const arrange=cs=>{const key=cs.slice().sort().join(",");if(AM[key])return AM[key];
+ const q=srt(cs),ms=cs.length<=12?part(q).m.slice():[];
+ ms.sort((p,r)=>(isSeri(p)?0:1)-(isSeri(r)?0:1));
+ const groups=ms.map(m=>run(m)?runOrd(m):m),rest=q.filter(c=>!ms.some(m=>m.includes(c)));
+ if(rest.length)groups.push(rest);
+ if(Object.keys(AM).length>300)for(const k in AM)delete AM[k];
+ return AM[key]={groups,live:new Set(ms.flat())}};
+function handView(h){
+ ord=ord.filter(c=>h.includes(c));h.forEach(c=>{if(!ord.includes(c))ord.push(c)});
+ const A=arrange(ord);
+ if(auto)ord=A.groups.flat();
+ const starts=new Set();
+ if(auto&&A.groups.length>1)A.groups.slice(1).forEach(g=>starts.add(g[0]));
+ return{live:A.live,starts}}
+function mv(d){
+ if(!sel.length)return;auto=false;const o=ord.slice();
+ if(d<0){for(let i=1;i<o.length;i++)if(sel.includes(o[i])&&!sel.includes(o[i-1]))[o[i-1],o[i]]=[o[i],o[i-1]]}
+ else{for(let i=o.length-2;i>=0;i--)if(sel.includes(o[i])&&!sel.includes(o[i+1]))[o[i],o[i+1]]=[o[i+1],o[i]]}
+ ord=o;render()}
 const mk=()=>{const d=[];for(const s of "SHDC")for(let r=2;r<=14;r++)d.push(s+r);d.push("X1","X2");for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d};
-let db,uid,room="",players={},st=null,sel=[];
+let db,uid,room="",players={},st=null,sel=[],ord=[],auto=true;
 const live=i=>players[i]&&players[i].t>Date.now()-72e5;
 const nm=i=>(st&&st.names&&st.names[i])||(players[i]&&players[i].name)||"?";
 const msg=t=>{$("#err").textContent=t};
 const save=async o=>{try{await db.doc("rooms/"+room).set(o);msg("")}catch(e){msg("Gagal menyimpan: "+(e.message||e.code))}};
-const card=(c,tag,on,x)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+s;return `<${tag} class="c ${red(c)?"r":""} ${x||""}" ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
+const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+s;return `<${tag} class="c ${red(c)?"r":""} ${x||""}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,i===uid?"sm":"mn")).join("")}</span>`).join("");
 
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
-const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
+const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
 const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
 (async()=>{
  try{
@@ -159,7 +189,7 @@ function start(){
  const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
  if(ids.length<2)return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan"});
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan"});
 }
 
 function fin(s,by,c){
@@ -183,8 +213,10 @@ function go(k,a){
  }else if(k==="take"){
   if(s.phase!=="draw"||s.pile.length<8)return;
   const i=s.pile.indexOf(a);if(i<0)return;if(s.pile.length-i>5)return msg("Hanya boleh makan dari 5 kartu teratas");
-  if(![2,3].some(n=>sub(h,n).some(x=>meld([a,...x]))))return msg("Kartu itu belum cocok dengan kartu di tanganmu");
-  h.push(...s.pile.splice(i));s.phase="act";s.msg=me+" memakan kartu "+lbl(a)+" dan semua di atasnya";
+  const nh=[...h,...s.pile.slice(i)],hasSeri=(s.laid[uid]||[]).some(m=>isSeri(m.split(",")));
+  const ok=[2,3].some(n=>sub(h,n).some(x=>{const m=[a,...x];return meld(m)&&(isSeri(m)||hasSeri)&&nh.length-m.length>=1&&nh.some(c=>!m.includes(c)&&!isJ(c))}));
+  if(!ok)return msg("Kartu itu belum bisa langsung kamu turunkan (harus cocok dengan kartu di tangan; rell butuh seri lebih dulu)");
+  h.push(...s.pile.splice(i));s.eat=a;s.phase="act";s.msg=me+" memakan kartu "+lbl(a)+" dan semua di atasnya";
  }else if(k==="set"){
   const X=s.pile[s.pile.length-1];
   if(s.phase!=="draw"||s.lb!==prev||!X)return;
@@ -194,13 +226,16 @@ function go(k,a){
   return fin(s,uid,c);
  }else if(k==="lay"){
   if(s.phase!=="act"||!a.every(c=>h.includes(c))||!meld(a))return msg("Kombinasi tidak valid");
-  if(h.length-a.length<1)return msg("Sisakan 1 kartu untuk dibuang");
+  if(s.eat&&!a.includes(s.eat))return msg("Turunkan dulu kombinasi yang berisi kartu yang kamu makan ("+lbl(s.eat)+")");
+  if(!h.filter(c=>!a.includes(c)).some(c=>!isJ(c)))return msg("Sisakan 1 kartu (bukan joker) untuk dibuang");
   const L=(s.laid[uid]||[]);
   if(!isSeri(a)&&!L.some(m=>isSeri(m.split(","))))return msg("Turunkan kartu seri dulu sebelum rell");
   a.forEach(c=>h.splice(h.indexOf(c),1));
-  s.laid[uid]=[...L,a.join(",")];s.msg=me+" menurunkan kartu";
+  s.laid[uid]=[...L,a.join(",")];s.msg=me+" menurunkan kartu";if(s.eat&&a.includes(s.eat))s.eat="";
  }else if(k==="drop"){
   if(s.phase!=="act"||!h.includes(a))return;
+  if(isJ(a))return msg("Joker tidak boleh dibuang. Joker hanya bisa diturunkan dalam kombinasi atau dipakai untuk Set");
+  if(s.eat)return msg("Turunkan dulu kombinasi yang berisi kartu yang kamu makan ("+lbl(s.eat)+")");
   h.splice(h.indexOf(a),1);s.pile.push(a);s.lb=uid;
   s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" membuang "+lbl(a);
  }
@@ -227,19 +262,21 @@ function render(){
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
  $("#info").textContent=`Di bawah: ${st.pile.length} kartu${canTake?" · ketuk salah satu dari 5 kartu teratas untuk memakan":""}`;
  $("#dkn").textContent="Cabutan: "+st.deck.length;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
- $("#pile").innerHTML=st.pile.map((c,i)=>{const on=canTake&&st.pile.length-i<=5;return card(c,"button",on,"sm"+(on?" tk":""))}).join("")||'<span class="lab">Belum ada kartu dibuang</span>';
+ const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||210,np=st.pile.length,rx=Math.max(40,(RW-30)/2-2),ry=(RH-42)/2-2,stp=2*Math.PI/Math.max(np,24);
+ $("#pile").innerHTML=np?st.pile.map((c,i)=>{const on=canTake&&np-i<=5,th=-Math.PI/2+i*stp;return card(c,"button",on,"sm"+(on?" tk":""),"left:"+(RW/2+rx*Math.cos(th)-15).toFixed(1)+"px;top:"+(RH/2+ry*Math.sin(th)-21).toFixed(1)+"px")}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
  $("#mine").innerHTML=laid(uid)||'<span class="lab">Kartu hidupmu akan muncul di sini</span>';
  let s=esc(st.msg||"");
  if(done)s=s+"<br>"+O.map(i=>esc(nm(i))+": "+st.sc[i]+" poin").join(" · ")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
  else if(!O.includes(uid))s="Game sedang berjalan, kamu menonton.";
- else if(mine)s=ph==="draw"?"Giliranmu: cabut kartu"+(cs?" atau Set!":""):"Giliranmu: turunkan kombinasi (opsional), lalu buang 1 kartu";
+ else if(mine)s=ph==="draw"?"Giliranmu: cabut kartu"+(cs?" atau Set!":""):st.eat?"Turunkan kombinasi berisi kartu yang kamu makan ("+lbl(st.eat)+"), lalu buang 1 kartu":"Giliranmu: turunkan kombinasi (opsional), lalu buang 1 kartu (joker tidak boleh dibuang)";
  else s=esc(st.msg||"")+" · giliran "+esc(nm(st.turn));
  $("#st").innerHTML=s;
  $("#bd").hidden=!(mine&&ph==="draw");$("#bs").hidden=!cs;
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
- const hs=h.slice().sort((a,b)=>suit(a).localeCompare(suit(b))||rank(a)-rank(b)),hd=$("#hand"),W=(hd.clientWidth||340)-8,step=hs.length>1?Math.min(36,(W-54)/(hs.length-1)):0;
+ const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
- hd.innerHTML=hs.map(c=>card(c,"button",mine&&ph==="act","lg"+(sel.includes(c)?" sl":""))).join("");
+ hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
+ $("#arr").hidden=!O.includes(uid);$("#mvl").disabled=$("#mvr").disabled=!sel.length;$("#aut").textContent="✨ Auto-susun: "+(auto?"ON":"OFF");
  $("#again").hidden=!done;
 }
 $("#hand").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];render()};
@@ -248,5 +285,8 @@ $("#bd").onclick=()=>go("draw");$("#deck").onclick=()=>go("draw");
 $("#bs").onclick=()=>go("set");
 $("#bl").onclick=()=>go("lay",sel.slice());
 $("#bx").onclick=()=>go("drop",sel[0]);
+$("#mvl").onclick=()=>mv(-1);$("#mvr").onclick=()=>mv(1);
+$("#aut").onclick=()=>{auto=!auto;render()};
+addEventListener("resize",()=>{if(st)render()});
 $("#ab").onclick=()=>save({status:"lobby"});
 </script></body></html>
