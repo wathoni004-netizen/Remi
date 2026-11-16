@@ -30,6 +30,7 @@ button.cd:not(:disabled){border-color:var(--ac)}
 .mt{display:inline-flex;gap:2px;margin:4px 6px 0 0}
 .msg{font-weight:600;margin:8px 0}
 .act{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}
+.alr{position:sticky;top:0;z-index:5;background:#c0392b;color:#fff;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-weight:700;text-align:center}
 [hidden]{display:none!important}
 
 .tb{background:#1f5c3a;border-radius:16px;padding:8px;color:#fff;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
@@ -51,7 +52,8 @@ button.cd:not(:disabled){border-color:var(--ac)}
 .c.lg{width:54px;height:78px;font-size:17px}
 button.c:disabled{opacity:1}
 button.c:not(:disabled){cursor:pointer}
-.c.tk{outline:3px solid #e8b923;outline-offset:1px}
+.c.tk{outline:2px solid #e8b923;outline-offset:0}
+.ring .pc .c.tk{outline:0;border-color:#e8b923;border-width:1px 1px 5px}
 .ring{position:relative;width:100%;height:210px}
 .ring .c{position:absolute}
 .ring .c.sm{min-width:30px}
@@ -86,7 +88,7 @@ details{margin-top:8px}summary{cursor:pointer}
 </div>
 <div id="game" hidden>
 <div id="lobby" class="box" hidden></div>
-<div id="play" hidden><div class="tb">
+<div id="play" hidden><div id="alr" class="alr" hidden></div><div class="tb">
 <div id="sT" class="seat top"></div>
 <div class="mid"><div id="sL" class="seat side"></div>
 <div class="ctr"><div id="ring" class="ring"><div id="pile" class="pc"></div><button id="deck" class="c back lg" aria-label="Cabut kartu"></button></div><div id="info" class="lab"></div><div id="dkn" class="lab"></div></div>
@@ -100,7 +102,7 @@ details{margin-top:8px}summary{cursor:pointer}
 <div id="again" class="act" hidden><button class="pri" id="ab">Main lagi</button></div>
 </div>
 </div></div>
-<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, dengan minimal 2 kartu biasa dalam kombinasi. Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Setelah ada 8 kartu di bawah, kartu buangan boleh dimakan: hanya dari 5 kartu teratas, dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (pilih kartu, geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Pemain yang hendak membuang kartu yang bisa membuatnya di-set mendapat peringatan, tanpa diberi tahu kartu apa yang dipakai lawan.</p></details>
+<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (pilih kartu, geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Pemain yang hendak membuang kartu yang bisa membuatnya di-set mendapat peringatan, tanpa diberi tahu kartu apa yang dipakai lawan.</p></details>
 </main>
 <script>
 const $=s=>document.querySelector(s);
@@ -112,8 +114,8 @@ const meldPts=m=>m.length*pts(nj(m)[0]);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sub=(a,k)=>k==0?[[]]:a.length<k?[]:[...sub(a.slice(1),k-1).map(x=>[a[0],...x]),...sub(a.slice(1),k)];
 const seq=a=>a.every((r,i)=>!i||r==a[i-1]+1);
-const run=m=>{const n=m.length,x=nj(m);if(n<3||n>4||x.length<2||x.some(c=>suit(c)!==suit(x[0])))return false;const r=x.map(rank).sort((a,b)=>a-b);if(r.some((v,i)=>i&&v===r[i-1]))return false;const e=r[r.length-1];let lo,hi;if(e<=10){lo=2;hi=10}else if(r[0]>=11&&e<=13){lo=11;hi=13}else return false;for(let s=lo;s+n-1<=hi;s++)if(s<=r[0]&&s+n-1>=e)return true;return false};
-const rell=m=>{const x=nj(m);return m.length>=3&&m.length<=4&&x.length>=2&&x.every(c=>rank(c)===rank(x[0]))};
+const run=m=>{const n=m.length,x=nj(m);if(n<3||n>4||x.length<2||n-x.length>1||x.some(c=>suit(c)!==suit(x[0])))return false;const r=x.map(rank).sort((a,b)=>a-b);if(r.some((v,i)=>i&&v===r[i-1]))return false;const e=r[r.length-1];let lo,hi;if(e<=10){lo=2;hi=10}else if(r[0]>=11&&e<=13){lo=11;hi=13}else return false;for(let s=lo;s+n-1<=hi;s++)if(s<=r[0]&&s+n-1>=e)return true;return false};
+const rell=m=>{const x=nj(m);return m.length>=3&&m.length<=4&&x.length>=2&&m.length-x.length<=1&&x.every(c=>rank(c)===rank(x[0]))};
 const meld=m=>run(m)||rell(m);
 const isSeri=m=>run(m)||(rell(m)&&rank(nj(m)[0])===14);
 const best=cs=>{if(!cs.length)return 0;const[a,...r]=cs;let b=-pts(a)+best(r);for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m))b=Math.max(b,meldPts(m)+best(r.filter(c=>!x.includes(c))))}return b};
@@ -130,6 +132,16 @@ const arrange=cs=>{const key=cs.slice().sort().join(",");if(AM[key])return AM[ke
  if(rest.length)groups.push(rest);
  if(Object.keys(AM).length>300)for(const k in AM)delete AM[k];
  return AM[key]={groups,live:new Set(ms.flat())}};
+const ALLC=[];for(const q of "SHDC")for(let r=2;r<=14;r++)ALLC.push(q+r);
+const RDY={};
+function ready(H,used){
+ if(H.length<3)return false;
+ const key=H.slice().sort().join(",")+"|"+used.length;
+ if(key in RDY)return RDY[key];
+ let ok=false;const cand=ALLC.filter(c=>!H.includes(c)&&!used.includes(c));
+ for(const y of H){const rest=H.filter(z=>z!==y);if(cand.some(X=>full([...rest,X]))){ok=true;break}}
+ if(Object.keys(RDY).length>400)for(const k in RDY)delete RDY[k];
+ return RDY[key]=ok}
 function adj(o){const L=new Set();let i=0;while(i<o.length){let k=0;for(const n of[4,3])if(i+n<=o.length&&meld(o.slice(i,i+n))){k=n;break}if(k){o.slice(i,i+k).forEach(c=>L.add(c));i+=k}else i++}return L}
 function handView(h){
  ord=ord.filter(c=>h.includes(c));h.forEach(c=>{if(!ord.includes(c))ord.push(c)});
@@ -213,7 +225,7 @@ function go(k,a){
   if(!s.deck.length)return fin(s);
   h.push(s.deck.shift());s.phase="act";s.msg=me+" mencabut kartu";
  }else if(k==="take"){
-  if(s.phase!=="draw"||s.pile.length<8)return;
+  if(s.phase!=="draw"||!s.pile.length)return;
   const i=s.pile.indexOf(a);if(i<0)return;if(s.pile.length-i>5)return msg("Hanya boleh makan dari 5 kartu teratas");
   const nh=[...h,...s.pile.slice(i)],hasSeri=(s.laid[uid]||[]).some(m=>isSeri(m.split(",")));
   const ok=[2,3].some(n=>sub(h,n).some(x=>{const m=[a,...x];return meld(m)&&(isSeri(m)||hasSeri)&&nh.length-m.length>=1&&nh.some(c=>!m.includes(c)&&!isJ(c))}));
@@ -258,7 +270,7 @@ function render(){
  sel=sel.filter(c=>h.includes(c));
  const prev=O[(O.indexOf(uid)+O.length-1)%O.length],X=st.pile[st.pile.length-1];
  const cs=mine&&ph==="draw"&&st.lb===prev&&!!X&&h.some(y=>full([...h.filter(z=>z!==y),X]));
- const canTake=mine&&ph==="draw"&&st.pile.length>=8;
+ const canTake=mine&&ph==="draw"&&st.pile.length>=1;
  const seat=i=>`<div class="${st.turn===i&&!done?"on":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span><div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div><div class="ml">${laid(i)}</div></div>`;
  const op=O.filter(i=>i!==uid),pos=op.length<2?[0,op[0],0]:op.length===2?[op[0],0,op[1]]:[op[0],op[1],op[2]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
@@ -276,6 +288,8 @@ function render(){
  let wr="";
  if(mine&&ph==="act"&&!st.eat&&sel.length===1&&!isJ(sel[0])){const nx=O[(O.indexOf(uid)+1)%O.length],nh=(st.hands[nx]||[]),X1=sel[0];if(nx!==uid&&nh.some(y=>full([...nh.filter(z=>z!==y),X1])))wr="⚠️ Awas! Kalau kartu ini kamu buang, lawan bisa men-set kamu."}
  $("#wr").textContent=wr;$("#wr").hidden=!wr;
+ const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
+ $("#alr").hidden=!rd.length;$("#alr").textContent=rd.length?"🔺 "+rd.map(i=>nm(i)).join(", ")+" siap men-set, hati-hati!":"";
  $("#bd").hidden=!(mine&&ph==="draw");$("#bs").hidden=!cs;
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
  const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
