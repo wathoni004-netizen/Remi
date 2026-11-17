@@ -66,7 +66,13 @@ button.pri.sec{background:transparent!important;color:var(--tx)!important;border
 button.c:disabled{opacity:1}
 button.c:not(:disabled){cursor:pointer}
 .c.tk{outline:2px solid #e8b923;outline-offset:0}
-.ring .pc .c.tk{outline:0;border-color:#e8b923;border-width:1px 1px 5px}
+.ring .pc .c.tk{outline:0}
+.ring .pc .c.hl{border-color:#e8b923;box-shadow:inset 0 0 0 1px #e8b923}
+.c.pk{border-radius:4px;overflow:hidden;font-weight:700}
+.pk i{line-height:1.05;white-space:nowrap;pointer-events:none}
+.pk .lb{letter-spacing:-.5px}
+.pk .lb.v{text-align:center}
+.pk .bg{display:flex;align-items:center;justify-content:center;font-size:1.3em;opacity:.85}
 .ring{position:relative;z-index:0;width:100%;height:230px}
 .ring .c{position:absolute}
 .ring .c.sm{min-width:30px}
@@ -183,6 +189,20 @@ function mv(d){
  else{for(let i=o.length-2;i>=0;i--)if(sel.includes(o[i])&&!sel.includes(o[i+1]))[o[i],o[i+1]]=[o[i+1],o[i]]}
  ord=o;render()}
 const mk=()=>{const d=[];for(const s of "SHDC")for(let r=2;r<=14;r++)d.push(s+r);d.push("X1","X2");for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d};
+const pileLay=(n,RW,RH)=>{
+ const r=125/175,W=Math.min(RW/9.24,RH*r/7.11,28),H=W/r,ox=(RW-9.24*W)/2,oy=(RH-7.11*H)/2,out=[];
+ const seg=(x0,y0,x1,y1,k,e)=>{for(let j=0;j<k&&out.length<n;j++){const t=k>1?j/(k-1):0;out.push({x:ox+(x0+(x1-x0)*t)*W,y:oy+(y0+(y1-y0)*t)*H,e})}};
+ seg(1.56,0,7.74,0,13,"T");seg(8.24,.5,8.24,5.61,11,"R");seg(7.74,6.11,.5,6.11,15,"B");seg(0,5.61,0,1,10,"L");
+ if(out.length<n){const d=1,a=8.24-d,b=6.11-d;
+  seg(d-1,d,a-.52,d,Math.round((a-.52-d+1)/.515)+1,"T");seg(a,d,a,b-.5,Math.round((b-.5-d)/.511)+1,"R");
+  seg(a-.5,b,d+.5,b,Math.round((a-d-1)/.515)+1,"B");seg(d,b-.5,d,d+1,Math.round((b-.5-d-1)/.511)+1,"L")}
+ while(out.length<n)out.push(Object.assign({},out[out.length-1]||{x:ox,y:oy,e:"T"}));
+ return{p:out,W,H,SX:.515*W,SY:.511*H,fs:Math.max(9,Math.round(W*.43))}};
+const pcard=(c,i,on,hl,xs,nw,p,L)=>{
+ const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c)),v=p.e==="T"||p.e==="B",sx=L.SX.toFixed(1),sy=L.SY.toFixed(1),sw=(L.SX-1).toFixed(1);
+ const lb={T:"left:0;top:2px;width:"+sw+"px",R:"left:2px;top:2px",B:"right:0;top:2px;width:"+sw+"px",L:"left:2px;bottom:2px"}[p.e];
+ const bg={T:"left:"+sx+"px;right:0;top:0;bottom:0",R:"left:0;right:0;top:"+sy+"px;bottom:0",B:"left:0;right:"+sx+"px;top:0;bottom:0",L:"left:0;right:0;top:0;bottom:"+sy+"px"}[p.e];
+ return `<button class="c pk ${red(c)?"r":""}${hl?" hl":""}${on?" tk":""}${xs?" xs":""}" style="left:${p.x.toFixed(1)}px;top:${p.y.toFixed(1)}px;width:${L.W.toFixed(1)}px;height:${L.H.toFixed(1)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${r}${v?"<br>":""}${s}</i>${nw?`<i class="bg" style="${bg}">${s}</i>`:""}</button>`};
 let db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false;
 const live=i=>players[i]&&players[i].t>Date.now()-18e4;
 const nm=i=>(st&&st.names&&st.names[i])||(players[i]&&players[i].name)||"?";
@@ -327,11 +347,10 @@ function render(){
  $("#info").textContent=`Di bawah: ${st.pile.length} kartu${canTake?" · ketuk salah satu dari 5 kartu teratas untuk memakan":""}`;
  $("#dkn").textContent="Cabutan: "+st.deck.length;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
  const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
- const pa=(RW-30)/2-1,pb=(RH-42)/2-1,PP=4*(pa+pb),dn=20,k5=Math.max(np-5,0),ds=Math.max(13,Math.min(20,(PP-5*dn)/Math.max(k5,1)));
- const pt=L=>{L=((L%PP)+PP)%PP;const cx=RW/2,cy=RH/2;if(L<pa)return[cx+L,cy-pb];L-=pa;if(L<2*pb)return[cx+pa,cy-pb+L];L-=2*pb;if(L<2*pa)return[cx+pa-L,cy+pb];L-=2*pa;if(L<2*pb)return[cx-pa,cy+pb-L];L-=2*pb;return[cx-pa+L,cy-pb]};
+ const PL=pileLay(np,RW,RH);
  $("#pile").innerHTML=np?st.pile.map((c,i)=>{
-  const big=np-i<=5,on=canTake&&big,xs=done&&st.sx===c,L=i<k5?i*ds:k5*ds+(i-k5)*dn,q=pt(L),w=big?30:24,hh=big?42:34,lx=q[0]-w/2,ty=q[1]-hh/2;
-  return card(c,"button",on,(big?"sm":"xm")+(on?" tk":"")+(xs?" xs":""),"left:"+lx.toFixed(1)+"px;top:"+ty.toFixed(1)+"px;z-index:"+(xs?9999:Math.round(lx+ty)))}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
+  const hl=np-i<=5;
+  return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
  $("#mine").innerHTML=laid(uid)||'<span class="lab">Kartu hidupmu akan muncul di sini</span>';
  let s=esc(st.msg||"");
  if(done)s=s+"<br>"+O.map(i=>{const f=(st.fb||{})[i];return esc(nm(i))+": "+(f?"hidup "+f.up+" − belum jadi "+f.dn+(f.st?(f.st>0?" + set ":" − set ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]+" poin"}).join("<br>")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
