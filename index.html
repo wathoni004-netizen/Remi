@@ -38,7 +38,7 @@ button.pri.sec{background:transparent!important;color:var(--tx)!important;border
 .tbl .wn{background:rgba(46,164,79,.45);font-weight:700}
 .tbl .vc{background:rgba(220,53,69,.45);font-weight:700}
 .tbl .tt th{font-size:16px}
-.ring .pc .c.xs{outline:3px solid #e53935;outline-offset:0;transform:rotate(14deg);z-index:4}
+.ring .pc .c.xs{outline:0;border-color:#e53935;transform:rotate(14deg) scale(1.4)}
 .hand .c{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .qb{padding:4px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.12);font-size:20px;line-height:1.2;color:#fff}
 .cb{display:inline-block;background:rgba(0,0,0,.35);border-radius:999px;padding:3px 10px;margin:2px;color:#fff;font-size:13px}
@@ -72,7 +72,10 @@ button.c:not(:disabled){cursor:pointer}
 .pk i{line-height:1.05;white-space:nowrap;pointer-events:none}
 .pk .lb{letter-spacing:-.5px}
 .pk .lb.v{text-align:center}
-.pk .bg{display:flex;align-items:center;justify-content:center;font-size:1.3em;opacity:.85}
+.c.pk.ex{overflow:visible}
+.pk .bd{box-sizing:border-box;border-radius:50%;background:#fff;border:2px solid #e8b923;box-shadow:0 0 4px 1px rgba(232,185,35,.7);display:flex;align-items:center;justify-content:center;line-height:1;z-index:3}
+.pk .sp{color:#e8b923;transform:translate(-50%,-50%);line-height:1}
+.pk .rb{box-sizing:border-box;border-radius:3px;background:#e53935;color:#fff;font-weight:700;text-align:center;z-index:3}
 .ring{position:relative;z-index:0;width:100%;height:230px}
 .ring .c{position:absolute}
 .ring .c.sm{min-width:30px}
@@ -123,7 +126,7 @@ details{margin-top:8px}summary{cursor:pointer}
 <div id="again" class="act" hidden><button class="pri" id="ab">Lanjut</button><button class="pri sec" id="kx2">Keluar</button></div>
 </div>
 </div><div id="score" class="box" hidden></div><div id="chatbox" class="box"><b>💬 Chat</b><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div><div class="act"><button class="pri sec" id="ky" hidden>Akhiri game</button><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
-<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Di akhir ronde, kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja), kartu yang belum jadi mengurangi poin, lalu poin set dihitung (contoh: hidup 15 − belum jadi 20 − set 50 = −55). Jika ada pemain yang berhenti main, siapa pun bisa menekan Akhiri game (di kotak Chat, bagian bawah) untuk kembali ke ruang tunggu; ronde itu tidak dihitung. Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah dan miring. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, muncul peringatan merah di atas layar untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
+<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Di akhir ronde, kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja), kartu yang belum jadi mengurangi poin, lalu poin set dihitung (contoh: hidup 15 − belum jadi 20 − set 50 = −55). Jika ada pemain yang berhenti main, siapa pun bisa menekan Akhiri game (di kotak Chat, bagian bawah) untuk kembali ke ruang tunggu; ronde itu tidak dihitung. Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah, miring, lebih besar, dan pita SET di sisi dalamnya. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, muncul peringatan merah di atas layar untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
 </main>
 <script>
 const $=s=>document.querySelector(s);
@@ -197,12 +200,19 @@ const pileLay=(n,RW,RH)=>{
   seg(d-1,d,a-.52,d,Math.round((a-.52-d+1)/.515)+1,"T");seg(a,d,a,b-.5,Math.round((b-.5-d)/.511)+1,"R");
   seg(a-.5,b,d+.5,b,Math.round((a-d-1)/.515)+1,"B");seg(d,b-.5,d,d+1,Math.round((b-.5-d-1)/.511)+1,"L")}
  while(out.length<n)out.push(Object.assign({},out[out.length-1]||{x:ox,y:oy,e:"T"}));
- return{p:out,W,H,SX:.515*W,SY:.511*H,fs:Math.max(9,Math.round(W*.43))}};
+ return{p:out,W,H,SX:.515*W,SY:.511*H,fs:Math.max(8,Math.round(W*.35))}};
 const pcard=(c,i,on,hl,xs,nw,p,L)=>{
- const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c)),v=p.e==="T"||p.e==="B",sx=L.SX.toFixed(1),sy=L.SY.toFixed(1),sw=(L.SX-1).toFixed(1);
- const lb={T:"left:0;top:2px;width:"+sw+"px",R:"left:2px;top:2px",B:"right:0;top:2px;width:"+sw+"px",L:"left:2px;bottom:2px"}[p.e];
- const bg={T:"left:"+sx+"px;right:0;top:0;bottom:0",R:"left:0;right:0;top:"+sy+"px;bottom:0",B:"left:0;right:"+sx+"px;top:0;bottom:0",L:"left:0;right:0;top:0;bottom:"+sy+"px"}[p.e];
- return `<button class="c pk ${red(c)?"r":""}${hl?" hl":""}${on?" tk":""}${xs?" xs":""}" style="left:${p.x.toFixed(1)}px;top:${p.y.toFixed(1)}px;width:${L.W.toFixed(1)}px;height:${L.H.toFixed(1)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${r}${v?"<br>":""}${s}</i>${nw?`<i class="bg" style="${bg}">${s}</i>`:""}</button>`};
+ const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c)),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sx=f(L.SX),sw=f(L.SX-1);
+ const lb={T:"left:0;top:2px;width:"+sw+"px",R:"left:2px;top:2px",B:"right:0;top:2px;width:"+sw+"px",L:"left:2px;bottom:2px"}[e];
+ let dc="";
+ if(ex){
+  const cx=e==="T"?(W+L.SX)/2:e==="R"?0:e==="B"?(W-L.SX)/2:W,cy=e==="T"?H:e==="R"?(H+L.SY)/2:e==="B"?0:(H-L.SY)/2;
+  if(xs){const w=Math.round(W*1.3),q=Math.round(W*.56),x=v?(W-w)/2:e==="R"?1-w:W-1,y=e==="T"?H-1:e==="B"?1-q:(H-q)/2;
+   dc=`<i class="rb" style="left:${f(x-1)}px;top:${f(y-1)}px;width:${w}px;height:${q}px;line-height:${q}px;font-size:${Math.round(q*.62)}px">SET ${s}</i>`}
+  else{const D=Math.max(14,Math.round(W*.74));
+   dc=`<i class="bd" style="left:${f(cx-D/2-1)}px;top:${f(cy-D/2-1)}px;width:${D}px;height:${D}px;font-size:${Math.round(D*.7)}px">${s}</i><i class="sp" style="left:${f(cx-D/2-3)}px;top:${f(cy-D/2-1)}px;font-size:6px">✦</i><i class="sp" style="left:${f(cx+D/2+1)}px;top:${f(cy+D/2)}px;font-size:5px">✦</i>`}}
+ const tx=xs?r:r+(v?"<br>":"")+s;
+ return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
 let db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false;
 const live=i=>players[i]&&players[i].t>Date.now()-18e4;
 const nm=i=>(st&&st.names&&st.names[i])||(players[i]&&players[i].name)||"?";
