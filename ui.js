@@ -40,6 +40,9 @@ const pcard=(c,i,on,hl,xs,nw,p,L)=>{
 const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+s;return `<${tag} class="c ${red(c)?"r":""} ${x||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,i===uid?"sm":"mn")).join("")}</span>`).join("");
 
+// Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
+function kickBtn(i){return hostId()===uid&&i!==uid&&st?`<button class="pri sec" data-kick="${i}" style="flex:none;margin-left:6px;padding:0 8px;font-size:12px;border-radius:999px">Kick</button>`:""}
+
 // Animasi kartu (FLIP): posisi kartu sebelum render dicatat, lalu kartu yang pindah meluncur dari posisi lama.
 const REDUCE=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 const FXSEL="#hand [data-fx],#pile [data-fx],#mine [data-fx]";
@@ -64,6 +67,8 @@ function playFx(m){
 
 function render(){
  if(!room)return;
+ // Pemain yang di-kick host: beri tahu lalu keluar dari ruang.
+ if(!kickOut&&st&&kicked(uid)){kickOut=true;alert("Kamu dikeluarkan dari ruang oleh host.");leave();return}
  if(drag&&drag.on){pend=true;return}
  $("#ky").hidden=!(st&&st.status==="play");
  const lob=$("#lobby"),pl=$("#play");
@@ -72,14 +77,14 @@ function render(){
  if(!st||st.status==="lobby"){
   const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t);
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div><div class="act"><button class="pri" id="sb" ${ids.length<2?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":"Mulai game"}</button></div>`;
+  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div><div class="act"><button class="pri" id="sb" ${ids.length<2?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":"Mulai game"}</button></div>`;
   $("#sb").onclick=start;return;
  }
  const HH=st.hist||[];
  if(st.status==="done"&&players[uid]&&players[uid].rd===HH.length){
   const rd=Object.keys(players).filter(i=>live(i)&&players[i].rd===HH.length).sort((a,b)=>players[a].t-players[b].t),wt=Object.keys(players).filter(i=>live(i)&&players[i].rd!==HH.length&&(st.order||[]).includes(i));
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act"><button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button><button class="pri sec" id="kx">Keluar</button></div>`;
+  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act"><button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button><button class="pri sec" id="kx">Keluar</button></div>`;
   $("#sb").onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
  const O=st.order,h=(st.hands&&st.hands[uid])||[],done=st.status==="done",mine=!done&&st.turn===uid,ph=st.phase;
@@ -130,6 +135,12 @@ if(!$("#setc")){const d=document.createElement("div");d.id="setc";d.className="a
 $("#setc").onclick=e=>{const b=e.target.closest("[data-sc]");if(b)go("set",b.dataset.sc)};
 $("#bl").onclick=()=>go("lay",sel.slice());
 $("#bx").onclick=()=>go("drop",sel[0]);
+// Klik Kick di ruang tunggu: host menandai pemain di st.kk (waktu kick).
+$("#lobby").onclick=e=>{
+ const b=e.target.closest("[data-kick]");if(!b||hostId()!==uid)return;
+ const i=b.dataset.kick;if(!confirm("Keluarkan "+nm(i)+" dari ruang?"))return;
+ const base=st||{status:"lobby",hist:[],host:uid,gen:0};
+ save({...base,kk:{...(base.kk||{}),[i]:players[i].j||0}})};
 addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}},{once:true});
 function beep(k){
  if(!snd)return;
