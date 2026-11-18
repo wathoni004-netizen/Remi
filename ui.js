@@ -100,34 +100,36 @@ function render(){
  const prev=O[(O.indexOf(uid)+O.length-1)%O.length],X=st.pile[st.pile.length-1];
  const sopt=mine&&ph==="draw"&&st.lb===prev&&!!X?h.filter(y=>full([...h.filter(z=>z!==y),X])):[],cs=sopt.length>0;
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
+ // Pemain yang siap men-set ditandai garis merah di namanya (CSS .rdy .nm), tanpa banner.
+ const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  const op=O.filter(i=>i!==uid),pos=op.length<2?[0,op[0],0]:op.length===2?[op[0],0,op[1]]:[op[0],op[1],op[2]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
- $("#info").textContent=`Di bawah: ${st.pile.length} kartu${canTake?" · ketuk salah satu dari 5 kartu teratas untuk memakan":""}`;
- $("#dkn").textContent="Cabutan: "+st.deck.length;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
+ $("#info").textContent=`Buangan ${st.pile.length} · Cabutan ${st.deck.length}`;
+ $("#dkn").hidden=true;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
  const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
  const PL=pileLay(np,RW,RH);
  $("#pile").innerHTML=np?st.pile.map((c,i)=>{
   const hl=np-i<=5;
-  return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
- $("#mine").innerHTML=laid(uid)||'<span class="lab">Kartu hidupmu akan muncul di sini</span>';
- let s=esc(st.msg||"");
- if(done)s=s+"<br>"+O.map(i=>{const f=(st.fb||{})[i];return esc(nm(i))+": "+(f?"hidup "+f.up+" − belum jadi "+f.dn+(f.st?(f.st>0?" + set ":" − set ")+Math.abs(f.st):""):"")+" = "+st.sc[i]+" poin"}).join("<br>")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
- else if(!O.includes(uid))s="Game sedang berjalan, kamu menonton.";
- else if(mine)s=ph==="draw"?"Giliranmu: cabut kartu"+(cs?" atau Set!":""):st.eat?"Turunkan kombinasi berisi kartu yang kamu makan ("+lbl(st.eat)+"), lalu buang 1 kartu":"Giliranmu: turunkan kombinasi (opsional), lalu buang 1 kartu (joker tidak boleh dibuang)";
- else s=esc(st.msg||"")+" · giliran "+esc(nm(st.turn));
+  return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada buangan</span>';
+ $("#mine").innerHTML=laid(uid);
+ let s;
+ // Akhir ronde: ringkas dari data skor (st.fb), bukan dari st.msg yang panjang.
+ if(done){const FB=st.fb||{},v=O.find(i=>(FB[i]||{}).st<0);
+  s="🏆 "+esc(nm(st.winner))+(st.sx&&v?" men-set "+esc(nm(v))+" (+"+FB[st.winner].st+")":"")+"<br>"+O.map(i=>{const f=FB[i];return esc(nm(i))+": "+(f?f.up+" − "+f.dn+(f.st?(f.st>0?" + ":" − ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]}).join("<br>")}
+ else if(!O.includes(uid))s="Menonton";
+ else if(mine)s=ph==="draw"?"Giliranmu: cabut"+(cs?" atau Set!":""):st.eat?"Turunkan "+lbl(st.eat)+" dulu, lalu buang":"Turunkan (opsional), lalu buang 1";
+ else s="Giliran "+esc(nm(st.turn))+" · "+esc(st.msg||"");
  $("#st").innerHTML=s;
 
- const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
- $("#alr").hidden=!rd.length;$("#alr").textContent=rd.length?"🔺 "+rd.map(i=>nm(i)).join(", ")+" siap men-set, hati-hati!":"";
  $("#bd").hidden=!(mine&&ph==="draw");$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);
  $("#setc").hidden=sopt.length<2;
- $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set (pen-set memakai kartu ini):</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set pakai ${lbl(c)}</button>`).join("");
+ $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set:</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set ${lbl(c)}</button>`).join("");
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
  const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
- $("#arr").hidden=!O.includes(uid);$("#mvl").disabled=$("#mvr").disabled=!sel.length;$("#aut").textContent="✨ Auto-susun: "+(auto?"ON":"OFF");
+ $("#arr").hidden=!O.includes(uid);$("#mvl").disabled=$("#mvr").disabled=!sel.length;$("#aut").textContent="✨ Auto "+(auto?"ON":"OFF");
  $("#again").hidden=!done;
  playFx(fxB);
 }

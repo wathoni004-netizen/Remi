@@ -32,14 +32,14 @@ function go(k,a){
  if(k==="draw"){
   if(s.phase!=="draw")return;
   if(!s.deck.length)return fin(s);
-  h.push(s.deck.shift());s.phase="act";s.msg=me+" mencabut kartu";
+  h.push(s.deck.shift());s.phase="act";s.msg=me+" cabut";
  }else if(k==="take"){
   if(s.phase!=="draw"||!s.pile.length)return;
   const i=s.pile.indexOf(a);if(i<0)return;if(s.pile.length-i>5)return msg("Hanya boleh makan dari 5 kartu teratas");
   const nh=[...h,...s.pile.slice(i)],hasSeri=(s.laid[uid]||[]).some(m=>isSeri(m.split(",")));
   const ok=[2,3].some(n=>sub(h,n).some(x=>{const m=[a,...x];return meld(m)&&(isSeri(m)||hasSeri)&&nh.length-m.length>=1&&nh.some(c=>!m.includes(c)&&!isJ(c))}));
   if(!ok)return msg("Kartu itu belum bisa langsung kamu turunkan (harus cocok dengan kartu di tangan; rell butuh seri lebih dulu)");
-  h.push(...s.pile.splice(i));s.eat=a;s.phase="act";s.msg=me+" memakan kartu "+lbl(a)+" dan semua di atasnya";
+  h.push(...s.pile.splice(i));s.eat=a;s.phase="act";s.msg=me+" makan "+lbl(a);
  }else if(k==="set"){
   const X=s.pile[s.pile.length-1];
   if(s.phase!=="draw"||s.lb!==prev||!X)return;
@@ -57,13 +57,13 @@ function go(k,a){
   const L=(s.laid[uid]||[]);
   if(!isSeri(a)&&!L.some(m=>isSeri(m.split(","))))return msg("Turunkan kartu seri dulu sebelum rell");
   a.forEach(c=>h.splice(h.indexOf(c),1));
-  s.laid[uid]=[...L,a.join(",")];s.msg=me+" menurunkan kartu";if(s.eat&&a.includes(s.eat))s.eat="";
+  s.laid[uid]=[...L,a.join(",")];s.msg=me+" turun kartu";if(s.eat&&a.includes(s.eat))s.eat="";
  }else if(k==="drop"){
   if(s.phase!=="act"||!h.includes(a))return;
   if(isJ(a))return msg("Joker tidak boleh dibuang. Joker hanya bisa diturunkan dalam kombinasi atau dipakai untuk Set");
   if(s.eat)return msg("Turunkan dulu kombinasi yang berisi kartu yang kamu makan ("+lbl(s.eat)+")");
   h.splice(h.indexOf(a),1);s.pile.push(a);s.lb=uid;
-  s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" membuang "+lbl(a)
+  s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" buang "+lbl(a)
  }
  sel=[];save(s);
 }
