@@ -31,6 +31,16 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
  }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
+// Reset otomatis: saat masuk ruang, kalau tidak ada pemain lain yang aktif dalam 30 menit terakhir,
+// game/ronde lama dikembalikan ke ruang tunggu dan catatan poin dikosongkan. Dicek sekali per pemuatan halaman.
+let chk=false;const got={p:0,s:0};
+function idleCheck(){
+ if(chk||!got.p||!got.s)return;chk=true;
+ if(!st||st.status==="lobby")return;
+ const lim=Date.now()-18e5;
+ if(Object.keys(players).some(i=>i!==uid&&players[i]&&players[i].t>lim))return;
+ save({status:"lobby",hist:[]})}
+
 $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
  room=($("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,""))||"kartu";
@@ -38,8 +48,8 @@ $("#jb").onclick=async()=>{
  try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now()})}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
  $("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
- db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());render()},()=>msg("Koneksi terputus, muat ulang halaman."));
- db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;render()},()=>msg("Koneksi terputus, muat ulang halaman."));
+ db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
+ db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
 
 function drawChat(){
