@@ -1,42 +1,3 @@
-let prd=null,prv=null,SO={},tags={};
-const BK='<span class="c back sm"></span>';
-function resHtml(){
- const O=st.order,fb=st.fb||{},sx=st.sx,v=sx?st.lb:"";
- const hd=sx?`<div class="rs"><div class="rbig">SET!</div><div>${esc(nm(st.winner))} men-set ${esc(nm(v))}</div><div class="rcd">${card(sx,"span",0,"","transform:rotate(12deg);outline:2px solid #e53935")}<span>Kartu set ${esc(lbl(sx))}<br>${pts(sx)} x 10 = ${pts(sx)*10} poin</span></div></div>`:`<div>${esc(st.msg||"")}</div><div class="rwin">Pemenang: ${esc(nm(st.winner))}</div>`;
- const rw=O.map(i=>{const f=fb[i],t=f?f.st:0;return `<tr class="${i===st.winner?"w":i===v?"v":""}"><td>${esc(nm(i))}</td><td>${f?f.up:"-"}</td><td>${f?-f.dn:"-"}</td><td>${t>0?"+"+t:(t||0)}</td><td>${st.sc[i]}</td></tr>`}).join("");
- return hd+`<table class="rtb"><tr><th>Pemain</th><th>Hidup</th><th>Belum jadi</th><th>Set</th><th>Total</th></tr>${rw}</table><div class="rleg">Hijau = pemenang ronde${sx?" · Merah = terkena set":""}</div>`}
-function flyC(a,b,html,dl,done){
- const TB=$(".tb"),T=TB.getBoundingClientRect(),A=a.getBoundingClientRect(),B=b.getBoundingClientRect();
- const x0=A.left-T.left+A.width/2-15,y0=A.top-T.top+A.height/2-21,dx=B.left-T.left+B.width/2-15-x0,dy=B.top-T.top+B.height/2-21-y0;
- const w=document.createElement("div");w.innerHTML=html;const e=w.firstChild;
- e.style.cssText+=";position:absolute;left:"+x0+"px;top:"+y0+"px;margin:0;z-index:30;pointer-events:none";
- TB.appendChild(e);
- const an=e.animate([{transform:"translate(0,0) rotate(0deg) scale(1)"},{transform:"translate("+dx/2+"px,"+(dy/2-16)+"px) rotate(8deg) scale(1.15)",offset:.5},{transform:"translate("+dx+"px,"+dy+"px) rotate(0deg) scale(1)"}],{duration:520,delay:dl||0,easing:"cubic-bezier(.2,.8,.2,1)",fill:"both"});
- an.onfinish=()=>{e.remove();if(done)done()};an.oncancel=()=>e.remove();
- setTimeout(()=>{if(e.isConnected)e.remove()},2500)}
-function fxPlan(){
- const C=st&&st.status==="play"&&st.order?{deck:st.deck.length,pile:st.pile.slice(),turn:st.turn,ord:st.order.join(),r:(st.hist||[]).length,lc:Object.fromEntries(st.order.map(i=>[i,((st.laid||{})[i]||[]).length])),h:((st.hands||{})[uid]||[]).slice()}:null,P=prv;
- prv=C;
- if(!C||!P||P.ord!==C.ord||P.r!==C.r)return null;
- const a=P.turn,dd=P.deck-C.deck,dp=C.pile.length-P.pile.length,nl=(C.lc[a]||0)-(P.lc[a]||0),mi=a===uid,E={a,mi,k:"",nl,nw:mi?C.h.filter(c=>!P.h.includes(c)):[]};
- if(dd===1&&dp===0)E.k="draw";
- else if(dd===0&&dp<0&&C.pile.every((c,i)=>c===P.pile[i])){E.k="take";E.cards=P.pile.slice(C.pile.length)}
- else if(dd===0&&dp===1&&P.pile.every((c,i)=>c===C.pile[i])){E.k="drop";E.c=C.pile[C.pile.length-1]}
- if(!E.k&&nl<=0)return null;
- if(!mi){tags[a]={t:Date.now(),x:E.k==="draw"?"cabut":E.k==="take"?"makan "+E.cards.length:E.k==="drop"?"buang "+lbl(E.c):"turunkan"};setTimeout(()=>{if(st)render()},2700)}
- return E}
-function fxPlay(E){
- if(!E)return;
- try{
-  const dk=$("#deck"),pl=$("#pile"),hd=$("#hand"),lc=pl.lastElementChild,top=lc&&lc.tagName==="BUTTON"?lc:null,so=SO[E.a],sn=E.mi?hd:(so&&($(so+" .nm")||$(so)));
-  if(!sn)return;
-  const land=el=>{if(!el)return null;el.style.visibility="hidden";setTimeout(()=>{el.style.visibility=""},1200);return()=>{el.style.visibility="";if(el.closest("#hand"))el.animate([{boxShadow:"0 0 0 3px #e8b923"},{boxShadow:"0 0 0 0 transparent"}],{duration:900})}};
-  const hc=c=>E.mi?hd.querySelector('[data-c="'+c+'"]'):null;
-  if(E.k==="draw"){const el=E.nw[0]?hc(E.nw[0]):null;flyC(dk,el||sn,BK,0,land(el))}
-  else if(E.k==="take")E.cards.slice(0,3).forEach((c,i)=>{const el=hc(c);flyC(top||dk,el||sn,card(c,"span",0,"sm"),i*140,land(el))});
-  else if(E.k==="drop")flyC(sn,top||pl,card(E.c,"span",0,"sm"),0,land(top));
-  if(E.nl>0){const bx=E.mi?$("#mine"):(so&&$(so+" .ml")),ms=bx?[...bx.querySelectorAll(".mt")]:[],m=ms[ms.length-1];if(m)m.animate([{transform:"translateY(-26px) scale(.4)",opacity:0},{transform:"none",opacity:1}],{duration:380,easing:"cubic-bezier(.2,.9,.3,1.3)"})}
- }catch(e){}}
 function scoreHtml(H){
  const ids=[],nmx={};
  H.forEach(r=>Object.keys(r.sc||{}).forEach(i=>{if(!ids.includes(i))ids.push(i);nmx[i]=(r.names&&r.names[i])||nmx[i]||"?"}));
@@ -88,33 +49,33 @@ function render(){
  if(!st||st.status==="lobby"){
   const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t);
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div><div class="act"><button class="pri" id="sb" ${ids.length<2?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":"Mulai game"}</button></div>`;
-  $("#sb").onclick=start;return;
+  const hid=hostId(),isH=hid===uid,me=players[uid]||{};
+  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl${players[i].ok||i===hid?" on":""}">${esc(players[i].name)}${i===hid?" · Host":players[i].ok?" · siap":""}</span>`).join("")}</div><div class="act">${isH?`<button class="pri" id="sb" ${ids.length<2?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":"Mulai game"}</button>`:`<button class="pri${me.ok?" sec":""}" id="sr">${me.ok?"Batal siap":"Siap"}</button>`}</div>${isH?"":`<div class="mut">Menunggu ${esc((players[hid]||{}).name||"host")} memulai game…</div>`}`;
+  if(isH)$("#sb").onclick=start;else $("#sr").onclick=()=>putMe({ok:me.ok?0:1}).catch(e=>msg("Gagal: "+(e.message||e.code)));
+  return;
  }
  const HH=st.hist||[];
  if(st.status==="done"&&players[uid]&&players[uid].rd===HH.length){
   const rd=Object.keys(players).filter(i=>live(i)&&players[i].rd===HH.length).sort((a,b)=>players[a].t-players[b].t),wt=Object.keys(players).filter(i=>live(i)&&players[i].rd!==HH.length&&(st.order||[]).includes(i));
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act"><button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button><button class="pri sec" id="kx">Keluar</button></div>`;
-  $("#sb").onclick=start;$("#kx").onclick=leave;return}
+  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:""}<button class="pri sec" id="kx">Keluar</button></div>${hostId()===uid?"":`<div class="mut">Menunggu ${esc((players[hostId()]||{}).name||"host")} memulai ronde baru…</div>`}`;
+  if(hostId()===uid)$("#sb").onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
+ if(st.status==="play"&&players[uid]&&players[uid].ok)putMe({ok:0}).catch(()=>{});
  const O=st.order,h=(st.hands&&st.hands[uid])||[],done=st.status==="done",mine=!done&&st.turn===uid,ph=st.phase;
- const used0=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rdy=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used0)),EV=fxPlan();
- {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph,nr=!done&&!!prd&&rdy.some(i=>!prd.includes(i));
-  if(sig&&sg!==sig){if(done&&!wasDone)beep(st.sx?"set":"win");else if(!done&&mine&&!wasMine){beep("turn");buzz()}else if(!done&&!nr)beep("tick");if(nr){setTimeout(()=>beep("alert"),mine&&!wasMine?450:0);buzz()}}
-  prd=rdy;sig=sg;wasDone=done;wasMine=!done&&mine;
+ {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph;
+  if(sig&&sg!==sig){if(done&&!wasDone)beep(st.sx?"set":"win");else if(!done&&mine&&!wasMine){beep("turn");buzz()}else if(!done)beep("tick")}
+  sig=sg;wasDone=done;wasMine=!done&&mine;
   document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Remi Online"}
  sel=sel.filter(c=>h.includes(c));
  const prev=O[(O.indexOf(uid)+O.length-1)%O.length],X=st.pile[st.pile.length-1];
  const cs=mine&&ph==="draw"&&st.lb===prev&&!!X&&h.some(y=>full([...h.filter(z=>z!==y),X]));
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
- const tg=i=>{const t=tags[i],d=t?Date.now()-t.t:9e9;return d<2600?`<span class="atg${d<400?" nw":""}">${esc(t.x)}</span>`:""};
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rdy.includes(i)?" rdy":""}"><div class="atw">${done?"":tg(i)}</div><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span>${rdy.includes(i)?'<div class="rtg">siap set</div>':""}${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}"><span class="nm">${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  const op=O.filter(i=>i!==uid),pos=op.length<2?[0,op[0],0]:op.length===2?[op[0],0,op[1]]:[op[0],op[1],op[2]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
- SO={};if(pos[0])SO[pos[0]]="#sL";if(pos[1])SO[pos[1]]="#sT";if(pos[2])SO[pos[2]]="#sR";
- $("#info").textContent="Ketuk salah satu dari 5 kartu teratas untuk memakan";$("#info").hidden=!canTake;
- $("#dkn").hidden=true;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
+ $("#info").textContent=`Di bawah: ${st.pile.length} kartu${canTake?" · ketuk salah satu dari 5 kartu teratas untuk memakan":""}`;
+ $("#dkn").textContent="Cabutan: "+st.deck.length;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
  const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
  const PL=pileLay(np,RW,RH);
  $("#pile").innerHTML=np?st.pile.map((c,i)=>{
@@ -122,23 +83,21 @@ function render(){
   return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada kartu dibuang</span>';
  $("#mine").innerHTML=laid(uid)||'<span class="lab">Kartu hidupmu akan muncul di sini</span>';
  let s=esc(st.msg||"");
- if(done)s=resHtml();
+ if(done)s=s+"<br>"+O.map(i=>{const f=(st.fb||{})[i];return esc(nm(i))+": "+(f?"hidup "+f.up+" − belum jadi "+f.dn+(f.st?(f.st>0?" + set ":" − set ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]+" poin"}).join("<br>")+"<br>Pemenang: "+esc(nm(st.winner))+" 🎉";
  else if(!O.includes(uid))s="Game sedang berjalan, kamu menonton.";
  else if(mine)s=ph==="draw"?"Giliranmu: cabut kartu"+(cs?" atau Set!":""):st.eat?"Turunkan kombinasi berisi kartu yang kamu makan ("+lbl(st.eat)+"), lalu buang 1 kartu":"Giliranmu: turunkan kombinasi (opsional), lalu buang 1 kartu (joker tidak boleh dibuang)";
  else s=esc(st.msg||"")+" · giliran "+esc(nm(st.turn));
  $("#st").innerHTML=s;
- {const t=mine?"Giliran kamu":"Giliran "+esc(nm(st.turn));let b=done?"":`<div><span class="bch on">${t}</span><span class="bch">Cabutan ${st.deck.length}</span><span class="bch">Buangan ${st.pile.length}</span></div>`;if(mine)b+=`<div class="bst">${["1 Cabut","2 Turunkan","3 Buang"].map((x,k)=>`<span${(ph==="draw"?1:st.eat?2:3)===k+1?' class="a"':""}>${x}</span>`).join("")}</div>`;$("#bar").innerHTML=b}
 
- const rd=rdy;
- $("#alr").hidden=!rd.length;$("#alr").innerHTML=rd.length?'<span class="adot"></span><span>'+(rd.length>1?rd.slice(0,-1).map(i=>esc(nm(i))).join(", ")+" dan "+esc(nm(rd[rd.length-1])):esc(nm(rd[0])))+" siap men-set. Hati-hati!</span>":"";
- $("#bd").hidden=!(mine&&ph==="draw");$("#sp").hidden=!cs;
- if(cs){const c0=h.filter(y=>full([...h.filter(z=>z!==y),X])).sort((p,q)=>pts(q)-pts(p))[0];if(c0){const v=pts(c0)*10;$("#spi").innerHTML=`<div class="seth"><span class="setb">SET!</span><span>Buangan ${esc(nm(prev))} melengkapi semua kartumu</span></div><div class="setc">${card(c0,"span",0,"sm")}<span>Kartu set: nilai ${pts(c0)} x 10<br><b>+${v} untukmu, −${v} untuk ${esc(nm(prev))}</b></span></div>`}}
+ const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
+ $("#alr").hidden=!rd.length;$("#alr").textContent=rd.length?"🔺 "+rd.map(i=>nm(i)).join(", ")+" siap men-set, hati-hati!":"";
+ $("#bd").hidden=!(mine&&ph==="draw");$("#bs").hidden=!cs;
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
  const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
  $("#arr").hidden=!O.includes(uid);$("#mvl").disabled=$("#mvr").disabled=!sel.length;$("#aut").textContent="✨ Auto-susun: "+(auto?"ON":"OFF");
- $("#again").hidden=!done;fxPlay(EV);
+ $("#again").hidden=!done;
 }
 $("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];render()};
 $("#pile").onclick=e=>{const b=e.target.closest("[data-c]");if(b)go("take",b.dataset.c)};
@@ -150,7 +109,7 @@ addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.w
 function beep(k){
  if(!snd)return;
  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
-  const Q={turn:[[660,.12],[880,.2]],alert:[[880,.1],[660,.1],[880,.18]],tick:[[520,.05]],pop:[[700,.06],[920,.08]],set:[[392,.15],[523,.15],[659,.15],[784,.35]],win:[[523,.12],[659,.12],[784,.12],[1047,.3]]};
+  const Q={turn:[[660,.12],[880,.2]],tick:[[520,.05]],pop:[[700,.06],[920,.08]],set:[[392,.15],[523,.15],[659,.15],[784,.35]],win:[[523,.12],[659,.12],[784,.12],[1047,.3]]};
   let t=AC.currentTime;
   (Q[k]||[]).forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.2,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);t+=d})
  }catch(e){}}

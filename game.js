@@ -1,4 +1,5 @@
 function start(){
+ if(hostId()!==uid)return;
  const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
  if(ids.length<2)return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
