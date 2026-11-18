@@ -1,12 +1,8 @@
 function start(){
- if(hostId()!==uid)return;
- const H0=(st&&st.hist)||[],nx=st&&st.status==="done",g=(st&&st.gen)||0;
- let ids=Object.keys(players).filter(i=>live(i)&&(nx?players[i].rd===H0.length:(i===uid||players[i].ok===g))).sort((a,b)=>players[a].t-players[b].t);
- if(ids.length>4&&!ids.slice(0,4).includes(uid))ids[3]=uid;
- ids=ids.slice(0,4);
+ const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
  if(ids.length<2)return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:uid,gen:g+1});
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan"});
 }
 
 function fin(s,by,c){
@@ -19,7 +15,7 @@ function fin(s,by,c){
   const up=lp+ms.reduce((t,m)=>t+meldPts(m),0),dn=rest.reduce((t,c)=>t+pts(c),0);
   s.sc[i]=up-dn;s.fb[i]={up,dn,st:0}});
  if(c){const b=pts(c)*10;s.sc[by]+=b;s.sc[s.lb]-=b;s.fb[by].st=b;s.fb[s.lb].st=-b;s.msg=nm(by)+" men-set "+nm(s.lb)+" dengan kartu set "+lbl(c)+"! +"+b+" poin untuk "+nm(by)+", −"+b+" poin untuk "+nm(s.lb)}
- else s.msg="Tumpukan habis, permainan selesai";
+ else s.msg="Tumpukan habis, permainan selesai"
  s.winner=c?by:s.order.reduce((a,b)=>s.sc[b]>s.sc[a]?b:a);
  s.hist=[...(s.hist||[]),{sc:Object.assign({},s.sc),names:Object.assign({},s.names),win:s.winner,vic:c?s.lb:""}];
  save(s);
@@ -44,7 +40,10 @@ function go(k,a){
  }else if(k==="set"){
   const X=s.pile[s.pile.length-1];
   if(s.phase!=="draw"||s.lb!==prev||!X)return;
-  const c=h.filter(y=>full([...h.filter(z=>z!==y),X])).sort((p,q)=>pts(q)-pts(p))[0];
+  // Semua kartu set yang mungkin (kartu tangan yang bisa ditukar dengan X sehingga seluruh tangan jadi kombinasi).
+  // Jika pemain memilih satu (a), pakai pilihan itu; jika tidak, pakai nilai tertinggi.
+  const opts=h.filter(y=>full([...h.filter(z=>z!==y),X]));
+  const c=opts.includes(a)?a:opts.slice().sort((p,q)=>pts(q)-pts(p))[0];
   if(!c)return msg("Belum bisa men-set");
   s.hands[uid]=[...h.filter(z=>z!==c),X];s.pile.pop();s.pile.push(c);s.sx=c;sel=[];
   return fin(s,uid,c);
@@ -61,8 +60,7 @@ function go(k,a){
   if(isJ(a))return msg("Joker tidak boleh dibuang. Joker hanya bisa diturunkan dalam kombinasi atau dipakai untuk Set");
   if(s.eat)return msg("Turunkan dulu kombinasi yang berisi kartu yang kamu makan ("+lbl(s.eat)+")");
   h.splice(h.indexOf(a),1);s.pile.push(a);s.lb=uid;
-  s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" membuang "+lbl(a);
+  s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" membuang "+lbl(a)
  }
  sel=[];save(s);
 }
-
