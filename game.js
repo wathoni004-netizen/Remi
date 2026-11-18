@@ -1,8 +1,11 @@
 function start(){
+ // Hanya host (pembuat ruang) yang bisa memulai; di ruang tunggu semua pemain harus sudah Siap.
+ if(hostId()!==uid)return;
  const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
- if(ids.length<2)return;
+ if(ids.length<2||(!nx&&!ids.every(isOk)))return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan"});
+ // host, gen, dan kk ikut disimpan: host tetap, tanda Siap direset untuk ruang tunggu berikutnya, daftar kick tidak hilang.
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:hostId(),gen:gen()+1,kk:(st&&st.kk)||{}});
 }
 
 function fin(s,by,c){
