@@ -1,9 +1,12 @@
 function start(){
  if(hostId()!==uid)return;
- const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
+ const H0=(st&&st.hist)||[],nx=st&&st.status==="done",g=(st&&st.gen)||0;
+ let ids=Object.keys(players).filter(i=>live(i)&&(nx?players[i].rd===H0.length:(i===uid||players[i].ok===g))).sort((a,b)=>players[a].t-players[b].t);
+ if(ids.length>4&&!ids.slice(0,4).includes(uid))ids[3]=uid;
+ ids=ids.slice(0,4);
  if(ids.length<2)return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan"});
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:uid,gen:g+1});
 }
 
 function fin(s,by,c){

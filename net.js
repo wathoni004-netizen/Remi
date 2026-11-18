@@ -1,12 +1,14 @@
-async function leave(){try{localStorage.removeItem("rn");localStorage.removeItem("rj");localStorage.removeItem("rr")}catch(e){}try{await db.doc(`rooms/${room}/players/${uid}`).set({name:(players[uid]||{}).name||"Pemain",t:0})}catch(e){}location.reload()}
+async function leave(){try{localStorage.removeItem("rn");localStorage.removeItem("rr")}catch(e){}try{await db.doc(`rooms/${room}/players/${uid}`).set({name:(players[uid]||{}).name||"Pemain",t:0})}catch(e){}location.reload()}
 let db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false;
 const live=i=>players[i]&&players[i].t>Date.now()-18e4;
 const nm=i=>(st&&st.names&&st.names[i])||(players[i]&&players[i].name)||"?";
-const hostId=()=>Object.keys(players).filter(live).sort((a,b)=>(players[a].j||9e15)-(players[b].j||9e15)||(a<b?-1:1))[0];
-const jk=()=>{try{const[r,j,t]=(localStorage.getItem("rj")||"").split("|");return r===room&&Date.now()-t<18e4?+j:0}catch(e){return 0}};
-const putMe=o=>{const p=players[uid]||{},v=Object.assign({name:p.name||"Pemain",t:Date.now()},p.j?{j:p.j}:{},p.rd!=null?{rd:p.rd}:{},p.ok?{ok:1}:{},o);if(!v.ok)delete v.ok;try{localStorage.setItem("rj",room+"|"+(v.j||0)+"|"+Date.now())}catch(e){}return db.doc(`rooms/${room}/players/${uid}`).set(v)};
 const msg=t=>{$("#err").textContent=t};
 const save=async o=>{try{await db.doc("rooms/"+room).set(o);msg("")}catch(e){msg("Gagal menyimpan: "+(e.message||e.code))}};
+// Host = pembuat ruang (st.host) selama masih aktif; kalau tidak aktif, pemain aktif yang masuk paling awal.
+const hostId=()=>{const L=Object.keys(players).filter(live);if(st&&st.host&&L.includes(st.host))return st.host;return L.sort((a,b)=>(players[a].j||players[a].t)-(players[b].j||players[b].t))[0]||""};
+const gen=()=>(st&&st.gen)||0;
+const isOk=i=>i===hostId()||(!!players[i]&&players[i].ok===gen());
+const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});return Object.assign(r,o||{})};
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
 const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
@@ -34,21 +36,25 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
  }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
-// Reset otomatis: saat masuk ruang, kalau tidak ada pemain lain yang aktif dalam 30 menit terakhir,
-// game/ronde lama dikembalikan ke ruang tunggu dan catatan poin dikosongkan. Dicek sekali per pemuatan halaman.
+// Saat masuk ruang (sekali per pemuatan halaman):
+// - ruang belum ada / ruang tunggu tanpa pemain lain yang aktif: pemain ini menjadi host (pembuat ruang).
+// - game/ronde lama dan tidak ada pemain lain yang aktif dalam 30 menit terakhir: kembali ke ruang tunggu,
+//   catatan poin dikosongkan, pemain ini menjadi host.
 let chk=false;const got={p:0,s:0};
 function idleCheck(){
  if(chk||!got.p||!got.s)return;chk=true;
- if(!st||st.status==="lobby")return;
+ const others=Object.keys(players).some(i=>i!==uid&&live(i));
+ if(!st){if(!others)save({status:"lobby",hist:[],host:uid,gen:0});return}
+ if(st.status==="lobby"){if(!others&&st.host!==uid)save({status:"lobby",hist:st.hist||[],host:uid,gen:st.gen||0});return}
  const lim=Date.now()-18e5;
  if(Object.keys(players).some(i=>i!==uid&&players[i]&&players[i].t>lim))return;
- save({status:"lobby",hist:[]})}
+ save({status:"lobby",hist:[],host:uid,gen:st.gen||0})}
 
 $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
  room=($("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,""))||"kartu";
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
- const j=jk()||Date.now();try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now(),j});try{localStorage.setItem("rj",room+"|"+j+"|"+Date.now())}catch(e){}}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
+ try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now(),j:Date.now()})}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
  $("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
@@ -73,9 +79,9 @@ $("#ci").onkeydown=e=>{if(e.key==="Enter"){sendChat(e.target.value);e.target.val
 $("#kx3").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
 function beat(){
  const p=players[uid];if(!room||!uid||!p||!p.name)return;
- try{Promise.resolve(putMe({})).catch(()=>{})}catch(e){}}
+ try{Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc())).catch(()=>{})}catch(e){}}
 setInterval(beat,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
-$("#ky").onclick=()=>{if(!st||st.status!=="play")return;if(confirm("Akhiri game yang sedang berjalan untuk semua pemain? Ronde ini tidak dihitung."))save({status:"lobby",hist:st.hist||[]})};
-$("#ab").onclick=async()=>{if(!st)return;try{await putMe({rd:(st.hist||[]).length});msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
+$("#ky").onclick=()=>{if(!st||st.status!=="play")return;if(confirm("Akhiri game yang sedang berjalan untuk semua pemain? Ronde ini tidak dihitung."))save({status:"lobby",hist:st.hist||[],host:hostId()||uid,gen:st.gen||0})};
+$("#ab").onclick=async()=>{if(!st)return;try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({rd:(st.hist||[]).length}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
 $("#kx2").onclick=leave;

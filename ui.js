@@ -47,21 +47,24 @@ function render(){
  const lob=$("#lobby"),pl=$("#play");
  {const H0=(st&&st.hist)||[],ss=st&&st.status,sh=H0.length&&(ss==="play"||(ss==="done"&&players[uid]&&players[uid].rd===H0.length));$("#score").hidden=!sh;if(sh)$("#score").innerHTML=scoreHtml(H0)}
  if(!st||st.status==="lobby"){
-  const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t);
+  const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t),HO=hostId(),isH=HO===uid,okN=ids.filter(isOk).length,meOk=isOk(uid);
   pl.hidden=true;lob.hidden=false;
-  const hid=hostId(),isH=hid===uid,me=players[uid]||{};
-  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl${players[i].ok||i===hid?" on":""}">${esc(players[i].name)}${i===hid?" · Host":players[i].ok?" · siap":""}</span>`).join("")}</div><div class="act">${isH?`<button class="pri" id="sb" ${ids.length<2?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":"Mulai game"}</button>`:`<button class="pri${me.ok?" sec":""}" id="sr">${me.ok?"Batal siap":"Siap"}</button>`}</div>${isH?"":`<div class="mut">Menunggu ${esc((players[hid]||{}).name||"host")} memulai game…</div>`}`;
-  if(isH)$("#sb").onclick=start;else $("#sr").onclick=()=>putMe({ok:me.ok?0:1}).catch(e=>msg("Gagal: "+(e.message||e.code)));
+  const act=isH?`<button class="pri" id="sb" ${okN<2?"disabled":""}>${okN<2?"Menunggu teman siap…":"Mulai game"}</button>`:`<button class="pri${meOk?" sec":""}" id="sk">${meOk?"Batal siap":"Siap"}</button>`;
+  const wait=!isH&&meOk&&players[HO]?`<div class="mut">Menunggu ${esc(players[HO].name)} memulai game…</div>`:"";
+  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl${isOk(i)?" on":""}">${esc(players[i].name)}${i===HO?" · Host":isOk(i)?" · Siap":""}</span>`).join("")}</div><div class="act">${act}</div>${wait}`;
+  const sb=$("#sb"),sk=$("#sk");
+  if(sb)sb.onclick=start;
+  if(sk)sk.onclick=async()=>{try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:isOk(uid)?-1:gen()}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
   return;
  }
  const HH=st.hist||[];
  if(st.status==="done"&&players[uid]&&players[uid].rd===HH.length){
   const rd=Object.keys(players).filter(i=>live(i)&&players[i].rd===HH.length).sort((a,b)=>players[a].t-players[b].t),wt=Object.keys(players).filter(i=>live(i)&&players[i].rd!==HH.length&&(st.order||[]).includes(i));
+  const HO=hostId(),isH=HO===uid;
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:""}<button class="pri sec" id="kx">Keluar</button></div>${hostId()===uid?"":`<div class="mut">Menunggu ${esc((players[hostId()]||{}).name||"host")} memulai ronde baru…</div>`}`;
-  if(hostId()===uid)$("#sb").onclick=start;$("#kx").onclick=leave;return}
+  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}${i===HO?" · Host":""}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${isH?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:""}<button class="pri sec" id="kx">Keluar</button></div>${!isH&&players[HO]?`<div class="mut">Menunggu ${esc(players[HO].name)} memulai ronde…</div>`:""}`;
+  const sb=$("#sb");if(sb)sb.onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
- if(st.status==="play"&&players[uid]&&players[uid].ok)putMe({ok:0}).catch(()=>{});
  const O=st.order,h=(st.hands&&st.hands[uid])||[],done=st.status==="done",mine=!done&&st.turn===uid,ph=st.phase;
  {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph;
   if(sig&&sg!==sig){if(done&&!wasDone)beep(st.sx?"set":"win");else if(!done&&mine&&!wasMine){beep("turn");buzz()}else if(!done)beep("tick")}
