@@ -116,7 +116,7 @@ function render(){
 
  const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
  $("#alr").hidden=!rd.length;$("#alr").textContent=rd.length?"🔺 "+rd.map(i=>nm(i)).join(", ")+" siap men-set, hati-hati!":"";
- $("#bd").hidden=!(mine&&ph==="draw");$("#bs").hidden=!(cs&&sopt.length===1);
+ $("#bd").hidden=!(mine&&ph==="draw");$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);
  $("#setc").hidden=sopt.length<2;
  $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set (pen-set memakai kartu ini):</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set pakai ${lbl(c)}</button>`).join("");
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
