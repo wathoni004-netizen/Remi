@@ -84,6 +84,7 @@ function beat(){
  try{Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc())).catch(()=>{})}catch(e){}}
 setInterval(beat,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
-$("#ky").onclick=()=>{if(!st||st.status!=="play")return;if(confirm("Akhiri game yang sedang berjalan untuk semua pemain? Ronde ini tidak dihitung."))save({status:"lobby",hist:st.hist||[],host:hostId()||uid,gen:st.gen||0})};
+// Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
+$("#ky").onclick=()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(confirm("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0})};
 $("#ab").onclick=async()=>{if(!st)return;try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({rd:(st.hist||[]).length}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
 $("#kx2").onclick=leave;

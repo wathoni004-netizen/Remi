@@ -121,6 +121,14 @@ details{margin-top:8px}summary{cursor:pointer}
 .atg.nw{animation:atn .25s}
 @keyframes atn{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
 .rdy .nm{outline:2px solid #ff5a4d}
+.seat .nm{position:relative}
+.seat.top{padding-top:7px}
+.stg{position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);padding:1px 7px 0;border-radius:6px 6px 0 0;background:#ff5a4d;color:#fff;font-size:10px;line-height:13px;font-weight:700}
+#dirw{position:absolute;left:0;right:0;top:0;pointer-events:none;z-index:1}
+#dirw .da{position:absolute;width:22px;height:22px;fill:#e8b923;stroke:#e8b923;opacity:.9}
+#dirw path{fill:none;stroke-width:2.5;stroke-linecap:round}
+#dirw polygon{stroke:none}
+.da.tl{left:6px;top:6px}.da.tr{right:6px;top:6px;transform:rotate(90deg)}.da.br{right:6px;bottom:6px;transform:rotate(180deg)}.da.bl{left:6px;bottom:6px;transform:rotate(270deg)}
 .rtg{font-size:11px;color:#ffb4ab}
 .rs{margin-bottom:6px}
 .rbig{font-size:28px;font-weight:700;color:#e8b923;line-height:1.1}
@@ -144,7 +152,7 @@ details{margin-top:8px}summary{cursor:pointer}
 </div>
 <div id="game" hidden>
 <div id="lobby" class="box" hidden></div>
-<div id="play" hidden><div id="alr" class="alr" hidden></div><div class="tb">
+<div id="play" hidden><div id="alr" class="alr" hidden></div><div class="tb"><div id="dirw" aria-hidden="true"></div>
 <div id="sT" class="seat top"></div>
 <div class="mid"><div id="sL" class="seat side"></div>
 <div class="ctr"><div id="ring" class="ring"><div id="pile" class="pc"></div><button id="deck" class="c back lg" aria-label="Cabut kartu"></button></div><div id="info" class="lab"></div><div id="dkn" class="lab"></div></div>
@@ -160,10 +168,10 @@ details{margin-top:8px}summary{cursor:pointer}
 <div id="again" class="act" hidden><button class="pri" id="ab">Lanjut</button><button class="pri sec" id="kx2">Keluar</button></div>
 </div>
 </div><div id="score" class="box" hidden></div><div id="chatbox" class="box"><b>💬 Chat</b><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div><div class="act"><button class="pri sec" id="ky" hidden>Akhiri game</button><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
-<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Di akhir ronde, kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja), kartu yang belum jadi mengurangi poin, lalu poin set dihitung (contoh: hidup 15 − belum jadi 20 − set 50 = −55). Jika ada pemain yang berhenti main, siapa pun bisa menekan Akhiri game (di kotak Chat, bagian bawah) untuk kembali ke ruang tunggu; ronde itu tidak dihitung. Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah, miring, lebih besar, dan pita SET di sisi dalamnya. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, nama pemain itu diberi garis merah untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
+<details class="mut"><summary>Aturan main</summary><p>Poin: 2-10 = 5, J/Q/K = 10, A = 15, Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya). Seri = 3-4 kartu berurutan satu jenis: angka 2-10 hanya dengan angka, J-Q-K hanya dengan J-Q-K; A-A-A atau A-A-A-A dihitung seri sekaligus rell. Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker dalam satu kombinasi (3 atau 4 kartu). Rell = 3-4 kartu angka sama. Seri harus turun dulu sebelum rell. Tiap giliran cabut 1 lalu buang 1. Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan), dan semua kartu di atasnya ikut terambil. Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang. Joker tidak boleh dibuang ke bawah; joker hanya bisa keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set. Kartu di tangan bisa disusun sendiri (seret kartu dengan jari, atau pilih kartu lalu geser ◀ ▶) atau otomatis berkelompok saat sudah hidup. Set: kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set. Di akhir ronde, kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja), kartu yang belum jadi mengurangi poin, lalu poin set dihitung (contoh: hidup 15 − belum jadi 20 − set 50 = −55). Hanya pemilik room yang bisa menekan Akhiri game (di kotak Chat, bagian bawah) untuk kembali ke ruang tunggu; permainan direset: catatan poin dikosongkan dan putaran kembali ke kanan. Kartu set yang dipakai pen-set tetap tampil di tumpukan dengan garis merah, miring, lebih besar, dan pita SET di sisi dalamnya. Kalau ada set, pen-set menjadi pemenang ronde; kalau tidak ada set (tumpukan habis), pemenangnya yang poinnya terbanyak. Pen-set mendapat poin nilai kartu pengganti × 10 (2-10 = 50, J/Q/K = 100, As = 150, joker = 250); pemain yang di-set kehilangan poin yang sama, lalu game selesai. Kalau ada pemain yang siap men-set, nama pemain itu diberi garis merah dan tanda SET untuk pemain lain, tanpa menyebut kartu apa yang ditunggu. Putaran: ronde pertama berputar ke kanan (berlawanan arah jarum jam); setiap ronde yang berakhir dengan set membuat ronde berikutnya berbalik arah, dan arah tidak berubah selama tidak ada set. Arah putaran tetap berlanjut antarronde selama pemain menekan Lanjut. Panah kuning di sudut meja dan susunan kartu buangan mengikuti arah putaran. Setelah ronde selesai, pilih Lanjut atau Keluar; catatan poin tiap ronde muncul di bawah.</p></details>
 </main>
 <script src="rules.js?v=1"></script>
-<script src="net.js?v=1"></script>
-<script src="game.js?v=3"></script>
-<script src="ui.js?v=5"></script>
+<script src="net.js?v=2"></script>
+<script src="game.js?v=4"></script>
+<script src="ui.js?v=7"></script>
 </body></html>

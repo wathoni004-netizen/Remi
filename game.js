@@ -1,3 +1,6 @@
+// Arah putaran: st.dir 1 = kanan (berlawanan arah jarum jam), -1 = kiri. Berbalik setiap ronde yang berakhir dengan set.
+const nxt=(s,i,k)=>{const O=s.order,n=O.length;return O[((O.indexOf(i)+k*(s.dir||1))%n+n)%n]};
+
 function start(){
  // Hanya host (pembuat ruang) yang bisa memulai; di ruang tunggu semua pemain harus sudah Siap.
  if(hostId()!==uid)return;
@@ -5,7 +8,7 @@ function start(){
  if(ids.length<2||(!nx&&!ids.every(isOk)))return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
  // host, gen, dan kk ikut disimpan: host tetap, tanda Siap direset untuk ruang tunggu berikutnya, daftar kick tidak hilang.
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:hostId(),gen:gen()+1,kk:(st&&st.kk)||{}});
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:hostId(),gen:gen()+1,kk:(st&&st.kk)||{},dir:nx?(st.sx?-1:1)*(st.dir||1):1});
 }
 
 function fin(s,by,c){
@@ -27,7 +30,7 @@ function fin(s,by,c){
 function go(k,a){
  if(!st||st.status!=="play"||st.turn!==uid)return;
  const s=JSON.parse(JSON.stringify(st)),h=s.hands[uid],O=s.order,me=nm(uid);
- const prev=O[(O.indexOf(uid)+O.length-1)%O.length];
+ const prev=nxt(s,uid,-1);
  s.laid=s.laid||{};
  if(k==="draw"){
   if(s.phase!=="draw")return;
@@ -63,7 +66,7 @@ function go(k,a){
   if(isJ(a))return msg("Joker tidak boleh dibuang. Joker hanya bisa diturunkan dalam kombinasi atau dipakai untuk Set");
   if(s.eat)return msg("Turunkan dulu kombinasi yang berisi kartu yang kamu makan ("+lbl(s.eat)+")");
   h.splice(h.indexOf(a),1);s.pile.push(a);s.lb=uid;
-  s.turn=O[(O.indexOf(uid)+1)%O.length];s.phase="draw";s.msg=me+" buang "+lbl(a)
+  s.turn=nxt(s,uid,1);s.phase="draw";s.msg=me+" buang "+lbl(a)
  }
  sel=[];save(s);
 }
