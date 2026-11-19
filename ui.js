@@ -35,12 +35,12 @@ const pcard=(c,i,on,hl,xs,nw,p,L)=>{
  if(ex){
   let cx=e==="T"?(W+L.SX)/2:e==="R"?0:e==="B"?(W-L.SX)/2:W,cy=e==="T"?H:e==="R"?(H+L.SY)/2:e==="B"?0:(H-L.SY)/2;
   if(L.m)cx=W-cx+2;
-  if(xs){const w=Math.round(W*1.3),q=Math.round(W*.56),x0=v?(W-w)/2:e==="R"?1-w:W-1,x=L.m?W-x0+2-w:x0,y=e==="T"?H-1:e==="B"?1-q:(H-q)/2;
-   dc=`<i class="rb" style="left:${f(x-1)}px;top:${f(y-1)}px;width:${w}px;height:${q}px;line-height:${q}px;font-size:${Math.round(q*.62)}px">SET ${s}</i>`}
+  if(xs){const w=Math.round(W*1.4),q=Math.round(W*.34);
+   dc=`<i class="rb" style="right:${f(-W*.38)}px;bottom:${f(W*.16)}px;width:${w}px;height:${q}px;line-height:${q}px;font-size:${Math.round(q*.75)}px">SET</i>`}
   else{const D=Math.max(14,Math.round(W*.74));
    dc=`<i class="bd" style="left:${f(cx-D/2-1)}px;top:${f(cy-D/2-1)}px;width:${D}px;height:${D}px;font-size:${Math.round(D*.7)}px">${s}</i><i class="sp" style="left:${f(cx-D/2-3)}px;top:${f(cy-D/2-1)}px;font-size:6px">✦</i><i class="sp" style="left:${f(cx+D/2+1)}px;top:${f(cy+D/2)}px;font-size:5px">✦</i>`}}
- const tx=xs?r:r+(v?"<br>":"")+s;
- return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" data-fx="${c}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}${xs?`;--tx:${e==="R"?(L.m?1:-1)*W*.5:e==="L"?(L.m?-1:1)*W*.5:0}px;--ty:${e==="T"?H*.4:e==="B"?-H*.4:0}px`:""}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
+ const tx=r+(v||xs?"<br>":"")+s;
+ return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" data-fx="${c}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}${xs?`;--tx:${f((e==="T"?1:e==="B"?-1:0)*(L.m?-1:1)*W)}px;--ty:${f((e==="R"?1:e==="L"?-1:0)*H*.95)}px`:""}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
 const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+s;return `<${tag} class="c ${red(c)?"r":""} ${x||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,i===uid?"sm":"mn")).join("")}</span>`).join("");
 
@@ -52,7 +52,7 @@ const REDUCE=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matc
 const FXSEL="#hand [data-fx],#pile [data-fx],#mine [data-fx]";
 function snapFx(){
  const m={};
- document.querySelectorAll(FXSEL).forEach(e=>{const r=e.getBoundingClientRect();if(r.width)m[e.dataset.fx]=r});
+ document.querySelectorAll(FXSEL).forEach(e=>{const r=e.getBoundingClientRect();if(r.width){m[e.dataset.fx]=r;if(e.classList.contains("xs"))m["xs:"+e.dataset.fx]=1}});
  const d=document.getElementById("deck");
  if(d){const r=d.getBoundingClientRect();if(r.width)m._deck=r}
  return m}
@@ -63,6 +63,10 @@ function playFx(m){
   if(!to.width)return;
   const old=m[k],from=old||m._deck;
   if(!from)return;
+  // Kartu SET baru muncul: animasi dilempar dari bawah sambil berputar, lalu mendarat (ditambahkan di atas transform CSS-nya).
+  if(el.classList.contains("xs")&&!m["xs:"+k]){
+   try{el.animate([{transform:`translate(${from.left-to.left}px,${from.top-to.top+160}px) rotate(-200deg) scale(1.3)`,opacity:.3},{transform:"translate(0,-14px) rotate(-10deg) scale(1.15)",opacity:1,offset:.75},{transform:"none"}],{duration:650,easing:"cubic-bezier(.2,.7,.3,1)",composite:"add"})}catch(e){}
+   return}
   const dx=from.left-to.left,dy=from.top-to.top,fresh=!old&&!!el.closest("#pile");
   if(Math.abs(dx)<3&&Math.abs(dy)<3&&!fresh)return;
   const fromT=`translate(${dx}px,${dy}px) scale(${fresh?1.25:1})`;
