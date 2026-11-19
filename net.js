@@ -47,10 +47,10 @@ function idleCheck(){
  if(chk||!got.p||!got.s)return;chk=true;
  const others=Object.keys(players).some(i=>i!==uid&&live(i));
  if(!st){if(!others)save({status:"lobby",hist:[],host:uid,gen:0});return}
- if(st.status==="lobby"){if(!others&&st.host!==uid)save({status:"lobby",hist:st.hist||[],host:uid,gen:st.gen||0});return}
+ if(st.status==="lobby"){if(!others&&st.host!==uid)save({status:"lobby",hist:st.hist||[],host:uid,gen:st.gen||0,cr:st.cr||0});return}
  const lim=Date.now()-18e5;
  if(Object.keys(players).some(i=>i!==uid&&players[i]&&players[i].t>lim))return;
- save({status:"lobby",hist:[],host:uid,gen:st.gen||0})}
+ save({status:"lobby",hist:[],host:uid,gen:st.gen||0,cr:Date.now()})}
 
 $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
@@ -60,13 +60,25 @@ $("#jb").onclick=async()=>{
  $("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
- db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
+ db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
 
+// Riwayat chat: tiap pemain menyimpan h = 30 pesan terakhirnya; pesan lebih lama dari st.cr (awal ronde baru) disembunyikan.
+// Pop-up di meja (#ct) hanya 10 detik; riwayat (#cl) tetap ada sampai ronde baru.
+const CHN=30,hh=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")};
+let clSig="";
+function chatList(){
+ const cr=(st&&st.cr)||0,L=[];
+ for(const i in chat){const c=chat[i];if(!c)continue;(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
+ return L.sort((a,b)=>a.t-b.t)}
 function drawChat(){
- const now=Date.now(),L=Object.keys(chat).map(i=>chat[i]).filter(m=>m&&m.t>now-45000).sort((a,b)=>a.t-b.t);
- const h=L.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");
- for(const id of ["#ct","#ct2"]){$(id).innerHTML=h;$(id).hidden=!L.length}}
+ const L=chatList(),P=L.filter(m=>m.t>Date.now()-1e4);
+ $("#ct").innerHTML=P.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");$("#ct").hidden=!P.length;
+ const lg=$("#cl"),last=L[L.length-1],sg=L.length+"|"+(last?last.t:0);
+ if(sg===clSig)return;clSig=sg;
+ const bot=lg.scrollHeight-lg.scrollTop-lg.clientHeight<40||(last&&last.i===uid);
+ lg.innerHTML=L.length?L.map(m=>{const me=m.i===uid;return `<div class="cm${me?" me":""}">${me?"":`<div class="cn">${esc(m.n)}</div>`}<div>${esc(m.x)}</div><div class="cmt">${hh(m.t)}</div></div>`}).join(""):'<div class="mut" style="text-align:center">Belum ada pesan</div>';
+ if(bot)lg.scrollTop=lg.scrollHeight}
 function onChat(sn){
  const m={};sn.docs.forEach(d=>{m[d.id]=d.data()});
  if(chatInit)for(const i in m)if(i!==uid&&m[i]&&m[i].t>((chat[i]||{}).t||0))beep("pop");
@@ -74,7 +86,8 @@ function onChat(sn){
 let lastSend=0;
 function sendChat(x){
  x=String(x||"").trim().slice(0,40);if(!x||!room||Date.now()-lastSend<700)return;lastSend=Date.now();
- Promise.resolve(db.doc(`rooms/${room}/chat/${uid}`).set({n:(players[uid]||{}).name||"?",x,t:Date.now()})).catch(e=>msg("Chat gagal: "+(e.message||e.code)))}
+ const c=chat[uid]||{},cr=(st&&st.cr)||0,t=Date.now(),h=[...(c.h||(c.x?[{x:c.x,t:c.t}]:[])).filter(m=>m.t>cr),{x,t}].slice(-CHN);
+ Promise.resolve(db.doc(`rooms/${room}/chat/${uid}`).set({n:(players[uid]||{}).name||"?",x,t,h})).catch(e=>msg("Chat gagal: "+(e.message||e.code)))}
 setInterval(drawChat,5000);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b)sendChat(b.dataset.e)});
 $("#cs").onclick=()=>{sendChat($("#ci").value);$("#ci").value=""};
@@ -86,6 +99,6 @@ function beat(){
 setInterval(beat,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
-$("#ky").onclick=()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(confirm("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0})};
+$("#ky").onclick=()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(confirm("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0,cr:Date.now()})};
 $("#ab").onclick=async()=>{if(!st)return;try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({rd:(st.hist||[]).length}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
 $("#kx2").onclick=leave;

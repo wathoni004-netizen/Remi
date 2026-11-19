@@ -9,7 +9,7 @@ function start(){
  if(ids.length<2||(!nx&&!ids.every(isOk)))return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
  // host, gen, dan kk ikut disimpan: host tetap, tanda Siap direset untuk ruang tunggu berikutnya, daftar kick tidak hilang.
- save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:hostId(),gen:gen()+1,kk:(st&&st.kk)||{},dir:nx?(st.sx?-1:1)*(st.dir||1):1});
+ save({status:"play",order:ids,names:Object.fromEntries(ids.map(i=>[i,players[i].name])),hands,deck:d,pile:[],laid:{},eat:"",hist:H0,turn:ids[0],phase:"draw",lb:"",msg:players[ids[0]].name+" jalan duluan",host:hostId(),gen:gen()+1,kk:(st&&st.kk)||{},dir:nx?(st.sx?-1:1)*(st.dir||1):1,cr:Date.now()});
 }
 
 function fin(s,by,c){
