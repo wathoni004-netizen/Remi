@@ -68,11 +68,11 @@ $("#jb").onclick=async()=>{
 const CHN=30,hh=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")};
 let clSig="";
 function chatList(){
- const cr=(st&&st.cr)||0,L=[];
+ const cr=Math.max((st&&st.cr)||0,!st||st.status==="lobby"?Date.now()-3e5:0),L=[];
  for(const i in chat){const c=chat[i];if(!c)continue;(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
  return L.sort((a,b)=>a.t-b.t)}
 function drawChat(){
- const L=chatList(),P=L.filter(m=>m.t>Date.now()-1e4);
+ const L=chatList(),P=Object.values(Object.fromEntries(L.filter(m=>m.t>Date.now()-1e4).map(m=>[m.i,m])));
  $("#cr").textContent=st&&st.status==="play"?"Ronde "+((st.hist||[]).length+1):"";
  $("#ct").innerHTML=P.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");$("#ct").hidden=!P.length;
  const lg=$("#cl"),last=L[L.length-1],sg=L.length+"|"+(last?last.t:0);
