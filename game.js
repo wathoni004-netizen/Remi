@@ -4,7 +4,8 @@ const nxt=(s,i,k)=>{const O=s.order,n=O.length;return O[((O.indexOf(i)+k*(s.dir|
 function start(){
  // Hanya host (pembuat ruang) yang bisa memulai; di ruang tunggu semua pemain harus sudah Siap.
  if(hostId()!==uid)return;
- const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>players[a].t-players[b].t).slice(0,4);
+ // Urutan duduk: ronde lanjutan mempertahankan urutan ronde sebelumnya; selebihnya menurut waktu masuk (j), bukan waktu aktif (t).
+ const H0=(st&&st.hist)||[],nx=st&&st.status==="done",jt=i=>players[i].j||players[i].t,ix=i=>{const k=nx?(st.order||[]).indexOf(i):-1;return k<0?9:k},ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>ix(a)-ix(b)||jt(a)-jt(b)).slice(0,4);
  if(ids.length<2||(!nx&&!ids.every(isOk)))return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
  // host, gen, dan kk ikut disimpan: host tetap, tanda Siap direset untuk ruang tunggu berikutnya, daftar kick tidak hilang.
