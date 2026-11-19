@@ -185,6 +185,12 @@ main:has(#join:not([hidden])) #ld,main:has(#game:not([hidden]) #lobby:not([hidde
 .rtb tr.w td{background:rgba(46,164,79,.5);font-weight:700}
 .rtb tr.v td{background:rgba(220,53,69,.5);font-weight:700}
 .rleg{font-size:12px;color:#cfe3d6;font-weight:400}
+.hw{display:flex;align-items:flex-end;gap:4px}
+.hw .hand{flex:1;min-width:0}
+#aut{flex:none;width:44px;height:44px;margin:0 0 8px;padding:0;border-radius:50%;border:2px solid #4cc58a;background:transparent;color:#4cc58a;display:flex;align-items:center;justify-content:center}
+#aut.on{background:#4cc58a;color:#06130c}
+#aut svg{width:24px;height:24px}
+main:has(#play:not([hidden])) h1{display:none}
 </style></head>
 <body><main>
 <h1>🃏 Kartu Remi</h1>
@@ -210,8 +216,8 @@ main:has(#join:not([hidden])) #ld,main:has(#game:not([hidden]) #lobby:not([hidde
 <div id="ct" class="lab" hidden></div>
 <div id="sp" class="setp" hidden><div id="spi"></div><button class="pri" id="bs">Set sekarang</button><div class="lab" style="margin-top:6px">atau cabut kartu</div></div>
 <div class="act"><button class="pri" id="bd" hidden>Cabut kartu</button><button class="pri" id="bl" hidden>Turunkan</button><button class="pri" id="bx" hidden>Buang</button></div>
-<div id="hand" class="hand"></div>
-<div id="arr" hidden><div class="lab">Seret atau ◀ ▶ untuk menyusun · hijau = hidup</div><div class="act"><button class="pri" id="mvl">◀</button><button class="pri" id="aut">✨ Auto ON</button><button class="pri" id="mvr">▶</button></div></div>
+<div class="hw"><div id="hand" class="hand"></div><button id="aut" class="on" aria-label="Susun otomatis" aria-pressed="true" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 5.3 7M4 13a8 8 0 0 0 14.7 4"/><path d="M5 3v4h4M19 21v-4h-4"/></svg></button></div>
+<div id="arr" hidden><div class="lab">Seret untuk menyusun · hijau = hidup</div></div>
 <div id="qe" class="act" style="justify-content:center;margin:2px 0"><button class="qb" id="mb" aria-label="Skor dan menu" style="min-width:36px;font-weight:700">☰</button><button class="qb" data-e="😂">😂</button><button class="qb" data-e="😡">😡</button><button class="qb" data-e="😭">😭</button><button class="qb" data-e="👍">👍</button><button class="qb" data-e="🔥">🔥</button><button class="qb" data-e="😎">😎</button><button class="qb cfb" aria-label="Buka obrolan" style="position:relative">💬<i class="ud"></i></button></div>
 <div id="again" class="act" hidden><button class="pri" id="ab">Lanjut</button><button class="pri sec" id="kx2">Keluar</button></div>
 </div>
@@ -221,5 +227,5 @@ main:has(#join:not([hidden])) #ld,main:has(#game:not([hidden]) #lobby:not([hidde
 <script src="rules.js?v=1"></script>
 <script src="net.js?v=11"></script>
 <script src="game.js?v=6"></script>
-<script src="ui.js?v=14"></script>
+<script src="ui.js?v=15"></script>
 </body></html>

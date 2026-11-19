@@ -11,11 +11,6 @@ function handView(h){
  const starts=new Set();
  if(auto&&A.groups.length>1)A.groups.slice(1).forEach(g=>starts.add(g[0]));
  return{live:auto?A.live:adj(ord),starts}}
-function mv(d){
- if(!sel.length)return;auto=false;const o=ord.slice();
- if(d<0){for(let i=1;i<o.length;i++)if(sel.includes(o[i])&&!sel.includes(o[i-1]))[o[i-1],o[i]]=[o[i],o[i-1]]}
- else{for(let i=o.length-2;i>=0;i--)if(sel.includes(o[i])&&!sel.includes(o[i+1]))[o[i],o[i+1]]=[o[i+1],o[i]]}
- ord=o;render()}
 // m = true: susunan dicerminkan kiri-kanan (putaran ke kanan / berlawanan arah jarum jam).
 const pileLay=(n,RW,RH,m)=>{
  const r=125/175,W=Math.min(RW/9.24,RH*r/7.11,28),H=W/r,ox=(RW-9.24*W)/2,oy=(RH-7.11*H)/2,out=[];
@@ -140,7 +135,7 @@ function render(){
  const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
- $("#arr").hidden=!O.includes(uid);$("#mvl").disabled=$("#mvr").disabled=!sel.length;$("#aut").textContent="✨ Auto "+(auto?"ON":"OFF");
+ $("#arr").hidden=!O.includes(uid);$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
  // Panah arah putaran di 4 sudut meja (dari atas sampai sebelum kartu turun milik kita).
  {const cw=(st.dir||1)<0,a=cw?'<path d="M4 22Q4 4 20 4"/><polygon points="17,0 17,8 25,4"/>':'<path d="M22 4Q4 4 4 20"/><polygon points="0,17 8,17 4,25"/>';
@@ -192,6 +187,5 @@ function buzz(){try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e)
   else if(pend){pend=false;render()}};
  HD.addEventListener("pointerup",e=>fin2(e,false));
  HD.addEventListener("pointercancel",e=>fin2(e,true))}
-$("#mvl").onclick=()=>mv(-1);$("#mvr").onclick=()=>mv(1);
 $("#aut").onclick=()=>{auto=!auto;render()};
 addEventListener("resize",()=>{if(st)render()});
