@@ -73,6 +73,7 @@ function chatList(){
  return L.sort((a,b)=>a.t-b.t)}
 function drawChat(){
  const L=chatList(),P=L.filter(m=>m.t>Date.now()-1e4);
+ $("#cr").textContent=st&&st.status==="play"?"Ronde "+((st.hist||[]).length+1):"";
  $("#ct").innerHTML=P.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");$("#ct").hidden=!P.length;
  const lg=$("#cl"),last=L[L.length-1],sg=L.length+"|"+(last?last.t:0);
  if(sg===clSig)return;clSig=sg;
