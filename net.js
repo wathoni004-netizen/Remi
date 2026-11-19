@@ -94,7 +94,7 @@ function drawChat(){
  if(bot)lg.scrollTop=lg.scrollHeight}
 function onChat(sn){
  const m={};sn.docs.forEach(d=>{m[d.id]=d.data()});
- if(chatInit)for(const i in m)if(i!==uid&&m[i]&&m[i].t>((chat[i]||{}).t||0))beep("pop");
+ if(chatInit)for(const i in m)if(i!==uid&&m[i]&&m[i].t>((chat[i]||{}).t||0)){beep("pop");if($("#chatbox").hidden)document.body.classList.add("unr")}
  chat=m;chatInit=true;drawChat()}
 let lastSend=0;
 function sendChat(x){
@@ -105,6 +105,10 @@ setInterval(drawChat,5000);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b)sendChat(b.dataset.e)});
 $("#cs").onclick=()=>{sendChat($("#ci").value);$("#ci").value=""};
 $("#ci").onkeydown=e=>{if(e.key==="Enter"){sendChat(e.target.value);e.target.value=""}};
+document.querySelectorAll(".cfb").forEach(x=>x.onclick=()=>{const b=$("#chatbox");b.hidden=!b.hidden;$("#mbox").hidden=true;if(!b.hidden){document.body.classList.remove("unr");$("#cl").scrollTop=$("#cl").scrollHeight}});
+$("#cc").onclick=()=>{$("#chatbox").hidden=true};
+$("#mb").onclick=()=>{const b=$("#mbox");b.hidden=!b.hidden;$("#chatbox").hidden=true};
+$("#mc").onclick=()=>{$("#mbox").hidden=true};
 $("#kx3").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
 function beat(){
  const p=players[uid];if(!room||!uid||!p||!p.name)return;

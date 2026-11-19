@@ -81,14 +81,15 @@ function render(){
  $("#ky").hidden=!(st&&st.status==="play"&&hostId()===uid);
  const lob=$("#lobby"),pl=$("#play");
  const fxB=snapFx();
- {const H0=(st&&st.hist)||[],ss=st&&st.status,sh=H0.length&&(ss==="play"||(ss==="done"&&players[uid]&&players[uid].rd===H0.length));$("#score").hidden=!sh;if(sh)$("#score").innerHTML=scoreHtml(H0)}
+ {const H0=(st&&st.hist)||[],ss=st&&st.status,sh=H0.length&&ss==="done"&&players[uid]&&players[uid].rd===H0.length;$("#score").hidden=!sh;if(sh)$("#score").innerHTML=scoreHtml(H0);$("#msc").innerHTML=H0.length?scoreHtml(H0):'<div class="mut">Belum ada catatan poin</div>'}
  if(!st||st.status==="lobby"){
   const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t);
   pl.hidden=true;lob.hidden=false;
   // Hanya host (pembuat ruang) yang bisa mulai; pemain lain menekan Siap dulu.
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
   const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
-  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}`;
+  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}<div class="act"><button class="pri sec" id="kx4">Keluar ruang</button></div>`;
+  $("#kx4").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
   if(hs)$("#sb").onclick=start;
   else $("#rb").onclick=()=>Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:me?-1:gen()}))).catch(e=>msg("Gagal: "+(e.message||e.code)));
   return;
