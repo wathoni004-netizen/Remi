@@ -34,10 +34,11 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   db={doc:p=>({set:o=>d.set(d.ref(rdb,map(p)),o),onSnapshot:(f,e)=>d.onValue(d.ref(rdb,map(p)),s=>{const v=s.val();f({exists:v!==null,data:()=>norm(v)})},e)}),
    get:p=>d.get(d.ref(rdb,p)).then(s=>s.val()),
    collection:p=>({onSnapshot:(f,e)=>d.onValue(d.ref(rdb,p),s=>{const v=s.val()||{};f({docs:Object.keys(v).map(k=>({id:k,data:()=>v[k]}))})},e)})};
-  $("#join").hidden=false;
-  // Link undangan ?r=kode: kolom kode terisi; kalau nama sudah tersimpan, langsung masuk.
+  // Layar judul tiap kali dibuka. Kode ruang: dari link undangan ?r=kode; kalau tidak ada, ruang yang belum
+  // ditinggalkan lewat tombol Keluar (supaya bisa kembali ke game yang sedang berjalan); selain itu kosong.
   const ur=(new URLSearchParams(location.search).get("r")||"").toUpperCase();
-  try{const sn=localStorage.getItem("rn"),sr=localStorage.getItem("rr");if(sn)$("#nm").value=sn;if(ur||sr)$("#rm").value=ur||sr.toUpperCase();if(sn&&(ur||sr))$("#jb").click()}catch(e){if(ur)$("#rm").value=ur}
+  try{const sn=localStorage.getItem("rn"),sr=localStorage.getItem("rr");if(sn)$("#nm").value=sn;$("#rm").value=ur||(sr||"").toUpperCase()}catch(e){$("#rm").value=ur}
+  $("#home").hidden=false;
  }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
@@ -66,6 +67,8 @@ $("#jb").onclick=async()=>{
  db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
 
+$("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
+$("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
 // Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
 $("#mk").onclick=async()=>{
  const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let k="";

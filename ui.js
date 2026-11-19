@@ -84,7 +84,7 @@ function render(){
   // Hanya host (pembuat ruang) yang bisa mulai; pemain lain menekan Siap dulu.
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
   const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
-  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}`;
+  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}`;
   if(hs)$("#sb").onclick=start;
   else $("#rb").onclick=()=>Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:me?-1:gen()}))).catch(e=>msg("Gagal: "+(e.message||e.code)));
   return;
@@ -100,7 +100,7 @@ function render(){
  {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph;
   if(sig&&sg!==sig){if(done&&!wasDone)beep(st.sx?"set":"win");else if(!done&&mine&&!wasMine){beep("turn");buzz()}else if(!done)beep("tick")}
   sig=sg;wasDone=done;wasMine=!done&&mine;
-  document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Remi Online"}
+  document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Kartu Remi"}
  sel=sel.filter(c=>h.includes(c));
  const prev=nxt(st,uid,-1),X=st.pile[st.pile.length-1];
  const sopt=mine&&ph==="draw"&&st.lb===prev&&!!X?h.filter(y=>full([...h.filter(z=>z!==y),X])):[],cs=sopt.length>0;
