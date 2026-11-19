@@ -65,7 +65,8 @@ $("#jb").onclick=async()=>{
 
 function drawChat(){
  const now=Date.now(),L=Object.keys(chat).map(i=>chat[i]).filter(m=>m&&m.t>now-45000).sort((a,b)=>a.t-b.t);
- $("#ct").innerHTML=L.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");$("#ct").hidden=!L.length}
+ const h=L.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");
+ for(const id of ["#ct","#ct2"]){$(id).innerHTML=h;$(id).hidden=!L.length}}
 function onChat(sn){
  const m={};sn.docs.forEach(d=>{m[d.id]=d.data()});
  if(chatInit)for(const i in m)if(i!==uid&&m[i]&&m[i].t>((chat[i]||{}).t||0))beep("pop");
