@@ -32,9 +32,12 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   uid=credential.user.uid;
   const d=M.d,rdb=d.getDatabase(app);
   db={doc:p=>({set:o=>d.set(d.ref(rdb,map(p)),o),onSnapshot:(f,e)=>d.onValue(d.ref(rdb,map(p)),s=>{const v=s.val();f({exists:v!==null,data:()=>norm(v)})},e)}),
+   get:p=>d.get(d.ref(rdb,p)).then(s=>s.val()),
    collection:p=>({onSnapshot:(f,e)=>d.onValue(d.ref(rdb,p),s=>{const v=s.val()||{};f({docs:Object.keys(v).map(k=>({id:k,data:()=>v[k]}))})},e)})};
   $("#join").hidden=false;
-  try{const sn=localStorage.getItem("rn"),sr=localStorage.getItem("rr");if(sn){$("#nm").value=sn;if(sr)$("#rm").value=sr;$("#jb").click()}}catch(e){}
+  // Link undangan ?r=kode: kolom kode terisi; kalau nama sudah tersimpan, langsung masuk.
+  const ur=(new URLSearchParams(location.search).get("r")||"").toUpperCase();
+  try{const sn=localStorage.getItem("rn"),sr=localStorage.getItem("rr");if(sn)$("#nm").value=sn;if(ur||sr)$("#rm").value=ur||sr.toUpperCase();if(sn&&(ur||sr))$("#jb").click()}catch(e){if(ur)$("#rm").value=ur}
  }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
@@ -54,7 +57,7 @@ function idleCheck(){
 
 $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
- room=($("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,""))||"kartu";
+ room=$("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,"");if(!room)return msg("Isi kode ruang, atau tekan Buat ruang baru.");
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
  try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now(),j:Date.now()})}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
  $("#join").hidden=true;$("#game").hidden=false;
@@ -63,6 +66,12 @@ $("#jb").onclick=async()=>{
  db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
 
+// Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
+$("#mk").onclick=async()=>{
+ const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let k="";
+ for(let n=0;n<6;n++){k=Array.from({length:4},()=>A[Math.floor(Math.random()*A.length)]).join("");
+  try{if(!db.get||!(await db.get(`rooms/${k.toLowerCase()}/players`)))break}catch(e){break}}
+ $("#rm").value=k;$("#jb").click()};
 // Riwayat chat: tiap pemain menyimpan h = 30 pesan terakhirnya; pesan lebih lama dari st.cr (awal ronde baru) disembunyikan.
 // Pop-up di meja (#ct) hanya 10 detik; riwayat (#cl) tetap ada sampai ronde baru.
 const CHN=30,hh=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")};

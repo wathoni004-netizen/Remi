@@ -83,7 +83,8 @@ function render(){
   pl.hidden=true;lob.hidden=false;
   // Hanya host (pembuat ruang) yang bisa mulai; pemain lain menekan Siap dulu.
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
-  lob.innerHTML=`<div class="mut">Ruang: <b>${esc(room)}</b> · pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}`;
+  const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
+  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}`;
   if(hs)$("#sb").onclick=start;
   else $("#rb").onclick=()=>Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:me?-1:gen()}))).catch(e=>msg("Gagal: "+(e.message||e.code)));
   return;
@@ -152,6 +153,7 @@ $("#bl").onclick=()=>go("lay",sel.slice());
 $("#bx").onclick=()=>go("drop",sel[0]);
 // Klik Kick di ruang tunggu: host menandai pemain di st.kk (waktu kick).
 $("#lobby").onclick=e=>{
+ const cp=e.target.closest("[data-cp]");if(cp){Promise.resolve(navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.cp)).then(()=>{cp.textContent="Tersalin"},()=>msg("Gagal menyalin, salin kode manual."));return}
  const b=e.target.closest("[data-kick]");if(!b||hostId()!==uid)return;
  const i=b.dataset.kick;if(!confirm("Keluarkan "+nm(i)+" dari ruang?"))return;
  const base=st||{status:"lobby",hist:[],host:uid,gen:0};
