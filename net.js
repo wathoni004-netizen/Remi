@@ -71,7 +71,7 @@ $("#jb").onclick=async()=>{
  $("#home").hidden=true;$("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
- db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
+ db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat();award()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
 
 // Akun: tamu = login anonim. "Masuk dengan Google" menautkan akun Google ke uid yang sama (data tamu ikut);
@@ -157,6 +157,15 @@ function beat(){
  try{Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc())).catch(()=>{})}catch(e){}}
 setInterval(beat,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
+// Hadiah: pemenang tiap ronde (poin tertinggi / men-set) dapat 1 kartu biru, hanya akun Google. Kunci per ronde di localStorage mencegah dobel.
+async function award(){
+ const g=auth&&auth.currentUser;
+ if(!st||st.status!=="done"||st.winner!==uid||!g||g.isAnonymous)return;
+ const k=room+":"+(st.gen||0)+":"+(st.hist||[]).length;
+ try{if(localStorage.getItem("aw")===k)return;localStorage.setItem("aw",k)}catch(e){}
+ try{const v=(await db.get("users/"+uid))||{};await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+1}));msg("🎉 Menang ronde! +1 kartu biru")}
+ catch(e){try{localStorage.removeItem("aw")}catch(_){}}
+}
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
 $("#ky").onclick=()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(confirm("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0,cr:Date.now()})};
 $("#ab").onclick=async()=>{if(!st)return;try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({rd:(st.hist||[]).length}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
