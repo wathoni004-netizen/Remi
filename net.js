@@ -97,6 +97,7 @@ $("#da").onclick=async()=>{
   await M.au.reauthenticateWithPopup(u,gp());
   let r="";try{r=localStorage.getItem("rr")||""}catch(e){}
   if(r)for(const p of["players","chat"])try{await db.doc(`rooms/${r}/${p}/${u.uid}`).set(null)}catch(e){}
+  try{await db.doc("users/"+u.uid).set(null)}catch(e){}
   await M.au.deleteUser(u);
   try{["rn","rr","rid"].forEach(k=>localStorage.removeItem(k))}catch(e){}
   location.reload()
@@ -108,7 +109,7 @@ $("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
 $("#tpg").onclick=()=>{$("#home").hidden=true;$("#pg").hidden=false};
 $("#pbk").onclick=()=>{$("#pg").hidden=true;$("#home").hidden=false};
 const soon=t=>{msg(t+" segera hadir");setTimeout(()=>msg(""),2500)};
-$("#tk").onclick=()=>soon("Toko");$("#ts").onclick=()=>soon("Spin Skin");
+$("#tk").onclick=()=>soon("Toko");
 $("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
 // Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
 $("#mk").onclick=async()=>{
