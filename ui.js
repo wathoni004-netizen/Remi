@@ -36,7 +36,7 @@ const pcard=(c,i,on,hl,xs,nw,p,L)=>{
    dc=`<i class="bd" style="left:${f(cx-D/2-1)}px;top:${f(cy-D/2-1)}px;width:${D}px;height:${D}px;font-size:${Math.round(D*.7)}px">${s}</i><i class="sp" style="left:${f(cx-D/2-3)}px;top:${f(cy-D/2-1)}px;font-size:6px">✦</i><i class="sp" style="left:${f(cx+D/2+1)}px;top:${f(cy+D/2)}px;font-size:5px">✦</i>`}}
  const tx=r+(v||xs?"<br>":"")+s;
  return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" data-fx="${c}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}${xs?`;--tx:${f((e==="T"?1:e==="B"?-1:0)*(L.m?-1:1)*W)}px;--ty:${f((e==="R"?1:e==="L"?-1:0)*H*.95)}px`:""}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
-const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+s;return `<${tag} class="c ${red(c)?"r":""} ${x||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
+const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+(x==="mn"?"":s);return `<${tag} class="c ${red(c)?"r":""} ${x||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,i===uid?"sm":"mn")).join("")}</span>`).join("");
 
 // Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
