@@ -32,7 +32,7 @@ function setTab(k){
  $("#spr").textContent="Putar untuk dapat skin";strip();
  const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";info()}
 async function open(){
- $("#home").hidden=true;$("#sp").hidden=false;$("#spq").hidden=true;
+ $("#home").hidden=true;$("#kp").hidden=false;$("#spq").hidden=true;
  U={biru:0,merah:0,skins:{}};sm("");
  if(isG()){try{const v=await db.get("users/"+uid);if(v)U=Object.assign(U,v);U.skins=U.skins||{}}catch(e){sm("Gagal memuat: "+(e.code||e.message))}}
  else sm("Masuk dengan Google di Pengaturan agar kartu dan skin tersimpan.");
@@ -73,9 +73,9 @@ function reveal(w,dup){
  $("#spr").innerHTML=`<div class="skc" style="width:36px;height:50px;border-width:3px;border-color:${c};color:${w.ink};font-size:${j?9:18}px">${label(w)}</div><b style="color:${c}">Skin ${w.t} · kartu ${label(w)}</b>`;
  if(navigator.vibrate)navigator.vibrate(l>=4?[60,40,60,40,120]:l>=3?[60,40,60]:30)}
 $("#ts").onclick=open;
-$("#spb").onclick=()=>{$("#sp").hidden=true;$("#home").hidden=false};
+$("#spb").onclick=()=>{$("#kp").hidden=true;$("#home").hidden=false};
 $("#spt1").onclick=()=>{if(!busy)setTab("biru")};
 $("#spt2").onclick=()=>{if(!busy)setTab("merah")};
-$("#spi").onclick=()=>{const q=$("#spq");q.hidden=!q.hidden};
+$("#kpi").onclick=()=>{const q=$("#spq");q.hidden=!q.hidden};
 $("#spn").onclick=spin;$("#spx").onclick=swap;
 })();
