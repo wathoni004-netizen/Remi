@@ -1,5 +1,5 @@
 async function leave(){try{localStorage.removeItem("rn");localStorage.removeItem("rr")}catch(e){}try{await db.doc(`rooms/${room}/players/${uid}`).set({name:(players[uid]||{}).name||"Pemain",t:0})}catch(e){}location.reload()}
-let db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false,kickOut=false;
+let auth,M,db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false,kickOut=false;
 // Pemain di-kick: st.kk[id] = nilai j pemain saat di-kick. Masuk ulang membuat j baru, jadi tidak lagi cocok (tanpa bergantung jam).
 const kicked=i=>!!(st&&st.kk&&players[i]&&st.kk[i]!=null&&st.kk[i]===(players[i].j||0));
 const live=i=>players[i]&&players[i].t>Date.now()-18e4&&!kicked(i);
@@ -20,16 +20,17 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   let id=new URLSearchParams(location.search).get("u");
   if(!id){try{id=localStorage.getItem("rid");if(!id){id="u"+Math.random().toString(36).slice(2,10);localStorage.setItem("rid",id)}}catch(e){}}
   uid=id||"u"+Math.random().toString(36).slice(2,10);
-  const M=window.__FBMOCK||{
+  M=window.__FBMOCK||{
    a:await import(CDN+"firebase-app.js"),
    d:await import(CDN+"firebase-database.js"),
    au:await import(CDN+"firebase-auth.js")
   };
   const app=M.a.initializeApp(FBC);
-  const auth=M.au.getAuth(app);
-  // Identitas anonim diperlukan agar Firebase dapat mengizinkan akses berdasarkan Rules.
-  const credential=await M.au.signInAnonymously(auth);
-  uid=credential.user.uid;
+  auth=M.au.getAuth(app);
+  // Pakai sesi yang tersimpan (anonim atau Google); anonim baru hanya jika belum ada sesi, agar login Google tidak tertimpa.
+  if(auth.authStateReady)await auth.authStateReady();
+  uid=(auth.currentUser||(await M.au.signInAnonymously(auth)).user).uid;
+  authUI();
   const d=M.d,rdb=d.getDatabase(app);
   db={doc:p=>({set:o=>d.set(d.ref(rdb,map(p)),o),onSnapshot:(f,e)=>d.onValue(d.ref(rdb,map(p)),s=>{const v=s.val();f({exists:v!==null,data:()=>norm(v)})},e)}),
    get:p=>d.get(d.ref(rdb,p)).then(s=>s.val()),
@@ -66,6 +67,33 @@ $("#jb").onclick=async()=>{
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
  db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
 };
+
+// Akun: tamu = login anonim. "Masuk dengan Google" menautkan akun Google ke uid yang sama (data tamu ikut);
+// kalau Google itu sudah punya akun, pindah ke akun tersebut. Hapus akun: login ulang Google, hapus data ruang terakhir, hapus akun.
+const gp=()=>new M.au.GoogleAuthProvider();
+function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
+ $("#gi").hidden=g;$("#go").hidden=!g;$("#da").hidden=!g;
+ $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu"}
+$("#gi").onclick=async()=>{
+ try{
+  try{await M.au.linkWithPopup(auth.currentUser,gp())}
+  catch(e){if(e.code!=="auth/credential-already-in-use")throw e;await M.au.signInWithCredential(auth,M.au.GoogleAuthProvider.credentialFromError(e))}
+  const u=auth.currentUser;uid=u.uid;
+  if(!$("#nm").value)$("#nm").value=(u.displayName||"").split(" ")[0].slice(0,16);
+  authUI();msg("")
+ }catch(e){if(e.code!=="auth/popup-closed-by-user")msg("Login Google gagal: "+(e.code||e.message))}};
+$("#go").onclick=async()=>{try{await M.au.signOut(auth);location.reload()}catch(e){msg("Gagal keluar: "+(e.code||e.message))}};
+$("#da").onclick=async()=>{
+ if(!confirm("Hapus akun ini secara permanen? Data akun hilang dan tidak bisa dikembalikan."))return;
+ try{
+  const u=auth.currentUser;
+  await M.au.reauthenticateWithPopup(u,gp());
+  let r="";try{r=localStorage.getItem("rr")||""}catch(e){}
+  if(r)for(const p of["players","chat"])try{await db.doc(`rooms/${r}/${p}/${u.uid}`).set(null)}catch(e){}
+  await M.au.deleteUser(u);
+  try{["rn","rr","rid"].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  location.reload()
+ }catch(e){if(e.code!=="auth/popup-closed-by-user")msg("Hapus akun gagal: "+(e.code||e.message))}};
 
 $("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
 $("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
