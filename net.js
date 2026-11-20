@@ -109,7 +109,7 @@ $("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
 $("#tpg").onclick=()=>{$("#home").hidden=true;$("#pg").hidden=false};
 $("#pbk").onclick=()=>{$("#pg").hidden=true;$("#home").hidden=false};
 const soon=t=>{msg(t+" segera hadir");setTimeout(()=>msg(""),2500)};
-$("#tk").onclick=()=>soon("Toko");
+
 $("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
 // Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
 $("#mk").onclick=async()=>{
@@ -161,9 +161,9 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
 async function award(){
  const g=auth&&auth.currentUser;
  if(!st||st.status!=="done"||st.winner!==uid||!g||g.isAnonymous)return;
- const k=room+":"+(st.gen||0)+":"+(st.hist||[]).length;
+ const k=room+":"+(st.gen||0)+":"+(st.hist||[]).length,kn=Math.max(0,Math.floor(((st.sc||{})[uid]||0)/2));
  try{if(localStorage.getItem("aw")===k)return;localStorage.setItem("aw",k)}catch(e){}
- try{const v=(await db.get("users/"+uid))||{};await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+1}));msg("🎉 Menang ronde! +1 kartu biru")}
+ try{const v=(await db.get("users/"+uid))||{};await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+1,koin:(v.koin||0)+kn}));msg("🎉 Menang ronde! +1 kartu biru, +"+kn+" koin")}
  catch(e){try{localStorage.removeItem("aw")}catch(_){}}
 }
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
