@@ -16,6 +16,7 @@ const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
 const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
 const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
 (async()=>{
+ const t0=Date.now();
  try{
   let id=new URLSearchParams(location.search).get("u");
   if(!id){try{id=localStorage.getItem("rid");if(!id){id="u"+Math.random().toString(36).slice(2,10);localStorage.setItem("rid",id)}}catch(e){}}
@@ -43,8 +44,9 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   $("#rm").value=ur;
   if(sr)db.get(`rooms/${sr}/state`).then(s=>{if(s&&(s.status==="play"||s.status==="done")&&(s.order||[]).includes(uid)){$("#rsk").textContent=sr.toUpperCase();$("#rs").hidden=false}}).catch(()=>{});
   $("#rg").onclick=()=>{$("#rm").value=sr;$("#jb").click()};
-  $("#home").hidden=false;
- }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
+  await new Promise(r=>setTimeout(r,Math.max(0,1200-(Date.now()-t0))));
+  menuUI();$("#ld").hidden=true;$("#home").hidden=false;
+ }catch(e){$("#ld").hidden=true;msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
 
 // Saat masuk ruang (sekali per pemuatan halaman):
@@ -66,7 +68,7 @@ $("#jb").onclick=async()=>{
  room=$("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,"");if(!room)return msg("Isi kode ruang, atau tekan Buat ruang baru.");
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
  try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now(),j:Date.now()})}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
- $("#join").hidden=true;$("#game").hidden=false;
+ $("#home").hidden=true;$("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
  db.doc("rooms/"+room).onSnapshot(s=>{st=s.exists?s.data():null;got.s=1;idleCheck();render();drawChat()},()=>msg("Koneksi terputus, muat ulang halaman."));
@@ -77,7 +79,8 @@ $("#jb").onclick=async()=>{
 const gp=()=>new M.au.GoogleAuthProvider();
 function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
  $("#gi").hidden=g;$("#go").hidden=!g;$("#da").hidden=!g;
- $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu"}
+ $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu";menuUI()}
+function menuUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous,n=($("#nm").value||"").trim()||"Pemain";$("#mpn").textContent=n;$("#mav").textContent=n.slice(0,1).toUpperCase();$("#mpt").textContent=g?"Akun Google":"Tamu"}
 $("#gi").onclick=async()=>{
  try{
   try{await M.au.linkWithPopup(auth.currentUser,gp())}
@@ -100,6 +103,12 @@ $("#da").onclick=async()=>{
  }catch(e){if(e.code!=="auth/popup-closed-by-user")msg("Hapus akun gagal: "+(e.code||e.message))}};
 
 $("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
+// Navigasi menu: kembali dari Masuk/Pengaturan; Toko dan Spin Skin belum ada (tile hanya penanda "Segera").
+$("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
+$("#tpg").onclick=()=>{$("#home").hidden=true;$("#pg").hidden=false};
+$("#pbk").onclick=()=>{$("#pg").hidden=true;$("#home").hidden=false};
+const soon=t=>{msg(t+" segera hadir");setTimeout(()=>msg(""),2500)};
+$("#tk").onclick=()=>soon("Toko");$("#ts").onclick=()=>soon("Spin Skin");
 $("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
 // Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
 $("#mk").onclick=async()=>{
