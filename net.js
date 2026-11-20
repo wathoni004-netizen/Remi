@@ -35,10 +35,14 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   db={doc:p=>({set:o=>d.set(d.ref(rdb,map(p)),o),onSnapshot:(f,e)=>d.onValue(d.ref(rdb,map(p)),s=>{const v=s.val();f({exists:v!==null,data:()=>norm(v)})},e)}),
    get:p=>d.get(d.ref(rdb,p)).then(s=>s.val()),
    collection:p=>({onSnapshot:(f,e)=>d.onValue(d.ref(rdb,p),s=>{const v=s.val()||{};f({docs:Object.keys(v).map(k=>({id:k,data:()=>v[k]}))})},e)})};
-  // Layar judul tiap kali dibuka. Kode ruang: dari link undangan ?r=kode; kalau tidak ada, ruang yang belum
-  // ditinggalkan lewat tombol Keluar (supaya bisa kembali ke game yang sedang berjalan); selain itu kosong.
+  // Layar judul tiap kali dibuka. Kode ruang: dari link undangan ?r=kode; kalau tidak ada, kosong.
+  // Ruang yang belum ditinggalkan lewat tombol Keluar (sr) dicek; kalau game-nya masih berjalan dan pemain ini
+  // anggotanya, tampil kartu "Game berjalan" dengan tombol Gabung (untuk pemain yang tidak sengaja keluar).
   const ur=(new URLSearchParams(location.search).get("r")||"").toUpperCase();
-  try{const sn=localStorage.getItem("rn"),sr=localStorage.getItem("rr");if(sn)$("#nm").value=sn;$("#rm").value=ur||(sr||"").toUpperCase()}catch(e){$("#rm").value=ur}
+  let sr="";try{const sn=localStorage.getItem("rn");sr=localStorage.getItem("rr")||"";if(sn)$("#nm").value=sn}catch(e){}
+  $("#rm").value=ur;
+  if(sr)db.get(`rooms/${sr}/state`).then(s=>{if(s&&(s.status==="play"||s.status==="done")&&(s.order||[]).includes(uid)){$("#rsk").textContent=sr.toUpperCase();$("#rs").hidden=false}}).catch(()=>{});
+  $("#rg").onclick=()=>{$("#rm").value=sr;$("#jb").click()};
   $("#home").hidden=false;
  }catch(e){msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
 })();
