@@ -61,6 +61,7 @@ function playFx(m){
   // Kartu SET baru muncul: animasi dilempar dari bawah sambil berputar, lalu mendarat (ditambahkan di atas transform CSS-nya).
   if(el.classList.contains("xs")&&!m["xs:"+k]){
    try{el.animate([{transform:`translate(${from.left-to.left}px,${from.top-to.top+160}px) rotate(-200deg) scale(1.3)`,opacity:.3},{transform:"translate(0,-14px) rotate(-10deg) scale(1.15)",opacity:1,offset:.75},{transform:"none"}],{duration:650,easing:"cubic-bezier(.2,.7,.3,1)",composite:"add"})}catch(e){}
+   if(st&&st.sk&&st.sx===k){const by=st.winner,vic=st.lb,b=(st.fb&&st.fb[by]&&st.fb[by].st)||pts(k)*10;setTimeout(()=>playSetFx(st.sk,by,vic,b),500)}
    return}
   const dx=from.left-to.left,dy=from.top-to.top,fresh=!old&&!!el.closest("#pile");
   if(Math.abs(dx)<3&&Math.abs(dy)<3&&!fresh)return;
@@ -70,6 +71,7 @@ function playFx(m){
 
 function render(){
  if(!room)return;
+ if(st&&st.status==="play")mySkins();else if(!st||st.status==="lobby")MYSK=null;
  // Pemain yang di-kick host: beri tahu lalu keluar dari ruang.
  if(!kickOut&&st&&kicked(uid)){kickOut=true;alert("Kamu dikeluarkan dari ruang oleh host.");leave();return}
  if(drag&&drag.on){pend=true;return}

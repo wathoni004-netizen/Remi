@@ -242,6 +242,16 @@ main:has(#join:not([hidden])) #ld,main:has(#game:not([hidden]) #lobby:not([hidde
 #aut.on{background:#4cc58a;color:#06130c}
 #aut svg{width:24px;height:24px}
 main:has(#play:not([hidden])) h1{display:none}
+.sfx{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);pointer-events:none}
+.sfx-st{position:relative;height:330px;border-radius:12px;background:#1f5c3a;overflow:hidden;font-family:system-ui,sans-serif}
+.sfx-sh,.sfx-fx{position:absolute;inset:0}
+.sfx-fx{z-index:2}
+.sfx .ab{position:absolute;left:0;top:0;pointer-events:none}
+.sfx-np{position:absolute;top:40px;left:50%;transform:translateX(-50%);display:flex;font-size:14px;font-weight:700;z-index:1}
+.sfx-np span{background:#f2efe4;color:#14201a;padding:5px 6px;white-space:nowrap}
+.sfx-np span:first-child{border-radius:8px 0 0 8px;padding-right:0}
+.sfx-np span:last-child{border-radius:0 8px 8px 0;padding-left:0}
+.sfx-me{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#e8b923;color:#14201a;font-size:14px;font-weight:700;padding:5px 14px;border-radius:8px;white-space:nowrap}
 </style></head>
 <body><main>
 <h1>🃏 Kartu Remi</h1>
@@ -303,8 +313,9 @@ main:has(#play:not([hidden])) h1{display:none}
 </main>
 <script src="rules.js?v=1"></script>
 <script src="net.js?v=18"></script>
-<script src="game.js?v=6"></script>
-<script src="ui.js?v=16"></script>
+<script src="game.js?v=7"></script>
+<script src="setfx.js?v=1"></script>
+<script src="ui.js?v=17"></script>
 <script src="spin.js?v=2"></script>
 <script src="toko.js?v=1"></script>
 </body></html>

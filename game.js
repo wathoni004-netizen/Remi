@@ -53,6 +53,8 @@ function go(k,a){
   const c=opts.includes(a)?a:opts.slice().sort((p,q)=>pts(q)-pts(p))[0];
   if(!c)return msg("Belum bisa men-set");
   s.hands[uid]=[...h.filter(z=>z!==c),X];s.pile.pop();s.pile.push(c);s.sx=c;sel=[];
+  // Efek skin: hanya jika pen-set punya skin kartu set ini (setfx.js).
+  const fx=skinFx(c);if(fx)s.sk=fx;else delete s.sk;
   return fin(s,uid,c);
  }else if(k==="lay"){
   if(s.phase!=="act"||!a.every(c=>h.includes(c))||!meld(a))return msg("Kombinasi tidak valid");
