@@ -131,11 +131,11 @@ function render(){
  if(done){const FB=st.fb||{},v=O.find(i=>(FB[i]||{}).st<0);
   s="🏆 "+esc(nm(st.winner))+(st.sx&&v?" men-set "+esc(nm(v))+" (+"+FB[st.winner].st+")":"")+"<br>"+O.map(i=>{const f=FB[i];return esc(nm(i))+": "+(f?f.up+" − "+f.dn+(f.st?(f.st>0?" + ":" − ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]}).join("<br>")}
  else if(!O.includes(uid))s="Menonton";
- else if(mine)s=ph==="draw"?"Giliranmu: cabut"+(cs?" atau Set!":""):st.eat?"Turunkan "+lbl(st.eat)+" dulu, lalu buang":"Turunkan (opsional), lalu buang 1";
+ else if(mine)s=ph==="draw"?(st.deck.length?"Giliranmu: cabut"+(cs?" atau Set!":""):"Tumpukan habis: makan / Set / Selesai"):st.eat?"Turunkan "+lbl(st.eat)+" dulu, lalu buang":"Turunkan (opsional), lalu buang 1";
  else s="Giliran "+esc(nm(st.turn))+" · "+esc(st.msg||"");
  $("#st").innerHTML=s;
 
- $("#bd").hidden=!(mine&&ph==="draw");$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);
+ $("#bd").hidden=!(mine&&ph==="draw");$("#bd").textContent=st.deck.length?"Cabut kartu":"Selesai";$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);
  $("#setc").hidden=sopt.length<2;
  $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set:</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set ${lbl(c)}</button>`).join("");
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
@@ -144,10 +144,10 @@ function render(){
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
  $("#arr").hidden=!O.includes(uid);$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
- // Panah arah putaran di 4 sudut meja (dari atas sampai sebelum kartu turun milik kita).
+ // Panah arah putaran di 4 sudut meja; panah bawah di celah 28px antara kursi samping dan kartu turun kita (tidak menimpa kartu).
  {const cw=(st.dir||1)<0,a=cw?'<path d="M4 22Q4 4 20 4"/><polygon points="17,0 17,8 25,4"/>':'<path d="M22 4Q4 4 4 20"/><polygon points="0,17 8,17 4,25"/>';
   $("#dirw").innerHTML=["tl","tr","br","bl"].map(c=>`<svg class="da ${c}" viewBox="0 0 26 26">${a}</svg>`).join("");
-  $("#dirw").style.height=$("#mine").offsetTop+"px"}
+  const md=document.querySelector(".tb .mid");$("#dirw").style.height=md.offsetTop+md.offsetHeight+28+"px"}
  playFx(fxB);
 }
 $("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];render()};
