@@ -21,6 +21,8 @@ const pileLay=(n,RW,RH,m)=>{
   seg(a-.5,b,d+.5,b,Math.round((a-d-1)/.515)+1,"B");seg(d,b-.5,d,d+1,Math.round((b-.5-d-1)/.511)+1,"L")}
  while(out.length<n)out.push(Object.assign({},out[out.length-1]||{x:ox,y:oy,e:"T"}));
  if(m)out.forEach(p=>{p.x=RW-W-p.x});
+ // HP miring: area buangan lebar dan pendek, jadi jarak kartu dilebarkan mendatar (ukuran kartu tetap).
+ try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches){const k=Math.max(1,Math.min(1.9,(RW-64)/(9.24*W)));out.forEach(p=>{p.x=RW/2+(p.x+W/2-RW/2)*k-W/2})}}catch(e){}
  return{p:out,W,H,m,SX:.515*W,SY:.511*H,fs:Math.max(8,Math.round(W*.35))}};
 const pcard=(c,i,on,hl,xs,nw,p,L)=>{
  const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c)),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sx=f(L.SX),sw=f(L.SX-1);

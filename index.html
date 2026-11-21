@@ -252,6 +252,46 @@ main:has(#play:not([hidden])) h1{display:none}
 .sfx-np span:first-child{border-radius:8px 0 0 8px;padding-right:0}
 .sfx-np span:last-child{border-radius:0 8px 8px 0;padding-left:0}
 .sfx-me{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#e8b923;color:#14201a;font-size:14px;font-weight:700;padding:5px 14px;border-radius:8px;white-space:nowrap}
+/* HP miring: posisi meja diatur ulang (gaya sama dengan HP tegak). Hanya untuk layar pendek mendatar. */
+@media (orientation:landscape) and (max-height:520px){
+main:has(#play:not([hidden])){max-width:none;padding:4px 6px}
+main:has(#play:not([hidden])) #game{padding-bottom:0}
+#play .tb{display:grid;grid-template-columns:150px minmax(0,1fr) 230px;grid-template-rows:auto auto auto auto auto 1fr auto;grid-template-areas:"st top mine" "sl ctr qe" "sl ctr sp" "sl ctr act" "sl ctr again" "sl ctr hand" "sr sr hand";gap:4px 8px;min-height:calc(100vh - 8px);min-height:calc(100dvh - 8px);margin:0;box-sizing:border-box;align-items:start}
+#play .mid{display:contents}
+#play #st{grid-area:st;margin:0;padding:6px 0 0 44px;text-align:left;font-size:13px}
+#qe #mb{position:absolute;left:8px;top:8px}
+#sT{grid-area:top;padding-top:0}
+#sT>div{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:start;justify-items:center}
+#sT .bk{grid-column:1;grid-row:1}
+#sT .nm{grid-column:1;grid-row:2}
+#sT .ml{grid-column:2;grid-row:1/span 2;justify-content:flex-start;margin:0}
+#sL{grid-area:sl;width:auto}
+#sR{grid-area:sr;width:auto;text-align:left}
+#sR>div{display:grid;grid-template-columns:auto auto 1fr;column-gap:8px;align-items:center}
+#sR .nm{grid-column:1;grid-row:1}
+#sR .bk{grid-column:2;grid-row:1}
+#sR .ml{grid-column:3;grid-row:1;justify-content:flex-start;margin:0}
+.side .bk{flex-direction:row}
+.side .bk .c{margin-top:0;margin-left:-18px}
+.side .bk .c:first-child{margin-left:0}
+#mine{grid-area:mine;min-height:0;align-content:flex-start}
+#mine .c.sm{width:24px;height:34px;font-size:9px}
+#play .ctr{grid-area:ctr;align-self:stretch}
+#ring{flex:1;height:auto;min-height:120px}
+#dirw{grid-area:ctr;height:auto!important;top:0;bottom:0}
+#ct{grid-area:ctr;position:absolute;z-index:5;align-self:start;justify-self:center}
+#qe{grid-area:qe;margin:0;flex-wrap:wrap;justify-content:center}
+#qe{gap:3px}
+#qe .qb{font-size:15px;padding:2px 3px}
+main:has(#play:not([hidden])) details{display:none}
+#sp{grid-area:sp;padding:6px;animation:none}
+#sp #spi,#sp>.lab{display:none}
+.tb>.act:not(#qe):not(#again){grid-area:act;margin:0}
+#again{grid-area:again;margin:0}
+#play .hw{grid-area:hand;align-self:end}
+#arr,#bar{display:none!important}
+#alr{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:30;margin:0}
+}
 </style></head>
 <body><main>
 <h1>🃏 Kartu Remi</h1>
@@ -314,8 +354,8 @@ main:has(#play:not([hidden])) h1{display:none}
 <script src="rules.js?v=1"></script>
 <script src="net.js?v=18"></script>
 <script src="game.js?v=7"></script>
-<script src="setfx.js?v=1"></script>
-<script src="ui.js?v=17"></script>
+<script src="setfx.js?v=2"></script>
+<script src="ui.js?v=18"></script>
 <script src="spin.js?v=2"></script>
 <script src="toko.js?v=1"></script>
 </body></html>

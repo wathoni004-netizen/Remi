@@ -15,7 +15,7 @@ function playSetFx(sk,by,vic,b){
  const T=SFXT[sk&&sk.t];if(!T)return;
  const ov=document.createElement("div");ov.className="sfx";
  const w=Math.min(380,innerWidth-16),vn=String(nm(vic)),h=Math.ceil(vn.length/2);
- ov.innerHTML=`<div class="sfx-st" style="width:${w}px"><div class="sfx-sh"><div class="sfx-np"><span></span><span></span></div><div class="sfx-me"></div><div class="sfx-fx"></div></div></div>`;
+ ov.innerHTML=`<div class="sfx-st" style="width:${w}px;transform:scale(${Math.min(1,(innerHeight-16)/330)})"><div class="sfx-sh"><div class="sfx-np"><span></span><span></span></div><div class="sfx-me"></div><div class="sfx-fx"></div></div></div>`;
  const q=s=>ov.querySelector(s),sp=ov.querySelectorAll(".sfx-np span");
  sp[0].textContent=vn.slice(0,h);sp[1].textContent=vn.slice(h);q(".sfx-me").textContent=by===uid?"Kamu":nm(by);
  document.body.appendChild(ov);
