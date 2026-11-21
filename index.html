@@ -293,6 +293,52 @@ main:has(#play:not([hidden])) details{display:none}
 #arr,#bar{display:none!important}
 #alr{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:30;margin:0}
 }
+/* HP miring: layar muat, ruang tunggu, menu, masuk, pengaturan, Spin, dan Toko disusun 2 kolom agar muat tanpa geser (gaya sama). */
+@media (orientation:landscape) and (max-height:520px){
+main:has(#play[hidden]),main:not(:has(#game:not([hidden]))){max-width:720px;padding:8px 16px}
+main:not(:has(#play:not([hidden]))) h1{font-size:18px;margin:0 0 6px}
+main:not(:has(#play:not([hidden]))) .mw{max-width:none;margin:0;gap:10px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start}
+#ld{padding:20px!important;align-items:center!important}
+#ld .hc{grid-column:1;grid-row:1/span 4;margin:0 auto}
+#ld>:not(.hc){grid-column:2}
+#home .mp{grid-column:1;grid-row:1}
+#home .mh{grid-column:1;grid-row:2/span 4;height:auto;align-self:stretch;min-height:150px}
+#home .mw>:not(.mp):not(.mh){grid-column:2}
+#home .mtl button{min-height:58px}
+#join{display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:end}
+#join>.act:first-child{grid-column:1/-1}
+#join>label:nth-of-type(1),#join>#nm{grid-column:1}
+#join>label:nth-of-type(2),#join>#rm{grid-column:2}
+#join>label:nth-of-type(1){grid-row:2}#join>#nm{grid-row:3}
+#join>label:nth-of-type(2){grid-row:2}#join>#rm{grid-row:3}
+#join>div.mut{display:none}
+#join>.act:nth-of-type(2){grid-column:1;grid-row:4}
+#join>.act:last-child{grid-column:2;grid-row:4}
+#pg .mw>*{grid-column:1/-1}
+#pg #pbk{justify-self:start}
+#kp .mw>:nth-child(1){grid-column:1;grid-row:1}
+#kp .mw>:nth-child(2){grid-column:1;grid-row:2}
+#kp .skch{grid-column:1;grid-row:3}
+#kp .mw>.act{grid-column:1;grid-row:4}
+#kp #spx{grid-column:1;grid-row:5}
+#kp #spw{grid-column:2;grid-row:1/span 3}
+#kp #spr{grid-column:2;grid-row:4;min-height:48px}
+#kp #spn{grid-column:2;grid-row:5;min-height:48px!important}
+#kp #spm{grid-column:1/-1;grid-row:6}
+#tw .mw>:nth-child(-n+5){grid-column:1}
+#tw .mw>:nth-child(n+6){grid-column:2}
+#tw .mw>:nth-child(1),#tw .mw>:nth-child(6){grid-row:1}
+#tw .mw>:nth-child(2),#tw .mw>:nth-child(7){grid-row:2}
+#tw .mw>:nth-child(3),#tw .mw>:nth-child(8){grid-row:3}
+#tw .mw>:nth-child(4),#tw .mw>:nth-child(9){grid-row:4}
+#tw .mw>:nth-child(5),#tw .mw>:nth-child(10){grid-row:5}
+#lobby:has(.rc){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;grid-auto-flow:row dense;align-items:center}
+#lobby:has(.rc)>*{grid-column:2;margin:4px 0}
+#lobby:has(.rc)>:nth-child(-n+3){grid-column:1}
+#lobby .rc{margin:0}
+main:has(#lobby:not([hidden])) h1{display:none}
+main:has(#lobby:not([hidden])) #game{padding-bottom:0}
+}
 </style></head>
 <body><main>
 <h1>🃏 Kartu Remi</h1>
