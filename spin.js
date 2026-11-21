@@ -1,22 +1,25 @@
 // Spin Skin: kartu biru/merah -> skin. Data di users/{uid} = {biru,merah,skins:{kunci:true}}; hanya akun Google yang boleh menyimpan (lihat Rules).
 // Satu tulisan penuh per aksi (kurangi kartu + tambah skin sekaligus) supaya saldo tidak setengah tersimpan.
 (()=>{
-const TC={Spesial:"#4ac68c",Epik:"#a56bff",Legenda:"#ff9d2e"},LV={Spesial:2,Epik:3,Legenda:4,Kolektor:4};
+const TC={Spesial:"#4ac68c",Epik:"#a56bff",Legenda:"#ff9d2e"},LV={Spesial:2,Epik:3,Legenda:4,Kolektor:4,Zonk:1};
 const card=(k,w)=>{const d=SKA.get(k);return{key:k,n:d.n,t:d.tn,w,col:d.c[0]}};
-// Peluang (persen), tiap skin dalam satu tier sama besar. biru = Spesial 98,5 (12 skin); Epik 1,5 (6 skin). merah = Spesial 50 (12 skin); Epik 40 (6 skin); Legenda 10 (4 skin). Kolektor tidak ada di Spin (event terbatas).
+const ZK=w=>({key:"ZONK",n:"Zonk",t:"Zonk",w,col:"#8a8f8c"});
+// Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (4 skin); Zonk 70. Zonk = kartu hangus tanpa skin. Kolektor tidak ada di Spin (event terbatas).
 const P1=[],P2=[],ids=t=>SKA.list.filter(d=>d.t===t).map(d=>d.k);
-ids("S").forEach(k=>{P1.push(card(k,98.5/12));P2.push(card(k,50/12))});
-ids("E").forEach(k=>{P1.push(card(k,1.5/6));P2.push(card(k,40/6))});
-ids("L").forEach(k=>P2.push(card(k,10/4)));
+ids("S").forEach(k=>{P1.push(card(k,5/12));P2.push(card(k,15/12))});
+ids("E").forEach(k=>P2.push(card(k,14/6)));
+ids("L").forEach(k=>P2.push(card(k,1/4)));
+P1.push(ZK(95));P2.push(ZK(70));
 const POOL={biru:P1,merah:P2};
-const ROWS={biru:[["#4ac68c","Spesial","12 skin","98,5%"],["#a56bff","Epik","6 skin","1,5%"]],
- merah:[["#4ac68c","Spesial","12 skin","50%"],["#a56bff","Epik","6 skin","40%"],["#ff9d2e","Legenda","4 skin","10%"]]};
+const ROWS={biru:[["#4ac68c","Spesial","12 skin","5%"],["#8a8f8c","Zonk","tanpa skin","95%"]],
+ merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","4 skin","1%"],["#8a8f8c","Zonk","tanpa skin","70%"]]};
 const NM={biru:"Spin Biasa",merah:"Spin Legenda"};
 let U={biru:0,merah:0,skins:{}},tab="biru",busy=false;
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#spm").textContent=t||""};
 const pick=p=>{let r=Math.random()*100,a=0;for(const c of p){a+=c.w;if(r<a)return c}return p[p.length-1]};
-const face=c=>`<div class="sks">${SKA.svg(c.key)}</div>`;
+const ZF='<div style="position:absolute;inset:6px 8px;border-radius:8px;background:#222a26;border:3px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 16px/1 system-ui">✕</div>';
+const face=c=>`<div class="sks">${c.key==="ZONK"?ZF:SKA.svg(c.key)}</div>`;
 function strip(win){const a=[];for(let i=0;i<32;i++)a.push(pick(POOL[tab]));if(win)a[24]=win;$("#spt").innerHTML=a.map(face).join("")}
 function counts(){$("#spcb").textContent=U.biru||0;$("#spcm").textContent=U.merah||0}
 function info(){$("#spq").innerHTML=`<div class="mut" style="font-weight:700;letter-spacing:.08em;margin-bottom:4px">PELUANG · ${NM[tab]}</div>`+ROWS[tab].map(r=>`<div style="display:flex;align-items:center;gap:10px;min-height:32px"><span style="width:12px;height:12px;border-radius:3px;background:${r[0]}"></span><b style="width:64px;font-size:14px">${r[1]}</b><span class="mut" style="flex:1;font-size:12px">${r[2]}</span><b>${r[3]}</b></div>`).join("")}
@@ -37,7 +40,7 @@ async function spin(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
  if((U[tab]||0)<1)return sm("Kartu "+(tab==="biru"?"biru":"merah")+" tidak cukup.");
- const w=pick(POOL[tab]),dup=!!U.skins[w.key],nu=Object.assign({},U,{skins:Object.assign({},U.skins,{[w.key]:true})});nu[tab]=U[tab]-1;
+ const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!U.skins[w.key],nu=Object.assign({},U,{skins:z?U.skins:Object.assign({},U.skins,{[w.key]:true})});nu[tab]=U[tab]-1;
  busy=true;sm("");
  if(!await put(nu)){busy=false;return}
  U=nu;counts();$("#spr").textContent="Memutar…";
@@ -54,6 +57,11 @@ async function swap(){
 function reveal(w,dup){
  const l=LV[w.t],c=w.col,G=[240,280,340,400][l-1],o=$("#spo");
  let h="";
+ if(w.key==="ZONK"){
+  o.innerHTML=`<div style="position:relative;width:150px;height:210px;box-sizing:border-box;border-radius:14px;background:#222a26;border:5px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 64px/1 system-ui;animation:skShake .5s ease-in-out .6s 1">✕</div><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;animation:skPop .5s ease-out .4s both"><div style="font-size:26px;font-weight:900;letter-spacing:.12em;color:#8a8f8c">ZONK</div><div style="font-size:14px;color:#d9e7de">Kartu hangus, tidak dapat skin</div></div><button class="skl" id="spl">Lanjut</button>`;
+  o.hidden=false;$("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
+  $("#spr").innerHTML=`<b style="color:#8a8f8c">Zonk · tidak dapat skin</b>`;
+  if(navigator.vibrate)navigator.vibrate(30);return}
  if(l===4)h+=`<div class="skx" style="top:0;left:0;right:0;bottom:0;background:#fff7d6;animation:skFlash .9s ease-out both"></div>`;
  if(l>=3){
   h+=`<div class="skx" style="left:50%;top:50%;width:640px;height:640px;margin:-350px 0 0 -320px;border-radius:50%;background:repeating-conic-gradient(from 0deg,${l===4?"rgba(232,185,35,.55)":"rgba(165,107,255,.4)"} 0deg 9deg,transparent 9deg 24deg);-webkit-mask-image:radial-gradient(circle,#000 18%,transparent 68%);mask-image:radial-gradient(circle,#000 18%,transparent 68%);animation:skRays ${l===4?6:12}s linear infinite"></div>`;

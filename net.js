@@ -157,13 +157,13 @@ function beat(){
  try{Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc())).catch(()=>{})}catch(e){}}
 setInterval(beat,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)beat()});
-// Hadiah: pemenang tiap ronde (poin tertinggi / men-set) dapat 1 kartu biru, hanya akun Google. Kunci per ronde di localStorage mencegah dobel.
+// Hadiah (hanya akun Google): pemenang ronde dapat koin = setengah poinnya. Kartu spin hanya dari men-set: set biasa +1 kartu biru, set dengan kartu joker +1 kartu merah. Kunci per ronde di localStorage mencegah dobel.
 async function award(){
  const g=auth&&auth.currentUser;
  if(!st||st.status!=="done"||st.winner!==uid||!g||g.isAnonymous)return;
- const k=room+":"+(st.gen||0)+":"+(st.hist||[]).length,kn=Math.max(0,Math.floor(((st.sc||{})[uid]||0)/2));
+ const k=room+":"+(st.gen||0)+":"+(st.hist||[]).length,kn=Math.max(0,Math.floor(((st.sc||{})[uid]||0)/2)),sx=st.sx;
  try{if(localStorage.getItem("aw")===k)return;localStorage.setItem("aw",k)}catch(e){}
- try{const v=(await db.get("users/"+uid))||{};await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+1,koin:(v.koin||0)+kn}));msg("🎉 Menang ronde! +1 kartu biru, +"+kn+" koin")}
+ try{const v=(await db.get("users/"+uid))||{};await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+(sx&&!isJ(sx)?1:0),merah:(v.merah||0)+(sx&&isJ(sx)?1:0),koin:(v.koin||0)+kn}));msg("🎉 Menang ronde! "+(sx?(isJ(sx)?"+1 kartu merah, ":"+1 kartu biru, "):"")+"+"+kn+" koin")}
  catch(e){try{localStorage.removeItem("aw")}catch(_){}}
 }
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
