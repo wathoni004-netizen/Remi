@@ -146,14 +146,20 @@ button.tci:active .tcd{transform:scale(.94)}
 .ivs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
 .ivs>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0 4px;border:1px solid #2f4238;border-radius:10px;font-size:11px;color:#9fb0a6;font-weight:700}
 .ivs>div.act,.ivs>div.sel{border-color:#e8b923}
-.ivs .skc,.ivl .skc,.ivg{width:36px;height:50px}
-.ivs .skc.em{border-style:dashed;border-color:#2f4238;background:transparent}
+.sk{position:relative;flex:none;width:36px;height:50px;box-sizing:border-box;touch-action:none}
+.sk .ska{position:absolute;left:-9px;top:-11px;width:54px;height:72px;overflow:visible;pointer-events:none}
+.sk.em{border:2px dashed #2f4238;border-radius:8px}
+.sks{position:relative;flex:none;width:70px;height:98px;overflow:hidden}
+.sks .ska{position:absolute;left:-17.5px;top:-21px;width:105px;height:140px;pointer-events:none}
+.sks .ska.sm{left:-9px;top:-11px;width:54px;height:72px}
+.ska.rv{position:absolute;left:-37.5px;top:-45px;width:225px;height:300px;overflow:visible}
 .ivl{display:flex;flex-wrap:wrap;gap:6px}
-.ivl .skc{touch-action:none;cursor:grab}
-.ivl .skc.on{outline:2px solid #e8b923}
+.ivl .sk{cursor:grab}
+.ivl .sk.on::after{content:"";position:absolute;inset:-2px;border:2px solid #e8b923;border-radius:8px;pointer-events:none}
+.ivu{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.ivu button{flex:none;padding:4px 12px}
 .ivp{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid #2f4238;border-radius:12px;background:#1f2b25}
 .ivh{display:flex;align-items:center;gap:8px;font-size:13px}
-.ivg{position:fixed;z-index:70;pointer-events:none;opacity:.9;box-sizing:border-box;border-radius:8px;background:#f7f3e6;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;line-height:1}
+.sk.ivg{position:fixed;z-index:70;pointer-events:none;opacity:.9}
 main:has(#iv:not([hidden])) h1,main:has(#iv:not([hidden])) #ld{display:none}
 main:has(#kp:not([hidden])) h1,main:has(#kp:not([hidden])) #ld,main:has(#tw:not([hidden])) h1,main:has(#tw:not([hidden])) #ld{display:none}
 main:has(#ld:not([hidden])) h1,main:has(#pg:not([hidden])) h1,main:has(#pg:not([hidden])) #ld{display:none}
@@ -432,9 +438,10 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 <script src="rules.js?v=2"></script>
 <script src="net.js?v=18"></script>
 <script src="game.js?v=10"></script>
-<script src="setfx.js?v=3"></script>
+<script src="skinart.js?v=1"></script>
+<script src="setfx.js?v=4"></script>
 <script src="ui.js?v=21"></script>
-<script src="spin.js?v=3"></script>
+<script src="spin.js?v=4"></script>
 <script src="toko.js?v=1"></script>
-<script src="inv.js?v=3"></script>
+<script src="inv.js?v=5"></script>
 </body></html>
