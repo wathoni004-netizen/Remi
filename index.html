@@ -111,6 +111,16 @@ main:has(#play[hidden]) #mbox{display:none}
 .skch div{flex:1;display:flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border-radius:12px;background:#1f2b25;border:1px solid #2f4238;font-size:13px;color:#9fb0a6}
 .skch i{width:16px;height:22px;border-radius:3px}
 .skch b{margin-left:auto;color:#f2efe4;font-size:16px}
+.tc{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:#1f2b25;border:1px solid #2f4238;color:#f2efe4;font-size:13px}
+.tc i{width:10px;height:14px;border-radius:2px}
+.tsh{display:flex;gap:12px;flex-wrap:wrap}
+.tci{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;color:#9fb0a6;font-size:12px}
+button.tci{color:#f2efe4;font-size:14px;font-weight:700;cursor:pointer}
+.tcd{width:46px;height:64px;box-sizing:border-box;border-radius:6px;border:2px solid #f2efe4;background:repeating-linear-gradient(45deg,var(--c) 0 6px,var(--d) 6px 9px);box-shadow:0 4px 12px rgba(0,0,0,.45);transition:transform .1s}
+button.tci:active .tcd{transform:scale(.94)}
+.tsn{background:#f7f3e6;opacity:.5;display:flex;align-items:center;justify-content:center;color:#14201a;font-size:20px;font-weight:800}
+.tpr{display:inline-flex;align-items:center;gap:4px}
+.tpr i{width:10px;height:10px;border-radius:50%;background:#e8b923}
 .skr{min-height:56px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px dashed #2f4238;border-radius:14px;color:#9fb0a6;font-size:14px;padding:0 10px}
 .skq{width:44px;height:44px;border:0;background:transparent;opacity:.5;color:#9fb0a6;padding:0;display:flex;align-items:center;justify-content:center}
 .skq span{width:22px;height:22px;border:1px solid #9fb0a6;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
@@ -325,13 +335,14 @@ main:not(:has(#play:not([hidden]))) .mw{max-width:none;margin:0;gap:10px;padding
 #kp #spr{grid-column:2;grid-row:4;min-height:48px}
 #kp #spn{grid-column:2;grid-row:5;min-height:48px!important}
 #kp #spm{grid-column:1/-1;grid-row:6}
-#tw .mw>:nth-child(-n+5){grid-column:1}
+#tw .mw>*{grid-column:1}
 #tw .mw>:nth-child(n+6){grid-column:2}
 #tw .mw>:nth-child(1),#tw .mw>:nth-child(6){grid-row:1}
-#tw .mw>:nth-child(2),#tw .mw>:nth-child(7){grid-row:2}
-#tw .mw>:nth-child(3),#tw .mw>:nth-child(8){grid-row:3}
-#tw .mw>:nth-child(4),#tw .mw>:nth-child(9){grid-row:4}
-#tw .mw>:nth-child(5),#tw .mw>:nth-child(10){grid-row:5}
+#tw .mw>:nth-child(2){grid-row:2}
+#tw .mw>:nth-child(4){grid-row:3}
+#tw .mw>:nth-child(5){grid-row:4}
+#tw .mw>:nth-child(3),#tw .mw>:nth-child(8){grid-row:5}
+#tw .mw>:nth-child(7){grid-row:2/span 3}
 #lobby:has(.rc){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;grid-auto-flow:row dense;align-items:center}
 #lobby:has(.rc)>*{grid-column:2;margin:4px 0}
 #lobby:has(.rc)>:nth-child(-n+3){grid-column:1}
@@ -371,15 +382,13 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 <div id="spq" class="skq2" hidden></div>
 </div><div id="spo" class="sko" hidden></div></div>
 <div id="tw" hidden><div class="mw">
-<div style="display:flex;align-items:center"><button class="pri sec" id="twb" style="flex:none;padding:6px 14px">‹ Menu</button></div>
+<div style="display:flex;align-items:center;gap:6px"><button class="pri sec" id="twb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="margin-left:auto;display:flex;gap:5px"><span class="tc" aria-label="Koin"><i style="background:#e8b923;border-radius:50%;height:10px"></i><b id="twk">0</b></span><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="twb1">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="twm2">0</b></span></span></div>
 <div style="font-weight:800;font-size:20px">Toko</div>
-<div class="skch"><div><i style="background:#e8b923;border-radius:50%;width:16px;height:16px"></i>Koin<b id="twk">0</b></div></div>
-<div class="skch"><div><i style="background:#2f6fe0"></i>Biru<b id="twb1">0</b></div><div><i style="background:#d63a3a"></i>Merah<b id="twm2">0</b></div></div>
 <div class="mut" style="font-size:12px">Koin didapat dari menang ronde (50% dari poin ronde).</div>
 <div style="font-weight:800;font-size:16px">Beli kartu spin</div>
-<div class="act" style="margin:0"><button class="pri" id="tw1" style="color:#fff;background:#2f6fe0">1 kartu biru<small>100 koin</small></button><button class="pri" id="tw2" style="color:#fff;background:#d63a3a">1 kartu merah<small>400 koin</small></button></div>
-<div style="font-weight:800;font-size:16px">Skin</div>
-<div class="skr">Skin Biasa, Spesial, dan Epik segera hadir</div>
+<div class="tsh"><button class="tci" id="tw1" aria-label="Beli 1 kartu biru, 100 koin"><span class="tcd" style="--c:#2f6fe0;--d:#1c4aa8"></span><span class="tpr"><i></i>100</span></button><button class="tci" id="tw2" aria-label="Beli 1 kartu merah, 400 koin"><span class="tcd" style="--c:#d63a3a;--d:#8e1f1f"></span><span class="tpr"><i></i>400</span></button></div>
+<div style="font-weight:800;font-size:16px">Skin <span class="mut" style="font-size:12px;font-weight:400">segera hadir</span></div>
+<div class="tsh"><span class="tci"><span class="tcd tsn" style="border-color:#c9d6cd">?</span>Biasa</span><span class="tci"><span class="tcd tsn" style="border-color:#4ac68c">?</span>Spesial</span><span class="tci"><span class="tcd tsn" style="border-color:#a56bff">?</span>Epik</span></div>
 <div class="mut" id="twm" style="text-align:center;font-size:12px;min-height:16px"></div>
 </div></div>
 <div id="game" hidden>
