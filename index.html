@@ -338,6 +338,10 @@ main:not(:has(#play:not([hidden]))) .mw{max-width:none;margin:0;gap:10px;padding
 #lobby .rc{margin:0}
 main:has(#lobby:not([hidden])) h1{display:none}
 main:has(#lobby:not([hidden])) #game{padding-bottom:0}
+.sko{display:grid;grid-template-columns:auto auto;align-content:center;justify-content:center;gap:16px 40px}
+.sko>:nth-last-child(3){grid-row:1/span 2}
+.sko>:nth-last-child(2){align-self:end}
+.sko>:last-child{align-self:start;justify-self:center}
 }
 </style></head>
 <body><main>
