@@ -49,7 +49,7 @@ function go(k,a){
   if(s.phase!=="draw"||s.lb!==prev||!X)return;
   // Semua kartu set yang mungkin (kartu tangan yang bisa ditukar dengan X sehingga seluruh tangan jadi kombinasi).
   // Jika pemain memilih satu (a), pakai pilihan itu; jika tidak, pakai nilai tertinggi.
-  const opts=h.filter(y=>full([...h.filter(z=>z!==y),X]));
+  const hs=hasSeri(s.laid[uid]),opts=h.filter(y=>full([...h.filter(z=>z!==y),X],hs));
   const c=opts.includes(a)?a:opts.slice().sort((p,q)=>pts(q)-pts(p))[0];
   if(!c)return msg("Belum bisa men-set");
   s.hands[uid]=[...h.filter(z=>z!==c),X];s.pile.pop();s.pile.push(c);s.sx=c;sel=[];

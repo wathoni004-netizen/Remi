@@ -4,13 +4,16 @@ function scoreHtml(H){
  const tot=ids.map(i=>H.reduce((t,r)=>t+((r.sc||{})[i]||0),0)),mx=Math.max(...tot);
  const cell=(r,i)=>{const v=(r.sc||{})[i];if(v==null)return"<td>-</td>";return`<td class="${r.vic===i?"vc":r.win===i?"wn":""}">${v}</td>`};
  return `<b>Catatan poin</b><div style="overflow-x:auto;margin-top:6px"><table class="tbl"><tr><th>Ronde</th>${ids.map(i=>`<th>${esc(nmx[i])}</th>`).join("")}</tr>${H.map((r,k)=>`<tr><td>${k+1}</td>${ids.map(i=>cell(r,i)).join("")}</tr>`).join("")}<tr class="tt"><th>Total poin</th>${tot.map(t=>`<th>${t}${t===mx?" 👑":""}</th>`).join("")}</tr></table></div><div class="mut" style="margin-top:6px">Hijau = menang ronde · Merah = terkena set</div>`}
-function handView(h){
+// live = hidup (hijau); half = rell yang belum hidup karena belum punya seri (kuning).
+function handView(h,hs){
  ord=ord.filter(c=>h.includes(c));h.forEach(c=>{if(!ord.includes(c))ord.push(c)});
- const A=arrange(ord);
+ const A=arrange(ord,hs);
  if(auto)ord=A.groups.flat();
  const starts=new Set();
  if(auto&&A.groups.length>1)A.groups.slice(1).forEach(g=>starts.add(g[0]));
- return{live:auto?A.live:adj(ord),starts}}
+ const M=auto?A.ms:adj(ord),ok=hs||M.some(isSeri),live=new Set(),half=new Set();
+ M.forEach(m=>m.forEach(c=>(ok||isSeri(m)?live:half).add(c)));
+ return{live,half,starts}}
 // m = true: susunan dicerminkan kiri-kanan (putaran ke kanan / berlawanan arah jarum jam).
 const pileLay=(n,RW,RH,m)=>{
  const r=125/175,W=Math.min(RW/9.24,RH*r/7.11,28),H=W/r,ox=(RW-9.24*W)/2,oy=(RH-7.11*H)/2,out=[];
@@ -107,10 +110,10 @@ function render(){
   document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Kartu Remi"}
  sel=sel.filter(c=>h.includes(c));
  const prev=nxt(st,uid,-1),X=st.pile[st.pile.length-1];
- const sopt=mine&&ph==="draw"&&st.lb===prev&&!!X?h.filter(y=>full([...h.filter(z=>z!==y),X])):[],cs=sopt.length>0;
+ const hsMe=hasSeri((st.laid||{})[uid]),sopt=mine&&ph==="draw"&&st.lb===prev&&!!X?h.filter(y=>full([...h.filter(z=>z!==y),X],hsMe)):[],cs=sopt.length>0;
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
  // Pemain yang siap men-set ditandai garis merah dan tab SET di namanya (CSS .rdy .nm, .stg), tanpa banner.
- const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used));
+ const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used,hasSeri((st.laid||{})[i])));
  const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  // Kursi diputar dari posisi kita: pemain berikutnya (urutan order) di kanan, lalu atas, lalu kiri.
  const k0=O.indexOf(uid),op=k0<0?O:[...O.slice(k0+1),...O.slice(0,k0)],pos=op.length<2?[0,op[0],0]:op.length===2?[op[1],0,op[0]]:[op[2],op[1],op[0]];
@@ -136,9 +139,9 @@ function render(){
  $("#setc").hidden=sopt.length<2;
  $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set:</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set ${lbl(c)}</button>`).join("");
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
- const V=handView(h),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
+ const V=handView(h,hsMe),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
- hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
+ hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
  $("#arr").hidden=!O.includes(uid);$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
  // Panah arah putaran di 4 sudut meja (dari atas sampai sebelum kartu turun milik kita).
