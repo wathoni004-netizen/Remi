@@ -90,7 +90,7 @@ function render(){
   // Hanya host (pembuat ruang) yang bisa mulai; pemain lain menekan Siap dulu.
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
   const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
-  lob.innerHTML=`<div class="mut" style="text-align:center">Kode ruang</div><div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="mut">Pemain masuk (maks 4)</div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs?"":`<div class="mut">${me?"Menunggu host memulai game…":"Tekan Siap, lalu host memulai game."}</div>`}<div class="act"><button class="pri sec" id="kx4">Keluar ruang</button></div>`;
+  lob.innerHTML=`<div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs||!me?"":`<div class="mut">Menunggu host memulai game…</div>`}<div class="act"><button class="pri sec" id="kx4">Keluar ruang</button></div>`;
   $("#kx4").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
   if(hs)$("#sb").onclick=start;
   else $("#rb").onclick=()=>Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:me?-1:gen()}))).catch(e=>msg("Gagal: "+(e.message||e.code)));
@@ -100,7 +100,7 @@ function render(){
  if(st.status==="done"&&players[uid]&&players[uid].rd===HH.length){
   const rd=Object.keys(players).filter(i=>live(i)&&players[i].rd===HH.length).sort((a,b)=>players[a].t-players[b].t),wt=Object.keys(players).filter(i=>live(i)&&players[i].rd!==HH.length&&(st.order||[]).includes(i));
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai · siap lanjut (maks 4)</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:`<span class="mut" style="flex:1">Menunggu host memulai ronde baru…</span>`}<button class="pri sec" id="kx">Keluar</button></div>`;
+  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:`<span class="mut" style="flex:1">Menunggu host memulai ronde baru…</span>`}<button class="pri sec" id="kx">Keluar</button></div>`;
   if($("#sb"))$("#sb").onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
  const O=st.order,h=(st.hands&&st.hands[uid])||[],done=st.status==="done",mine=!done&&st.turn===uid,ph=st.phase;
@@ -118,8 +118,8 @@ function render(){
  // Kursi diputar dari posisi kita: pemain berikutnya (urutan order) di kanan, lalu atas, lalu kiri.
  const k0=O.indexOf(uid),op=k0<0?O:[...O.slice(k0+1),...O.slice(0,k0)],pos=op.length<2?[0,op[0],0]:op.length===2?[op[1],0,op[0]]:[op[2],op[1],op[0]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
- $("#info").textContent=`Buangan ${st.pile.length} · Cabutan ${st.deck.length}`;
- $("#dkn").hidden=true;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");
+ $("#info").textContent="";
+ $("#dkn").hidden=true;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");$("#deck").innerHTML=`<b class="dcn">${st.deck.length}</b>`;$("#deck").setAttribute("aria-label","Cabut kartu, sisa "+st.deck.length);
  const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
  const PL=pileLay(np,RW,RH,(st.dir||1)>0);
  $("#pile").innerHTML=np?st.pile.map((c,i)=>{
@@ -142,7 +142,7 @@ function render(){
  const V=handView(h,hsMe),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
- $("#arr").hidden=!O.includes(uid);$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
+ $("#arr").hidden=true;$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
  // Panah arah putaran di 4 sudut meja; panah bawah di celah 28px antara kursi samping dan kartu turun kita (tidak menimpa kartu).
  {const cw=(st.dir||1)<0,a=cw?'<path d="M4 22Q4 4 20 4"/><polygon points="17,0 17,8 25,4"/>':'<path d="M22 4Q4 4 4 20"/><polygon points="0,17 8,17 4,25"/>';

@@ -27,7 +27,7 @@ function counts(){$("#spcb").textContent=U.biru||0;$("#spcm").textContent=U.mera
 function info(){$("#spq").innerHTML=`<div class="mut" style="font-weight:700;letter-spacing:.08em;margin-bottom:4px">PELUANG · ${NM[tab]}</div>`+ROWS[tab].map(r=>`<div style="display:flex;align-items:center;gap:10px;min-height:32px"><span style="width:12px;height:12px;border-radius:3px;background:${r[0]}"></span><b style="width:64px;font-size:14px">${r[1]}</b><span class="mut" style="flex:1;font-size:12px">${r[2]}</span><b>${r[3]}</b></div>`).join("")}
 function setTab(k){
  tab=k;const b=k==="biru";
- $("#spt1").style.background=b?"#2f6fe0":"#1f2b25";$("#spt2").style.background=b?"#1f2b25":"#d63a3a";
+ $("#spt1").classList.toggle("on",b);$("#spt2").classList.toggle("on",!b);
  $("#spn").style.background=b?"#2f6fe0":"#d63a3a";$("#spn").textContent="PUTAR · 1 kartu "+(b?"biru":"merah");
  $("#spr").textContent="Putar untuk dapat skin";strip();
  const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";info()}
