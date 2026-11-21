@@ -1,20 +1,21 @@
 // Efek lempar Set per tier skin (Spesial, Epik, Legenda, Kolektor). Diputar di semua HP saat kartu SET muncul.
-// Pen-set menulis state.sk = {t:"S"|"E"|"L"|"K", v:0-9} (game.js) hanya jika ia punya skin kartu set itu (users/{uid}/skins).
-// Kunci skin sama dengan spin.js: "K_s", "A_h", "JOKER_jb" (joker hitam X1), "JOKER_jr" (joker merah X2).
-const skKey=c=>isJ(c)?(c==="X2"?"JOKER_jr":"JOKER_jb"):(RK[rank(c)]||String(rank(c)))+"_"+suit(c).toLowerCase();
-const skTier=c=>isJ(c)?"L":({11:"S",12:"S",13:"S",14:"E"})[rank(c)]||"";
-let MYSK=null;
-// Skin milik sendiri dimuat sekali saat main (render memanggilnya), supaya siap tanpa menunggu saat Set.
+// Pen-set menulis state.sk = {t:"S"|"E"|"L"|"K", v:0-9} (game.js) hanya jika ia memasang skin di slot kelompok kartu set itu (users/{uid}/equip, diatur di Inventori, inv.js).
+// Variasi efek tetap per skin (fxV dari kunci skin), jadi pemain cukup memasang skin.
+// Kunci skin sama dengan spin.js: "K_s", "A_h", "JOKER_jb" (joker hitam X1), "JOKER_jr" (joker merah X2). Tier efek mengikuti skin terpasang (fxTier): Joker=L, As=E, lainnya=S.
+let MYSK=null,MYEQ={};
+// Slot terpasang dimuat sekali saat main (render memanggilnya), supaya siap tanpa menunggu saat Set.
 function mySkins(){
  const u=typeof auth!=="undefined"&&auth&&auth.currentUser;
- if(MYSK===null&&u&&!u.isAnonymous){MYSK={};db.get("users/"+uid).then(v=>{MYSK=(v&&v.skins)||{}}).catch(()=>{})}
+ if(MYSK===null&&u&&!u.isAnonymous){MYSK={};db.get("users/"+uid).then(v=>{MYSK=(v&&v.skins)||{};MYEQ=(v&&v.equip)||{}}).catch(()=>{})}
  return MYSK||{}}
-function skinFx(c){const k=skKey(c),t=skTier(c);if(!t||!mySkins()[k])return null;let h=0;for(const ch of k)h=(h*31+ch.charCodeAt(0))%997;return {t,v:h%10}}
+const fxTier=e=>e.startsWith("JOKER")?"L":e[0]==="A"?"E":"S";
+const fxV=e=>{let h=0;for(const ch of e)h=(h*31+ch.charCodeAt(0))%997;return h%10};
+function skinFx(c){mySkins();const e=MYEQ[isJ(c)?"jk":rank(c)===14?"as":rank(c)>10?"kqj":"k2"];return e?{t:fxTier(e),v:fxV(e)}:null}
 
-function playSetFx(sk,by,vic,b){
+function playSetFx(sk,by,vic,b,vname){
  const T=SFXT[sk&&sk.t];if(!T)return;
  const ov=document.createElement("div");ov.className="sfx";
- const w=Math.min(380,innerWidth-16),vn=String(nm(vic)),h=Math.ceil(vn.length/2);
+ const w=Math.min(380,innerWidth-16),vn=String(vname||nm(vic)),h=Math.ceil(vn.length/2);
  ov.innerHTML=`<div class="sfx-st" style="width:${w}px;transform:scale(${Math.min(1,(innerHeight-16)/330)})"><div class="sfx-sh"><div class="sfx-np"><span></span><span></span></div><div class="sfx-me"></div><div class="sfx-fx"></div></div></div>`;
  const q=s=>ov.querySelector(s),sp=ov.querySelectorAll(".sfx-np span");
  sp[0].textContent=vn.slice(0,h);sp[1].textContent=vn.slice(h);q(".sfx-me").textContent=by===uid?"Kamu":nm(by);

@@ -143,6 +143,18 @@ button.tci:active .tcd{transform:scale(.94)}
 @keyframes skShine{0%{transform:translateX(-160%) skewX(-20deg)}100%{transform:translateX(280%) skewX(-20deg)}}
 @keyframes skPop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes skFlash{0%{opacity:.95}100%{opacity:0}}
+.ivs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.ivs>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0 4px;border:1px solid #2f4238;border-radius:10px;font-size:11px;color:#9fb0a6;font-weight:700}
+.ivs>div.act,.ivs>div.sel{border-color:#e8b923}
+.ivs .skc,.ivl .skc,.ivg{width:36px;height:50px}
+.ivs .skc.em{border-style:dashed;border-color:#2f4238;background:transparent}
+.ivl{display:flex;flex-wrap:wrap;gap:6px}
+.ivl .skc{touch-action:none;cursor:grab}
+.ivl .skc.on{outline:2px solid #e8b923}
+.ivp{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid #2f4238;border-radius:12px;background:#1f2b25}
+.ivh{display:flex;align-items:center;gap:8px;font-size:13px}
+.ivg{position:fixed;z-index:70;pointer-events:none;opacity:.9;box-sizing:border-box;border-radius:8px;background:#f7f3e6;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;line-height:1}
+main:has(#iv:not([hidden])) h1,main:has(#iv:not([hidden])) #ld{display:none}
 main:has(#kp:not([hidden])) h1,main:has(#kp:not([hidden])) #ld,main:has(#tw:not([hidden])) h1,main:has(#tw:not([hidden])) #ld{display:none}
 main:has(#ld:not([hidden])) h1,main:has(#pg:not([hidden])) h1,main:has(#pg:not([hidden])) #ld{display:none}
 main:has(#home:not([hidden])) h1,main:has(#home:not([hidden])) #ld{display:none}
@@ -313,6 +325,8 @@ main:has(#play:not([hidden])) details{display:none}
 main:has(#play[hidden]),main:not(:has(#game:not([hidden]))){max-width:720px;padding:8px 16px}
 main:not(:has(#play:not([hidden]))) h1{font-size:18px;margin:0 0 6px}
 main:not(:has(#play:not([hidden]))) .mw{max-width:none;margin:0;gap:10px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start}
+#iv .mw>*{grid-column:1}
+#iv .mw>#ivr{grid-column:2;grid-row:1/span 4}
 #ld{padding:20px!important;align-items:center!important}
 #ld .hc{grid-column:1;grid-row:1/span 4;margin:0 auto}
 #ld>:not(.hc){grid-column:2}
@@ -363,7 +377,7 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 <h1>🃏 Kartu Remi</h1>
 <div id="err" class="mut"></div>
 <div id="ld" class="mw" style="align-items:center;text-align:center;padding:48px 20px 28px"><div class="hc"><i style="left:6px;top:12px;transform:rotate(-18deg)">A<br>♠<b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)">A<br>♥<b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)">A<br>♦<b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)">A<br>♣<b>H</b></i></div><div class="ht">Kartu Remi</div><div class="hs" style="margin:0">Game Kampung</div><div class="pb" style="width:100%"><i></i></div><div class="mut">Memuat…</div></div>
-<div id="home" hidden><div class="mw"><div class="mp"><div class="av" id="mav">P</div><div><div class="mpn" id="mpn">Pemain</div><div class="mps"><i class="dt"></i><span id="mpt">Tamu</span></div></div></div><div class="mh"><div class="hc" style="margin:0"><i style="left:6px;top:12px;transform:rotate(-18deg)">A<br>♠<b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)">A<br>♥<b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)">A<br>♦<b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)">A<br>♣<b>H</b></i></div></div><button class="mb" id="hp">MAIN</button><div id="rs" class="act" hidden style="align-items:center;justify-content:space-between;margin:0;padding:8px 8px 8px 16px;border:1px solid #e8b923;border-radius:14px"><span class="mut">Game berjalan: <b id="rsk" style="color:#f2efe4"></b></span><button class="pri" id="rg" style="flex:none;padding:8px 18px">Gabung</button></div><div class="mtl"><button id="tk"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Toko</button><button id="ts"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="10" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></svg>Spin Skin</button><button id="tpg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</button></div><button class="hb2" id="hr" style="margin:0">Cara main</button><div class="hf" style="text-align:center">2–4 pemain · versi 1.0</div></div></div>
+<div id="home" hidden><div class="mw"><div class="mp"><div class="av" id="mav">P</div><div><div class="mpn" id="mpn">Pemain</div><div class="mps"><i class="dt"></i><span id="mpt">Tamu</span></div></div></div><div class="mh"><div class="hc" style="margin:0"><i style="left:6px;top:12px;transform:rotate(-18deg)">A<br>♠<b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)">A<br>♥<b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)">A<br>♦<b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)">A<br>♣<b>H</b></i></div></div><button class="mb" id="hp">MAIN</button><div id="rs" class="act" hidden style="align-items:center;justify-content:space-between;margin:0;padding:8px 8px 8px 16px;border:1px solid #e8b923;border-radius:14px"><span class="mut">Game berjalan: <b id="rsk" style="color:#f2efe4"></b></span><button class="pri" id="rg" style="flex:none;padding:8px 18px">Gabung</button></div><div class="mtl"><button id="tk"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Toko</button><button id="ts"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="10" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></svg>Spin Skin</button><button id="ti"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Inventori</button><button id="tpg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</button></div><button class="hb2" id="hr" style="margin:0">Cara main</button><div class="hf" style="text-align:center">2–4 pemain · versi 1.0</div></div></div>
 <div id="join" class="box" hidden>
 <div class="act" style="margin:0 0 6px"><button class="pri sec" id="jbk" style="flex:none;padding:6px 14px">‹ Menu</button></div>
 <label class="mut">Nama kamu</label><input id="nm" maxlength="16" placeholder="Contoh: Boss">
@@ -384,6 +398,7 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 <div class="mut" id="spm" style="text-align:center;font-size:12px;min-height:16px"></div>
 <div id="spq" class="skq2" hidden></div>
 </div><div id="spo" class="sko" hidden></div></div>
+<div id="iv" hidden><div class="mw"><div style="display:flex;align-items:center;gap:10px"><button class="pri sec" id="ivb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="font-weight:800;font-size:20px">Inventori</span></div><div class="mut" id="ivm" style="font-size:12px;min-height:16px"></div><div class="ivs" id="ivs"></div><div class="ivp" id="ivp" hidden></div><div id="ivr"><div class="mut" style="margin-bottom:6px;font-size:12px">Skin dimiliki: tarik ke slot</div><div class="ivl" id="ivl"></div></div></div></div>
 <div id="tw" hidden><div class="mw">
 <div style="display:flex;align-items:center;gap:6px"><button class="pri sec" id="twb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="margin-left:auto;display:flex;gap:5px"><span class="tc" aria-label="Koin"><i style="background:#e8b923;border-radius:50%;height:10px"></i><b id="twk">0</b></span><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="twb1">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="twm2">0</b></span></span></div>
 <div style="font-weight:800;font-size:20px">Toko</div>
@@ -416,9 +431,10 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 </main>
 <script src="rules.js?v=2"></script>
 <script src="net.js?v=18"></script>
-<script src="game.js?v=9"></script>
-<script src="setfx.js?v=2"></script>
+<script src="game.js?v=10"></script>
+<script src="setfx.js?v=3"></script>
 <script src="ui.js?v=21"></script>
 <script src="spin.js?v=3"></script>
 <script src="toko.js?v=1"></script>
+<script src="inv.js?v=3"></script>
 </body></html>
