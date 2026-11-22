@@ -28,7 +28,7 @@ const pileLay=(n,RW,RH,m)=>{
  try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches){const k=Math.max(1,Math.min(1.9,(RW-64)/(9.24*W)));out.forEach(p=>{p.x=RW/2+(p.x+W/2-RW/2)*k-W/2})}}catch(e){}
  return{p:out,W,H,m,SX:.515*W,SY:.511*H,fs:Math.max(8,Math.round(W*.35))}};
 const pcard=(c,i,on,hl,xs,nw,p,L)=>{
- const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c)),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sx=f(L.SX),sw=f(L.SX-1);
+ const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c))),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sx=f(L.SX),sw=f(L.SX-1);
  let lb={T:"left:0;top:2px;width:"+sw+"px",R:"left:2px;top:2px",B:"right:0;top:2px;width:"+sw+"px",L:"left:2px;bottom:2px"}[e];
  if(L.m)lb=lb.replace(/left|right/,k=>k==="left"?"right":"left");
  let dc="";
@@ -41,8 +41,10 @@ const pcard=(c,i,on,hl,xs,nw,p,L)=>{
    dc=`<i class="bd" style="left:${f(cx-D/2-1)}px;top:${f(cy-D/2-1)}px;width:${D}px;height:${D}px;font-size:${Math.round(D*.7)}px">${s}</i><i class="sp" style="left:${f(cx-D/2-3)}px;top:${f(cy-D/2-1)}px;font-size:6px">✦</i><i class="sp" style="left:${f(cx+D/2+1)}px;top:${f(cy+D/2)}px;font-size:5px">✦</i>`}}
  const tx=r+(v||xs?"<br>":"")+s;
  return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" data-fx="${c}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}${xs?`;--tx:${f((e==="T"?1:e==="B"?-1:0)*(L.m?-1:1)*W)}px;--ty:${f((e==="R"?1:e==="L"?-1:0)*H*.95)}px`:""}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
-const card=(c,tag,on,x,sy)=>{const j=isJ(c),s=j?"🃏":SU[suit(c)],r=j?"JK":(RK[rank(c)]||rank(c))+(x==="mn"?"":s);return `<${tag} class="c ${red(c)?"r":""} ${x||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
-const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,i===uid?"sm":"mn")).join("")}</span>`).join("");
+const card=(c,tag,on,x,sy,kk)=>{const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c)))+(x==="mn"||(j&&!/lc/.test(x||""))?"":s);return `<${tag} class="c ${red(c)?"r":""} ${x||""}${kk||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
+// Skin Kartu pemain i (players/{i}.ck): kelas punggung (kb) dan wajah (kf); kosong kalau tidak ada.
+const ckey=i=>(players[i]&&players[i].ck)||"",kb=i=>KSK.kb(ckey(i)),kf=i=>KSK.kf(ckey(i));
+const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,(i===uid?"sm":"mn")+" lc",0,kf(i))).join("")}</span>`).join("");
 
 // Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
 function kickBtn(i){return hostId()===uid&&i!==uid&&st?`<button class="pri sec" data-kick="${i}" style="flex:none;margin-left:6px;padding:0 8px;font-size:12px;border-radius:999px">Kick</button>`:""}
@@ -114,12 +116,12 @@ function render(){
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
  // Pemain yang siap men-set ditandai garis merah dan tab SET di namanya (CSS .rdy .nm, .stg), tanpa banner.
  const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used,hasSeri((st.laid||{})[i])));
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn")).join("")}</div>`:`<div class="bk">${'<span class="c back sm"></span>'.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn",0,kf(i))).join("")}</div>`:`<div class="bk">${`<span class="c back sm${kb(i)}"></span>`.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  // Kursi diputar dari posisi kita: pemain berikutnya (urutan order) di kanan, lalu atas, lalu kiri.
  const k0=O.indexOf(uid),op=k0<0?O:[...O.slice(k0+1),...O.slice(0,k0)],pos=op.length<2?[0,op[0],0]:op.length===2?[op[1],0,op[0]]:[op[2],op[1],op[0]];
  $("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
  $("#info").textContent="";
- $("#dkn").hidden=true;$("#deck").className="c back lg"+(mine&&ph==="draw"?" tk":"");$("#deck").innerHTML=`<b class="dcn">${st.deck.length}</b>`;$("#deck").setAttribute("aria-label","Cabut kartu, sisa "+st.deck.length);
+ $("#dkn").hidden=true;$("#deck").className="c back lg"+kb(uid)+(mine&&ph==="draw"?" tk":"");$("#deck").innerHTML=`<b class="dcn">${st.deck.length}</b>`;$("#deck").setAttribute("aria-label","Cabut kartu, sisa "+st.deck.length);
  const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
  const PL=pileLay(np,RW,RH,(st.dir||1)>0);
  $("#pile").innerHTML=np?st.pile.map((c,i)=>{
@@ -141,7 +143,7 @@ function render(){
  $("#bl").hidden=!(mine&&ph==="act"&&sel.length>=3);$("#bx").hidden=!(mine&&ph==="act"&&sel.length===1);
  const V=handView(h,hsMe),hs=ord,hd=$("#hand"),W=(hd.clientWidth||340)-8,gp=hs.filter(c=>V.starts.has(c)).length,step=hs.length>1?Math.min(36,(W-54-gp*14)/(hs.length-1)):0;
  hd.style.setProperty("--ov",(step-54)+"px");
- hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""))).join("");
+ hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""),0,kf(uid))).join("");
  $("#arr").hidden=true;$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
  // Panah arah putaran di 4 sudut meja; panah bawah di celah 28px antara kursi samping dan kartu turun kita (tidak menimpa kartu).

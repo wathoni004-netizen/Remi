@@ -182,6 +182,11 @@ main:has(#home:not([hidden])) h1,main:has(#home:not([hidden])) #ld{display:none}
 .ctr{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
 .c{display:inline-block;position:relative;flex:none;box-sizing:border-box;width:44px;height:62px;padding:0;border:1px solid #b9b9b9;border-radius:6px;background:#fff;color:#111;font:700 14px/1 system-ui,sans-serif;text-align:left}
 .c.r{color:#c0392b}
+.gl{display:inline-block;vertical-align:-.12em;height:1em;fill:currentColor;overflow:visible}
+.gk{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.gs{width:1em}
+.c .ct .gs{vertical-align:middle}
+.pk .lb .gl{vertical-align:-.1em}
 .c i{font-style:normal;position:absolute}
 .c .rk{top:3px;left:4px;font-size:.85em}
 .c .ct{inset:0;display:flex;align-items:center;justify-content:center;font-size:2em;opacity:.85}
@@ -191,6 +196,13 @@ main:has(#home:not([hidden])) h1,main:has(#home:not([hidden])) #ld{display:none}
 .c.mn .rk{top:1px;left:2px;font-size:1.35em}
 .c.mn .ct{inset:auto;right:1px;bottom:0;font-size:1.9em;line-height:1;opacity:1;display:block}
 .c.lg{width:54px;height:78px;font-size:17px}
+/* Kartu turun (Set/kombinasi): hanya angka dan lambang bertumpuk di pojok kiri, supaya tetap terbaca saat saling menimpa */
+.c.lc .ct{display:none!important}
+.c.lc .rk{display:flex;flex-direction:column;align-items:center;gap:1px;top:2px;left:2px;font-size:1em;line-height:1}
+.c.mn.lc{font-size:10px}
+.mt .c.mn.lc{margin-left:-4px}
+.mt .c.mn.lc:first-child{margin-left:0}
+.c.sm.lc{font-size:12px}
 .dcn{position:absolute;right:-8px;top:-8px;min-width:22px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:11px;background:#14201a;border:2px solid #e8b923;color:#e8b923;font:700 12px/18px system-ui,sans-serif;text-align:center}
 button.c:disabled{opacity:1}
 button.c:not(:disabled){cursor:pointer}
@@ -314,6 +326,7 @@ main:has(#play:not([hidden])) #game{padding-bottom:0}
 .side .bk .c:first-child{margin-left:0}
 #mine{grid-area:mine;min-height:0;align-content:flex-start}
 #mine .c.sm{width:24px;height:34px;font-size:9px}
+#mine .c.sm.lc{width:26px;height:36px;font-size:11px}
 #play .ctr{grid-area:ctr;align-self:stretch}
 #ring{flex:1;height:auto;min-height:120px}
 #dirw{grid-area:ctr;height:auto!important;top:0;bottom:0}
@@ -441,13 +454,14 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 </div><div id="score" class="box" hidden></div><button id="cf" class="cfb" aria-label="Buka obrolan">💬<i class="ud"></i></button><div id="chatbox" class="box" hidden><div style="display:flex;align-items:center;justify-content:space-between"><b>Obrolan meja</b><span><span id="cr" class="lab"></span><button id="cc" class="xc" aria-label="Tutup obrolan">✕</button></span></div><div id="cl"></div><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div></div><div id="mbox" class="box" hidden><div style="display:flex;align-items:center;justify-content:space-between"><b>Skor &amp; menu</b><button class="xc" id="mc" aria-label="Tutup">✕</button></div><div id="msc" style="margin:8px 0"></div><div class="act"><button class="pri sec" id="ky" hidden>Akhiri game</button><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
 <details class="mut"><summary>Aturan main</summary><div class="ar"><h5>Poin kartu</h5><ul><li>2-10 = 5</li><li>J / Q / K = 10</li><li>A = 15</li><li>Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya)</li></ul><h5>Kombinasi</h5><ul><li>Seri = 3-4 kartu berurutan satu jenis. Angka 2-10 hanya dengan angka; J-Q-K hanya dengan J-Q-K.</li><li>A-A-A atau A-A-A-A dihitung seri sekaligus rell.</li><li>Rell = 3-4 kartu angka sama.</li><li>Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker per kombinasi (3 atau 4 kartu).</li><li>Seri harus turun dulu sebelum rell. Kalau menurunkan rell saat seri masih di tangan, seri itu ikut turun otomatis lebih dulu.</li></ul><h5>Giliran</h5><ul><li>Cabut 1, lalu buang 1.</li><li>Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan). Semua kartu di atasnya ikut terambil.</li><li>Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang.</li><li>Joker tidak boleh dibuang ke bawah. Joker hanya keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set.</li><li>Kartu di tangan bisa disusun sendiri (seret dengan jari) atau otomatis berkelompok saat sudah hidup.</li></ul><h5>Set</h5><ul><li>Kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set.</li><li>Rell baru dihitung hidup dan bisa dipakai men-set kalau sudah punya seri (di tangan atau sudah diturunkan). Di tangan, rell tanpa seri berwarna kuning; jadi hijau setelah ada seri.</li><li>Pen-set mendapat nilai kartu pengganti × 10: 2-10 = 50, J/Q/K = 100, As = 150, joker = 250.</li><li>Pemain yang di-set kehilangan poin yang sama, lalu game selesai.</li><li>Pemain yang siap men-set diberi garis merah dan tanda SET di namanya (terlihat pemain lain), tanpa menyebut kartu yang ditunggu.</li><li>Kartu set dilempar ke tumpukan buangan dan tampil sedikit terpisah: lebih besar, agak miring, bergaris merah, dengan pita SET di sudut kanan bawah.</li></ul><h5>Akhir ronde</h5><ul><li>Kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja).</li><li>Kartu yang belum jadi mengurangi poin, lalu poin set dihitung. Contoh: hidup 15 − belum jadi 20 − set 50 = −55.</li><li>Ada set: pen-set jadi pemenang ronde. Tanpa set (tumpukan habis): pemenang = poin terbanyak.</li><li>Pilih Lanjut atau Keluar. Catatan poin tiap ronde muncul di bawah.</li></ul><h5>Putaran</h5><ul><li>Ronde pertama berputar ke kanan (berlawanan arah jarum jam).</li><li>Ronde yang berakhir dengan set membuat ronde berikutnya berbalik arah. Tanpa set, arah tetap.</li><li>Arah berlanjut antarronde selama pemain menekan Lanjut.</li><li>Panah kuning di sudut meja dan susunan kartu buangan mengikuti arah putaran.</li></ul><h5>Akhiri game</h5><ul><li>Hanya pemilik room yang bisa menekan Akhiri game (tombol ☰ di samping emoji, bagian bawah) untuk kembali ke ruang tunggu.</li><li>Permainan direset: catatan poin dikosongkan dan putaran kembali ke kanan.</li></ul></div></details>
 </main>
-<script src="rules.js?v=2"></script>
+<script src="rules.js?v=4"></script>
 <script src="net.js?v=19"></script>
 <script src="game.js?v=10"></script>
-<script src="skinart.js?v=1"></script>
+<script src="kartuskin.js?v=3"></script>
+<script src="skinart.js?v=2"></script>
 <script src="setfx.js?v=4"></script>
-<script src="ui.js?v=21"></script>
+<script src="ui.js?v=23"></script>
 <script src="spin.js?v=8"></script>
-<script src="toko.js?v=4"></script>
-<script src="inv.js?v=5"></script>
+<script src="toko.js?v=5"></script>
+<script src="inv.js?v=6"></script>
 </body></html>

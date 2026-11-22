@@ -64,9 +64,10 @@ const get=k=>D.find(d=>d.k===k);
 function svg(k,cls){const s=get(k),g="ska_"+k+"_"+(++SN);setPal(s);const st=s.c.length>=5?s.c.map((c,i)=>`<stop offset="${(i/(s.c.length-1)).toFixed(2)}" stop-color="${c}"/>`).join(""):`<stop offset="0" stop-color="${s.fr[0]}"/><stop offset=".3" stop-color="${s.fr[1]}"/><stop offset=".55" stop-color="${s.fr[2]}"/><stop offset=".75" stop-color="${s.fr[1]}"/><stop offset="1" stop-color="${s.fr[0]}"/>`;return `<svg class="${cls||"ska"}" viewBox="0 0 300 400" overflow="visible" aria-hidden="true"><defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1">${st}</linearGradient></defs><rect x="50" y="60" width="200" height="280" rx="20" fill="${s.fr[3]}" stroke="url(#${g})" stroke-width="12"/>${s.a(mk(s.sd))}</svg>`}
 // Skin lama (kunci kartu) -> skin baru. Biasa (2-10) dihapus. Dipakai saat memuat users/{uid}: migrate(skins) dan migrateEquip(equip).
 const OLD={K_s:"S01",K_h:"S02",K_d:"S03",K_c:"S04",Q_s:"S05",Q_h:"S06",Q_d:"S07",Q_c:"S08",J_s:"S09",J_h:"S10",J_d:"S11",J_c:"S12",A_s:"E01",A_h:"E02",A_d:"E03",A_c:"E04",JOKER_jb:"L01",JOKER_jr:"L02"};
-const nk=k=>get(k)?k:(OLD[k]||null);
+const isC=k=>typeof KSK!=="undefined"&&!!KSK.get(k);
+const nk=k=>get(k)||isC(k)?k:(OLD[k]||null);
 const migrate=o=>{const r={};for(const k in o||{}){const n=nk(k);if(n&&o[k])r[n]=true}return r};
-const migrateEquip=o=>{const r={};for(const s in o||{}){const n=nk(o[s]);if(n&&(get(n).t!=="K"||s==="as"||s==="jk"))r[s]=n}return r};
+const migrateEquip=o=>{const r={};for(const s in o||{}){const n=nk(o[s]);if(!n)continue;if(isC(n)){if(s==="kartu")r[s]=n}else if(s!=="kartu"&&(get(n).t!=="K"||s==="as"||s==="jk"))r[s]=n}return r};
 // Kolektor hanya boleh di slot As dan Joker; tier lain di slot 2-10, KQJ, As, Joker.
-const canSlot=(k,s)=>!!get(k)&&["k2","kqj","as","jk"].includes(s)&&(get(k).t!=="K"||s==="as"||s==="jk");
-return {list:D,get,svg,migrate,migrateEquip,canSlot,tier:k=>get(k)&&get(k).tn}})();
+const canSlot=(k,s)=>isC(k)?s==="kartu":!!get(k)&&["k2","kqj","as","jk"].includes(s)&&(get(k).t!=="K"||s==="as"||s==="jk");
+return {list:D,get,svg,migrate,migrateEquip,canSlot,tier:k=>(get(k)||(isC(k)&&KSK.get(k))||{}).tn}})();

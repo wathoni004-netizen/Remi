@@ -10,7 +10,7 @@ const save=async o=>{try{await db.doc("rooms/"+room).set(o);msg("")}catch(e){msg
 const hostId=()=>{const L=Object.keys(players).filter(live);if(st&&st.host&&L.includes(st.host))return st.host;return L.sort((a,b)=>(players[a].j||players[a].t)-(players[b].j||players[b].t))[0]||""};
 const gen=()=>(st&&st.gen)||0;
 const isOk=i=>i===hostId()||(!!players[i]&&players[i].ok===gen());
-const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});return Object.assign(r,o||{})};
+const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok","ck"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});return Object.assign(r,o||{})};
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
 const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
@@ -67,7 +67,9 @@ $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
  room=$("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,"");if(!room)return msg("Isi kode ruang, atau tekan Buat ruang baru.");
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
- try{await db.doc(`rooms/${room}/players/${uid}`).set({name,t:Date.now(),j:Date.now()})}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
+ // Skin Kartu yang dipasang (users/{uid}.equip.kartu) ikut ke data pemain agar terlihat semua orang; hanya akun Google.
+ let ck="";try{const g=auth&&auth.currentUser;if(g&&!g.isAnonymous){const v=await db.get("users/"+uid),k=v&&v.equip&&v.equip.kartu;if(k&&KSK.get(k)&&v.skins&&v.skins[k])ck=k}}catch(e){}
+ try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign({name,t:Date.now(),j:Date.now()},ck?{ck}:{}))}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
  $("#home").hidden=true;$("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
