@@ -42,8 +42,8 @@ const pcard=(c,i,on,hl,xs,nw,p,L)=>{
  const tx=r+(v||xs?"<br>":"")+s;
  return `<button class="c pk ${red(c)?"r":""}${hl&&!xs?" hl":""}${on?" tk":""}${xs?" xs":""}${ex?" ex":""}" data-fx="${c}" style="left:${f(p.x)}px;top:${f(p.y)}px;width:${f(W)}px;height:${f(H)}px;font-size:${L.fs}px;z-index:${xs?9999:i+1}${xs?`;--tx:${f((e==="T"?1:e==="B"?-1:0)*(L.m?-1:1)*W)}px;--ty:${f((e==="R"?1:e==="L"?-1:0)*H*.95)}px`:""}" ${on?'data-c="'+c+'"':"disabled"}><i class="lb${v?" v":""}" style="${lb}">${tx}</i>${dc}</button>`};
 const card=(c,tag,on,x,sy,kk)=>{const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c)))+(x==="mn"||(j&&!/lc/.test(x||""))?"":s);return `<${tag} class="c ${red(c)?"r":""} ${x||""}${kk||""}" data-fx="${c}"${sy?` style="${sy}"`:""} ${tag==="button"?(on?'data-c="'+c+'"':"disabled"):""}><i class="rk">${r}</i><i class="ct">${s}</i></${tag}>`};
-// Skin Kartu pemain i (players/{i}.ck): kelas punggung (kb) dan wajah (kf); kosong kalau tidak ada.
-const ckey=i=>(players[i]&&players[i].ck)||"",kb=i=>KSK.kb(ckey(i)),kf=i=>KSK.kf(ckey(i));
+// Skin Kartu: semua pemain memakai skin host (players/{host}.ck): kelas punggung (kb) dan wajah (kf); kosong kalau tidak ada.
+const ckey=i=>(players[hostId()]&&players[hostId()].ck)||"",kb=i=>KSK.kb(ckey(i)),kf=i=>KSK.kf(ckey(i));
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,(i===uid?"sm":"mn")+" lc",0,kf(i))).join("")}</span>`).join("");
 
 // Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
