@@ -266,6 +266,11 @@ main:has(#play:not([hidden])) h1{display:none}
 .sfx-np span{background:#f2efe4;color:#14201a;padding:5px 6px;white-space:nowrap}
 .sfx-np span:first-child{border-radius:8px 0 0 8px;padding-right:0}
 .sfx-np span:last-child{border-radius:0 8px 8px 0;padding-left:0}
+.sfx.tb .sfx-st{position:absolute;background:none;overflow:visible;border-radius:0}
+.sfx-nw,.sfx-mw{position:absolute;left:50%;width:0;height:0;z-index:1}
+.sfx-nw{top:54px}.sfx-mw{top:302px}
+.sfx.tb .sfx-np{top:-14px}
+.sfx.tb .sfx-me{bottom:auto;top:-14px}
 .sfx-me{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#e8b923;color:#14201a;font-size:14px;font-weight:700;padding:5px 14px;border-radius:8px;white-space:nowrap}
 /* HP miring: posisi meja diatur ulang (gaya sama dengan HP tegak). Hanya untuk layar pendek mendatar. */
 @media (orientation:landscape) and (max-height:520px){
@@ -425,8 +430,8 @@ main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 <script src="js/kartuskin.js?v=3"></script>
 <script src="js/mejaskin.js?v=1"></script>
 <script src="js/skinart.js?v=5"></script>
-<script src="js/setfx.js?v=4"></script>
-<script src="js/ui.js?v=27"></script>
+<script src="js/setfx.js?v=5"></script>
+<script src="js/ui.js?v=28"></script>
 <script src="js/spin.js?v=9"></script>
 <script src="js/toko.js?v=9"></script>
 <script src="js/inv.js?v=9"></script>

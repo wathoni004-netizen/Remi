@@ -13,15 +13,24 @@ const mixc=(a,b,t)=>{const h=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),A=h(
 const rgbs=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)).join(",");
 function skinFx(c){mySkins();const e=MYEQ[isJ(c)?"jk":rank(c)===14?"as":rank(c)>10?"kqj":"k2"],d=e&&SKA.get(e);return d?{t:d.t,v:d.v,k:d.k}:null}
 
+// Posisi kursi di layar kita (ui.js mengisi SP = [kiri, atas, kanan] tiap render); kita sendiri = area tangan.
+let SP=[0,0,0];
+const skc=(k,s)=>`<div class="sks" style="transform:scale(${s});transform-origin:0 0">${SKA.svg(k,"ska")}</div>`;
+function seatC(i){const e=i===uid?($("#hand")||$("#mine")):i?[$("#sL"),$("#sT"),$("#sR")][SP.indexOf(i)]:null,r=e&&e.getBoundingClientRect();return r&&r.width?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
+// Kartu lemparan = gambar bingkai skin yang dipasang (SKA.svg). Jika korban dan pen-set ketemu kursinya, efek dimiringkan: kartu terbang dari pen-set ke kursi korban, dampak tepat di kursi korban.
 function playSetFx(sk,by,vic,b,vname){
  const T=SFXT[sk&&sk.t];if(!T)return;
  const ov=document.createElement("div");ov.className="sfx";
  const w=Math.min(380,innerWidth-16),vn=String(vname||nm(vic)),h=Math.ceil(vn.length/2);
- ov.innerHTML=`<div class="sfx-st" style="width:${w}px;transform:scale(${Math.min(1,(innerHeight-16)/330)})"><div class="sfx-sh"><div class="sfx-np"><span></span><span></span></div><div class="sfx-me"></div><div class="sfx-fx"></div></div></div>`;
+ const A=seatC(by),V=seatC(vic),dx=V&&A?V.x-A.x:0,dy=V&&A?V.y-A.y:0,ds=Math.hypot(dx,dy),tb=ds>40;
+ const th=Math.atan2(dx,-dy)*180/Math.PI,sc=Math.min(1.3,Math.max(.8,ds/231));
+ const np='<div class="sfx-np"><span></span><span></span></div>',me='<div class="sfx-me"></div>';
+ ov.innerHTML=tb?`<div class="sfx-st" style="width:${w}px;left:${V.x}px;top:${V.y}px;margin:-54px 0 0 ${-w/2}px;transform-origin:${w/2}px 54px;transform:rotate(${th}deg) scale(${sc})"><div class="sfx-sh"><div class="sfx-nw" style="transform:rotate(${-th}deg) scale(${1/sc})">${np}</div><div class="sfx-mw" style="transform:rotate(${-th}deg) scale(${1/sc})">${me}</div><div class="sfx-fx"></div></div></div>`:`<div class="sfx-st" style="width:${w}px;transform:scale(${Math.min(1,(innerHeight-16)/330)})"><div class="sfx-sh">${np}${me}<div class="sfx-fx"></div></div></div>`;
+ if(tb)ov.classList.add("tb");
  const q=s=>ov.querySelector(s),sp=ov.querySelectorAll(".sfx-np span");
  sp[0].textContent=vn.slice(0,h);sp[1].textContent=vn.slice(h);q(".sfx-me").textContent=by===uid?"Kamu":nm(by);
  document.body.appendChild(ov);
- const sd=sk.k&&SKA.get(sk.k),X={c:sd?sd.c:null,st:q(".sfx-st"),sh:q(".sfx-sh"),fx:q(".sfx-fx"),np:q(".sfx-np"),nl:sp[0],nr:sp[1],pen:"−"+b};
+ const sd=sk.k&&SKA.get(sk.k),X={tb,k:sk.k,c:sd?sd.c:null,st:q(".sfx-st"),sh:q(".sfx-sh"),fx:q(".sfx-fx"),np:q(".sfx-np"),nl:sp[0],nr:sp[1],pen:"−"+b};
  let r;try{r=T(X);r.V[(sk.v|0)%r.V.length]()}catch(e){console.error(e)}
  try{ov.animate([{opacity:0},{opacity:1}],{duration:200})}catch(e){}
  const D={S:3000,E:3800,L:4600,K:5000}[sk.t];
@@ -33,7 +42,7 @@ function sfxBase(X){
  const timers=[],{st,fx,sh}=X;
  const W=()=>st.clientWidth,O=()=>({x:W()/2,y:285}),T=()=>({x:W()/2,y:54});
  const tf=(x,y,r=0,s=1)=>`translate(${x}px,${y}px) translate(-50%,-50%) rotate(${r}deg) scale(${s})`;
- function el(h,c){const d=document.createElement("div");d.className="ab";d.style.cssText=c||"";d.innerHTML=h||"";fx.appendChild(d);return d}
+ function el(h,c){const d=document.createElement("div");d.className="ab";d.style.cssText=X.tb&&c?c.replace("inset:0;width:100%;height:100%","left:-150vmax;top:-150vmax;width:300vmax;height:300vmax"):(c||"");d.innerHTML=h||"";fx.appendChild(d);return d}
  function later(ms,f){timers.push(setTimeout(f,ms))}
  function anim(d,k,o){return d.animate(k,Object.assign({fill:"forwards"},o))}
  function shake(delay,a,dur,t){later(delay,()=>{const k=[];for(let i=0;i<12;i++){const m=a*(1-i/12);k.push({transform:`translate(${(Math.random()-.5)*2*m}px,${(Math.random()-.5)*2*m}px)`})}k.push({transform:"none"});(t||sh).animate(k,{duration:dur||450})})}
@@ -46,7 +55,7 @@ const SFXT={};
 SFXT.S=X=>{
 const B=sfxBase(X),{W,O,T,tf,el,later,anim,shake,npAnim}=B,{nl,nr,np}=X;
 const G=X.c?mixc(X.c[0],"#000000",.25):"#4ac68c",GL=X.c?mixc(X.c[0],"#ffffff",.5):"#7dffc0",GR=rgbs(GL),GW=mixc(GL,"#ffffff",.6);
-const CARD=o=>`<div style="width:34px;height:48px;border-radius:5px;background:#fff;border:3px solid ${G};box-sizing:border-box;color:#0f3d2a;font:500 14px/42px sans-serif;text-align:center;opacity:${o??1}">K♠</div>`;
+const CARD=o=>`<div style="width:42px;height:59px;opacity:${o??1}">${skc(X.k,.6)}</div>`;
 function fly(pts,dur,ease,o,del){const c=el(CARD(o));const a=anim(c,pts.map(p=>({transform:tf(...p)})),{duration:dur,easing:ease||"linear",delay:del||0});return [c,a]}
 function dot(s,c){return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>`}
 function burst(x,y,n,d0,c,s,delay){later(delay,()=>{for(let i=0;i<n;i++){const a=Math.PI*2*i/n+Math.random()*.4,d=d0*(.6+Math.random()*.5);anim(el(dot(s,c)),[{transform:tf(x,y,0,1.3),opacity:1},{transform:tf(x+Math.cos(a)*d,y+Math.sin(a)*d,0,.3),opacity:0}],{duration:650,easing:"cubic-bezier(.2,.8,.3,1)"})}})}
@@ -76,7 +85,7 @@ return {V,stop:B.stop}};
 SFXT.E=X=>{
 const B=sfxBase(X),{W,O,T,tf,el,later,anim,shake,npAnim}=B,{nl,nr,np}=X;
 const P=X.c?X.c[0]:"#a56bff",PL=X.c?X.c[1]:"#c9a4ff",PW=mixc(PL,"#ffffff",.6),PR=rgbs(P),PD=mixc(P,"#000000",.85),PK=mixc(P,"#000000",.7);
-const CARD=o=>`<div style="width:34px;height:48px;border-radius:5px;background:#fff;border:3px solid ${P};box-sizing:border-box;color:${PK};font:500 14px/42px sans-serif;text-align:center;box-shadow:0 0 12px ${P};opacity:${o??1}">A♠</div>`;
+const CARD=o=>`<div style="width:42px;height:59px;opacity:${o??1}">${skc(X.k,.6)}</div>`;
 function fly(pts,dur,ease,o,del){const c=el(CARD(o));const a=anim(c,pts.map(p=>({transform:tf(...p)})),{duration:dur,easing:ease||"linear",delay:del||0});return [c,a]}
 function dot(s,c){return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>`}
 function burst(x,y,n,d0,c,s,delay){later(delay,()=>{for(let i=0;i<n;i++){const a=Math.PI*2*i/n+Math.random()*.4,d=d0*(.6+Math.random()*.5);anim(el(dot(s,c)),[{transform:tf(x,y,0,1.3),opacity:1},{transform:tf(x+Math.cos(a)*d,y+Math.sin(a)*d,0,.3),opacity:0}],{duration:700,easing:"cubic-bezier(.2,.8,.3,1)"})}})}
@@ -110,7 +119,7 @@ return {V,stop:B.stop}};
 SFXT.L=X=>{
 const B=sfxBase(X),{W,O,T,tf,el,later,anim}=B,{nl,nr,np}=X;
 const Y=X.c?X.c[0]:"#ff9d2e",YL=X.c?X.c[1]:"#ffd25a",YW=X.c?(X.c[2]||"#ffffff"):"#fff3c4",YO=X.c?mixc(Y,YL,.5):"#ff7a00",YR=rgbs(Y);
-const CARD=(o,sz)=>{sz=sz||1;return `<div style="width:${34*sz}px;height:${48*sz}px;border-radius:${5*sz}px;background:#fff;border:${3*sz}px solid ${Y};box-sizing:border-box;color:#3a1a00;font:500 ${18*sz}px/${42*sz}px sans-serif;text-align:center;box-shadow:0 0 ${12*sz}px ${YL};opacity:${o??1}">★</div>`};
+const CARD=(o,sz)=>{sz=sz||1;return `<div style="width:${42*sz}px;height:${59*sz}px;opacity:${o??1}">${skc(X.k,.6*sz)}</div>`};
 function fly(pts,dur,ease,o,del,sz){const c=el(CARD(o,sz));const a=anim(c,pts.map(p=>({transform:tf(...p)})),{duration:dur,easing:ease||"linear",delay:del||0});return [c,a]}
 function dot(s,c){return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>`}
 const STAR=(s,c)=>`<div style="width:${s}px;height:${s}px;background:${c};clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)"></div>`;
@@ -120,7 +129,7 @@ function ring(x,y,s,c,delay,w){later(delay,()=>{anim(el(`<div style="width:${s}p
 function fire(x,y,s,delay,dur){later(delay,()=>anim(el(`<div style="width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle,${YW},${YL} 22%,${YO} 45%,rgba(160,40,0,.6) 60%,rgba(80,20,0,0) 72%)"></div>`),[{transform:tf(x,y,0,.1),opacity:1},{transform:tf(x,y,0,1),opacity:1,offset:.3},{transform:tf(x,y,0,1.2),opacity:0}],{duration:dur||1100,easing:"ease-out"}))}
 function flash(delay,c,dur){later(delay,()=>anim(el("",`inset:0;width:100%;height:100%;background:${c||YW}`),[{opacity:1},{opacity:0}],{duration:dur||450}))}
 function dark(dur,peak){anim(el("","inset:0;width:100%;height:100%;background:#05080a"),[{opacity:0},{opacity:peak||.7,offset:.12},{opacity:peak||.7,offset:.75},{opacity:0}],{duration:dur})}
-function bars(dur){const a=el("","left:0;top:0;width:100%;height:28px;background:#000;z-index:5"),b=el("","left:0;top:302px;width:100%;height:28px;background:#000;z-index:5");anim(a,[{transform:"translateY(-100%)"},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:"translateY(-100%)"}],{duration:dur});anim(b,[{transform:"translateY(100%)"},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:"translateY(100%)"}],{duration:dur})}
+function bars(dur){if(X.tb)return;const a=el("","left:0;top:0;width:100%;height:28px;background:#000;z-index:5"),b=el("","left:0;top:302px;width:100%;height:28px;background:#000;z-index:5");anim(a,[{transform:"translateY(-100%)"},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:"translateY(-100%)"}],{duration:dur});anim(b,[{transform:"translateY(100%)"},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:"translateY(100%)"}],{duration:dur})}
 function aura(x,y,delay,dur){dur=dur||2200;later(delay,()=>{anim(el(`<div style="width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,${"rgba("+rgbs(YW)+",.85)"},${"rgba("+rgbs(YL)+",.45)"} 40%,${"rgba("+YR+","}0) 70%)"></div>`),[{transform:tf(x,y,0,.5),opacity:0},{transform:tf(x,y,0,1.1),opacity:1,offset:.15},{transform:tf(x,y,0,.95),opacity:.7,offset:.35},{transform:tf(x,y,0,1.15),opacity:1,offset:.55},{transform:tf(x,y,0,.95),opacity:.7,offset:.75},{transform:tf(x,y,0,1),opacity:0}],{duration:dur});for(let i=0;i<20;i++){const a=Math.random()*Math.PI*2,r=40+Math.random()*110,sx=x+Math.cos(a)*r,sy=y+Math.sin(a)*r*.75,s=8+Math.random()*10;anim(el(STAR(s,i%3?YW:YL)),[{transform:tf(sx,sy,0,0),opacity:1},{transform:tf(sx,sy,45,1.3),opacity:1,offset:.4},{transform:tf(sx,sy,90,0),opacity:0}],{duration:500+Math.random()*300,delay:Math.random()*dur*.8})}})}
 function shake(delay,a,dur,t){B.shake(delay,a,dur||700,t)}
 function pop(x,y,t,c,s,delay,rot){rot=rot??-8;later(delay,()=>{const p=el(`<div style="font-size:${s}px;font-weight:700;color:${c};text-shadow:0 0 18px ${Y},0 0 36px ${YO},0 4px 0 #7a3a00;white-space:nowrap">${t}</div>`,"z-index:6");anim(p,[{transform:tf(x,y,rot,4),opacity:0},{transform:tf(x,y,rot,.85),opacity:1,offset:.1},{transform:tf(x,y,rot,1.08),offset:.15},{transform:tf(x,y,rot,1),opacity:1,offset:.8},{transform:tf(x,y-12,rot,1),opacity:0}],{duration:2000,easing:"ease-out"})})}
@@ -147,7 +156,7 @@ return {V,stop:B.stop}};
 SFXT.K=X=>{
 const B=sfxBase(X),{W,O,T,tf,el,later,anim,npAnim}=B,{nl,nr,np,sh}=X;
 const R=X.c&&X.c.length<5?[X.c[0],X.c[1],X.c[2],X.c[0],X.c[1],X.c[2],X.c[0]]:["#ff4f4f","#ff9d2e","#ffe14f","#4fdc7a","#4fc3ff","#6b7bff","#c06bff"],RG="linear-gradient(135deg,"+R.join(",")+")";
-const CARD=(o,sz)=>{sz=sz||1;return `<div style="width:${34*sz}px;height:${48*sz}px;border-radius:${6*sz}px;padding:${3*sz}px;background:${RG};box-sizing:border-box;box-shadow:0 0 ${14*sz}px rgba(255,255,255,.7);opacity:${o??1}"><div style="width:100%;height:100%;border-radius:${4*sz}px;background:#fff;color:#14201a;font:500 ${17*sz}px/${42*sz}px sans-serif;text-align:center">♛</div></div>`};
+const CARD=(o,sz)=>{sz=sz||1;return `<div style="width:${42*sz}px;height:${59*sz}px;opacity:${o??1}">${skc(X.k,.6*sz)}</div>`};
 function fly(pts,dur,ease,o,del,sz){const c=el(CARD(o,sz));const a=anim(c,pts.map(p=>({transform:tf(...p)})),{duration:dur,easing:ease||"linear",delay:del||0});return [c,a]}
 function dot(s,c){return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${c};box-shadow:0 0 8px ${c}"></div>`}
 const STAR=(s,c)=>`<div style="width:${s}px;height:${s}px;background:${c};clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)"></div>`;
@@ -157,7 +166,7 @@ function shards(x,y,n,d0,delay){later(delay,()=>{for(let i=0;i<n;i++){const a=Ma
 function rings(x,y,delay){R.forEach((c,i)=>later(delay+i*70,()=>anim(el(`<div style="width:${160+i*30}px;height:${160+i*30}px;border-radius:50%;border:4px solid ${c};box-sizing:border-box"></div>`),[{transform:tf(x,y,0,.1),opacity:1},{transform:tf(x,y,0,1.3),opacity:0}],{duration:900,easing:"ease-out"})))}
 function flash(delay,c,dur){later(delay,()=>anim(el("",`inset:0;width:100%;height:100%;background:${c||"#fff"}`),[{opacity:1},{opacity:0}],{duration:dur||500}))}
 function dark(dur,peak){anim(el("","inset:0;width:100%;height:100%;background:#05030a"),[{opacity:0},{opacity:peak||.8,offset:.12},{opacity:peak||.8,offset:.75},{opacity:0}],{duration:dur})}
-function bars(dur){const a=el("","left:0;top:0;width:100%;height:28px;background:#000;z-index:5"),b=el("","left:0;top:302px;width:100%;height:28px;background:#000;z-index:5");[[a,"-100%"],[b,"100%"]].forEach(([e,v])=>anim(e,[{transform:`translateY(${v})`},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:`translateY(${v})`}],{duration:dur}))}
+function bars(dur){if(X.tb)return;const a=el("","left:0;top:0;width:100%;height:28px;background:#000;z-index:5"),b=el("","left:0;top:302px;width:100%;height:28px;background:#000;z-index:5");[[a,"-100%"],[b,"100%"]].forEach(([e,v])=>anim(e,[{transform:`translateY(${v})`},{transform:"none",offset:.08},{transform:"none",offset:.92},{transform:`translateY(${v})`}],{duration:dur}))}
 function sparkle(x,y,delay,dur){dur=dur||2400;later(delay,()=>{anim(el(`<div style="width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.85),rgba(200,180,255,.35) 40%,rgba(120,200,255,0) 70%)"></div>`),[{transform:tf(x,y,0,.5),opacity:0},{transform:tf(x,y,0,1.1),opacity:1,offset:.15},{transform:tf(x,y,0,.95),opacity:.7,offset:.4},{transform:tf(x,y,0,1.12),opacity:1,offset:.6},{transform:tf(x,y,0,1),opacity:0}],{duration:dur});for(let i=0;i<24;i++){const a=Math.random()*Math.PI*2,r=40+Math.random()*120,sx=x+Math.cos(a)*r,sy=y+Math.sin(a)*r*.75;anim(el(STAR(8+Math.random()*10,R[i%7])),[{transform:tf(sx,sy,0,0),opacity:1},{transform:tf(sx,sy,45,1.3),opacity:1,offset:.4},{transform:tf(sx,sy,90,0),opacity:0}],{duration:500+Math.random()*300,delay:Math.random()*dur*.8})}})}
 function shake(delay,a,dur,t){B.shake(delay,a,dur||800,t)}
 function rtext(x,y,t,s,delay,rot){rot=rot??-8;later(delay,()=>{anim(el(`<div style="font-size:${s}px;font-weight:700;background:${RG};-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.7)) drop-shadow(0 0 10px rgba(255,255,255,.6));white-space:nowrap">${t}</div>`,"z-index:6"),[{transform:tf(x,y,rot,4),opacity:0},{transform:tf(x,y,rot,.85),opacity:1,offset:.1},{transform:tf(x,y,rot,1.08),offset:.15},{transform:tf(x,y,rot,1),opacity:1,offset:.8},{transform:tf(x,y-12,rot,1),opacity:0}],{duration:2200,easing:"ease-out"})})}
