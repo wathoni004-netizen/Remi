@@ -72,5 +72,5 @@ const migrateEquip=o=>{const r={};for(const s in o||{}){const n=nk(o[s]);if(!n)c
 // Skin Kartu hanya di slot Kartu, skin Meja hanya di slot Meja. Kolektor hanya boleh di slot As dan Joker; tier lain di slot 2-10, KQJ, As, Joker.
 const canSlot=(k,s)=>isC(k)?s==="kartu":isM(k)?s==="meja":!!get(k)&&["k2","kqj","as","jk"].includes(s)&&(get(k).t!=="K"||s==="as"||s==="jk");
 // Label tingkat (gambar lbl-s/e/l/k.webp, ~20 KB): dipakai di Toko dan Inventori.
-const tag=(t,cls)=>`<img class="${cls||"lbl"}" src="img/lbl-${t.toLowerCase()}.webp?v=1" alt="" draggable="false">`;
+const tag=(t,cls)=>`<img class="${cls||"lbl"}" src="img/lbl-${t.toLowerCase()}.webp?v=2" alt="" draggable="false">`;
 return {list:D,get,svg,migrate,migrateEquip,canSlot,tag,tier:k=>(get(k)||(isC(k)&&KSK.get(k))||(isM(k)&&MJK.get(k))||{}).tn}})();
