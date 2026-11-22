@@ -36,6 +36,11 @@ async function open(){
  else sm("Masuk dengan Google di Pengaturan agar kartu dan skin tersimpan.");
  counts();setTab("biru")}
 async function put(nu){try{await db.doc("users/"+uid).set(nu);return true}catch(e){sm("Gagal menyimpan: "+(e.code||e.message));return false}}
+// Putaran strip (dipakai 1x dan tiap putaran 10x): berhenti di kartu w dalam d detik, lalu fn.
+function roll(w,fn,d){d=d||4;
+ strip(w);const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";void t.offsetWidth;
+ t.style.transition="transform "+d+"s cubic-bezier(.1,.75,.15,1)";t.style.transform="translateX(-"+(24*90+35-$("#spw").clientWidth/2)+"px)";
+ setTimeout(fn,d*1000+300)}
 async function spin(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
@@ -44,9 +49,7 @@ async function spin(){
  busy=true;sm("");
  if(!await put(nu)){busy=false;return}
  U=nu;counts();$("#spr").textContent="Memutar…";
- strip(w);const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";void t.offsetWidth;
- t.style.transition="transform 4s cubic-bezier(.1,.75,.15,1)";t.style.transform="translateX(-"+(24*90+35-$("#spw").clientWidth/2)+"px)";
- setTimeout(()=>{busy=false;reveal(w,dup)},4300)}
+ roll(w,()=>{busy=false;reveal(w,dup)})}
 async function spin10(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
@@ -56,8 +59,14 @@ async function spin10(){
  const nu=Object.assign({},U,{skins:own});nu[tab]=U[tab]-10;
  busy=true;sm("");
  if(!await put(nu)){busy=false;return}
- U=nu;counts();$("#spr").textContent="Memutar 10x…";
- setTimeout(()=>{busy=false;reveal10(R)},700)}
+ U=nu;counts();
+ // 10 putaran berurutan; tiap putaran berhenti sebentar menampilkan hasilnya, lalu layar ringkasan.
+ for(let i=0;i<10;i++){
+  $("#spr").textContent="Putaran "+(i+1)+" / 10";
+  await new Promise(f=>roll(R[i].w,f,1.5));
+  $("#spr").innerHTML=`<b style="color:${R[i].w.col}">${R[i].z?"Zonk":R[i].w.n+" · skin "+R[i].w.t}</b>`;
+  await new Promise(f=>setTimeout(f,700))}
+ busy=false;reveal10(R)}
 function reveal10(R){
  const o=$("#spo"),nw=R.filter(r=>!r.z&&!r.dup).length,zk=R.filter(r=>r.z).length;
  const ZS='<div style="width:36px;height:50px;box-sizing:border-box;border-radius:6px;background:#222a26;border:2px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 14px/1 system-ui">✕</div>';
