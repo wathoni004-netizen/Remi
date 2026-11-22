@@ -148,7 +148,7 @@ function sendChat(x){
 setInterval(drawChat,5000);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b)sendChat(b.dataset.e)});
 $("#cs").onclick=()=>{sendChat($("#ci").value);$("#ci").value=""};
-$("#ci").onkeydown=e=>{if(e.key==="Enter"){sendChat(e.target.value);e.target.value=""}};
+$("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){sendChat(e.target.value);e.target.value=""}};
 document.querySelectorAll(".cfb").forEach(x=>x.onclick=()=>{const b=$("#chatbox");b.hidden=!b.hidden;$("#mbox").hidden=true;if(!b.hidden){document.body.classList.remove("unr");$("#cl").scrollTop=$("#cl").scrollHeight}});
 $("#cc").onclick=()=>{$("#chatbox").hidden=true};
 $("#mb").onclick=()=>{const b=$("#mbox");b.hidden=!b.hidden;$("#chatbox").hidden=true};
