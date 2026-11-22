@@ -8,12 +8,12 @@ let U={skins:{},equip:{}},sel=null,act=null;
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#ivm").textContent=t||""};
 const D=k=>SKA.get(k)||KSK.get(k),isC=k=>!!KSK.get(k);
-const face=(k,x)=>`<div class="sk${x||""}" data-k="${k}">${isC(k)?KSK.thumb(k):SKA.svg(k)}</div>`;
+const face=(k,x,nl)=>`<div class="sk${x||""}" data-k="${k}">${isC(k)?KSK.thumb(k):SKA.svg(k)}${nl?"":SKA.tag(D(k).t,"lbl lbs")}</div>`;
 function draw(){
  const q=U.equip||{};
- $("#ivs").innerHTML=SL.map(([id,n])=>`<div data-s="${id}" class="${id===act?"act":sel&&!act?"sel":""}">${q[id]?face(q[id]):'<div class="sk em"></div>'}<span>${n}</span></div>`).join("");
+ $("#ivs").innerHTML=SL.map(([id,n])=>`<div data-s="${id}" class="${id===act?"act":sel&&!act?"sel":""}">${q[id]?face(q[id],"",1):'<div class="sk em"></div>'}<span>${n}</span></div>`).join("");
  const p=$("#ivp");p.hidden=!sel;
- if(sel){const d=D(sel);p.innerHTML=`<div class="ivh">${face(sel)}<div style="flex:1;min-width:0"><b>${d.n}</b><div class="mut" style="font-size:12px">${d.tn}${d.t==="K"?" · hanya As dan Joker":""}</div></div>${isC(sel)?"":'<button class="pri sec" data-a="play" style="flex:none;padding:4px 10px">Putar</button>'}</div>`+(act?'<div class="ivu"><button class="pri sec" data-a="off">Lepas</button></div>':`<div class="ivu"><span class="mut" style="font-size:12px">Pakai di</span>${(isC(sel)?[SL[1]]:NS).filter(([s])=>SKA.canSlot(sel,s)).map(([s,n])=>`<button class="pri" data-a="on" data-s="${s}">${n}</button>`).join("")}</div>`)}
+ if(sel){const d=D(sel);p.innerHTML=`<div class="ivh">${face(sel,"",1)}<div style="flex:1;min-width:0"><b>${d.n}</b><div class="mut" style="font-size:12px">${d.tn}${d.t==="K"?" · hanya As dan Joker":""}</div></div>${isC(sel)?"":'<button class="pri sec" data-a="play" style="flex:none;padding:4px 10px">Putar</button>'}</div>`+(act?'<div class="ivu"><button class="pri sec" data-a="off">Lepas</button></div>':`<div class="ivu"><span class="mut" style="font-size:12px">Pakai di</span>${(isC(sel)?[SL[1]]:NS).filter(([s])=>SKA.canSlot(sel,s)).map(([s,n])=>`<button class="pri" data-a="on" data-s="${s}">${n}</button>`).join("")}</div>`)}
  const ks=Object.keys(U.skins||{}).sort((a,b)=>LV[D(b).t]-LV[D(a).t]||(a<b?-1:1));
  $("#ivl").innerHTML=ks.length?ks.map(k=>face(k,k===sel&&!act?" on":"")).join(""):'<span class="mut">Belum ada skin. Putar di Spin Skin atau beli di Toko.</span>';
  $("#ivl").querySelectorAll(".sk").forEach(el=>el.onpointerdown=e=>down(e,el))}

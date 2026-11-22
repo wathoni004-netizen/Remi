@@ -6,7 +6,7 @@ let U={koin:0,biru:0,merah:0,skins:{}},busy=false;
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#twm").textContent=t||""};
 const counts=()=>{$("#twk").textContent=(U.koin||0).toLocaleString("id-ID");$("#twb1").textContent=U.biru||0;$("#twm2").textContent=U.merah||0};
-function tile(d,art){const own=!!(U.skins||{})[d.k];return `<button class="tci${own?" own":""}" data-k="${d.k}" aria-label="${d.n}, ${d.tn}, ${PS[d.t]} koin"><div class="sk">${art}</div><span>${d.n}</span>${own?"<span>✓</span>":`<span class="tpr"><i></i>${PS[d.t].toLocaleString("id-ID")}</span>`}</button>`}
+function tile(d,art){const own=!!(U.skins||{})[d.k];return `<button class="tci${own?" own":""}" data-k="${d.k}" aria-label="${d.n}, ${d.tn}, ${PS[d.t]} koin"><div class="sk">${art}${SKA.tag(d.t,"lbl lbs")}</div><span>${d.n}</span>${own?"<span>✓</span>":`<span class="tpr"><i></i>${PS[d.t].toLocaleString("id-ID")}</span>`}</button>`}
 const hd=t=>`<div style="width:100%;font-weight:800;font-size:13px;color:#e8b923">${t}</div>`;
 function list(){
  const srt=(a,b)=>LV[a.t]-LV[b.t],ds=SKA.list.filter(d=>PS[d.t]).sort(srt),ks=KSK.list.slice().sort(srt);
