@@ -28,7 +28,7 @@ const pileLay=(n,RW,RH,m)=>{
  try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches){const k=Math.max(1,Math.min(1.9,(RW-64)/(9.24*W)));out.forEach(p=>{p.x=RW/2+(p.x+W/2-RW/2)*k-W/2})}}catch(e){}
  return{p:out,W,H,m,SX:.515*W,SY:.511*H,fs:Math.max(8,Math.round(W*.35))}};
 const pcard=(c,i,on,hl,xs,nw,p,L)=>{
- const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c))),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sx=f(L.SX),sw=f(L.SX-1);
+ const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c))),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sw=f(L.SX-1);
  let lb={T:"left:0;top:2px;width:"+sw+"px",R:"left:2px;top:2px",B:"right:0;top:2px;width:"+sw+"px",L:"left:2px;bottom:2px"}[e];
  if(L.m)lb=lb.replace(/left|right/,k=>k==="left"?"right":"left");
  let dc="";

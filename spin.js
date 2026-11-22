@@ -1,7 +1,7 @@
 // Spin Skin: kartu biru/merah -> skin. Data di users/{uid} = {biru,merah,skins:{kunci:true}}; hanya akun Google yang boleh menyimpan (lihat Rules).
 // Satu tulisan penuh per aksi (kurangi kartu + tambah skin sekaligus) supaya saldo tidak setengah tersimpan.
 (()=>{
-const TC={Spesial:"#4ac68c",Epik:"#a56bff",Legenda:"#ff9d2e"},LV={Spesial:2,Epik:3,Legenda:4,Kolektor:4,Zonk:1};
+const LV={Spesial:2,Epik:3,Legenda:4,Kolektor:4,Zonk:1};
 const card=(k,w)=>{const d=SKA.get(k);return{key:k,n:d.n,t:d.tn,w,col:d.c[0]}};
 const ZK=w=>({key:"ZONK",n:"Zonk",t:"Zonk",w,col:"#8a8f8c"});
 // Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (4 skin); Zonk 70. Zonk = kartu hangus tanpa skin. Kolektor tidak ada di Spin (event terbatas).

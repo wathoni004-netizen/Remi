@@ -14,12 +14,10 @@ const pts=c=>{if(isJ(c))return 25;const r=rank(c);return r==14?15:r>10?10:5};
 const meldPts=m=>m.length*pts(nj(m)[0]);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sub=(a,k)=>k==0?[[]]:a.length<k?[]:[...sub(a.slice(1),k-1).map(x=>[a[0],...x]),...sub(a.slice(1),k)];
-const seq=a=>a.every((r,i)=>!i||r==a[i-1]+1);
 const run=m=>{const n=m.length,x=nj(m);if(n<3||n>4||x.length<2||n-x.length>1||x.some(c=>suit(c)!==suit(x[0])))return false;const r=x.map(rank).sort((a,b)=>a-b);if(r.some((v,i)=>i&&v===r[i-1]))return false;const e=r[r.length-1];let lo,hi;if(e<=10){lo=2;hi=10}else if(r[0]>=11&&e<=13){lo=11;hi=13}else return false;for(let s=lo;s+n-1<=hi;s++)if(s<=r[0]&&s+n-1>=e)return true;return false};
 const rell=m=>{const x=nj(m);return m.length>=3&&m.length<=4&&x.length>=2&&m.length-x.length<=1&&x.every(c=>rank(c)===rank(x[0]))};
 const meld=m=>run(m)||rell(m);
 const isSeri=m=>run(m)||(rell(m)&&rank(nj(m)[0])===14);
-const best=cs=>{if(!cs.length)return 0;const[a,...r]=cs;let b=-pts(a)+best(r);for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m))b=Math.max(b,meldPts(m)+best(r.filter(c=>!x.includes(c))))}return b};
 // Semua kartu habis jadi kombinasi. need = masih wajib ada seri (rell baru sah kalau sudah punya seri di tangan atau di bawah).
 const all=(cs,need)=>{if(!cs.length)return !need;const[a,...r]=cs;for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)&&all(r.filter(c=>!x.includes(c)),need&&!isSeri(m)))return true}return false};
 const full=(cs,hs)=>cs.length>=3&&all(cs,!hs);
