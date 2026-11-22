@@ -1,4 +1,4 @@
-// Inventori: 6 slot skin yang dipakai saat bermain. Data users/{uid}.equip = {k2,kqj,as,jk: kunci skin Set; kartu: kunci skin Kartu C01..}; skin meja belum ada.
+// Inventori: 6 slot skin yang dipakai saat bermain. Data users/{uid}.equip = {k2,kqj,as,jk: kunci skin Set; kartu: kunci skin Kartu C01..; meja: kunci skin Meja M01..}.
 // Skin (skinart.js: S01..S12 Spesial, E01..E06 Epik, L01..L04 Legenda, K01,K02 Kolektor) boleh di slot 2-10, KQJ, As, Joker; Kolektor hanya As dan Joker.
 // Ketuk skin: pratinjau efek Set + tombol slot untuk memakainya. Atau tarik skin ke slot mana pun. Ketuk slot terisi: lihat efeknya, bisa Lepas. Efek Set memakai slot ini (setfx.js).
 (()=>{
@@ -7,13 +7,13 @@ const LV={S:1,E:2,L:3,K:4};
 let U={skins:{},equip:{}},sel=null,act=null;
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#ivm").textContent=t||""};
-const D=k=>SKA.get(k)||KSK.get(k),isC=k=>!!KSK.get(k);
-const face=(k,x,nl)=>`<div class="sk${x||""}" data-k="${k}">${isC(k)?KSK.thumb(k):SKA.svg(k)}${nl?"":SKA.tag(D(k).t,"lbl lbs")}</div>`;
+const D=k=>SKA.get(k)||KSK.get(k)||MJK.get(k),isC=k=>!!KSK.get(k),isM=k=>!!MJK.get(k);
+const face=(k,x,nl)=>`<div class="sk${x||""}" data-k="${k}">${isC(k)?KSK.thumb(k):isM(k)?MJK.thumb(k):SKA.svg(k)}${nl?"":SKA.tag(D(k).t,"lbl lbs")}</div>`;
 function draw(){
  const q=U.equip||{};
  $("#ivs").innerHTML=SL.map(([id,n])=>`<div data-s="${id}" class="${id===act?"act":sel&&!act?"sel":""}">${q[id]?face(q[id],"",1):'<div class="sk em"></div>'}<span>${n}</span></div>`).join("");
  const p=$("#ivp");p.hidden=!sel;
- if(sel){const d=D(sel);p.innerHTML=`<div class="ivh">${face(sel,"",1)}<div style="flex:1;min-width:0"><b>${d.n}</b><div class="mut" style="font-size:12px">${d.tn}${d.t==="K"?" · hanya As dan Joker":""}</div></div>${isC(sel)?"":'<button class="pri sec" data-a="play" style="flex:none;padding:4px 10px">Putar</button>'}</div>`+(act?'<div class="ivu"><button class="pri sec" data-a="off">Lepas</button></div>':`<div class="ivu"><span class="mut" style="font-size:12px">Pakai di</span>${(isC(sel)?[SL[1]]:NS).filter(([s])=>SKA.canSlot(sel,s)).map(([s,n])=>`<button class="pri" data-a="on" data-s="${s}">${n}</button>`).join("")}</div>`)}
+ if(sel){const d=D(sel);p.innerHTML=`<div class="ivh">${face(sel,"",1)}<div style="flex:1;min-width:0"><b>${d.n}</b><div class="mut" style="font-size:12px">${d.tn}${d.t==="K"?" · hanya As dan Joker":""}</div></div>${isC(sel)||isM(sel)?"":'<button class="pri sec" data-a="play" style="flex:none;padding:4px 10px">Putar</button>'}</div>`+(act?'<div class="ivu"><button class="pri sec" data-a="off">Lepas</button></div>':`<div class="ivu"><span class="mut" style="font-size:12px">Pakai di</span>${(isC(sel)?[SL[1]]:isM(sel)?[SL[0]]:NS).filter(([s])=>SKA.canSlot(sel,s)).map(([s,n])=>`<button class="pri" data-a="on" data-s="${s}">${n}</button>`).join("")}</div>`)}
  const ks=Object.keys(U.skins||{}).sort((a,b)=>LV[D(b).t]-LV[D(a).t]||(a<b?-1:1));
  $("#ivl").innerHTML=ks.length?ks.map(k=>face(k,k===sel&&!act?" on":"")).join(""):'<span class="mut">Belum ada skin. Putar di Spin Skin atau beli di Toko.</span>';
  $("#ivl").querySelectorAll(".sk").forEach(el=>el.onpointerdown=e=>down(e,el))}
@@ -29,11 +29,10 @@ function save(q){
  db.doc("users/"+uid).set(nu).catch(e=>sm("Gagal menyimpan: "+(e.code||e.message)))}
 function place(s,k){
  sel=null;act=null;
- if(s==="meja"){draw();return sm("Skin meja belum tersedia.")}
- if(!SKA.canSlot(k,s)){draw();return sm(isC(k)?"Skin kartu hanya untuk slot Kartu.":s==="kartu"?"Slot Kartu hanya untuk skin kartu.":"Kolektor hanya untuk slot As dan Joker.")}
+ if(!SKA.canSlot(k,s)){draw();return sm(isC(k)?"Skin kartu hanya untuk slot Kartu.":isM(k)?"Skin meja hanya untuk slot Meja.":s==="kartu"?"Slot Kartu hanya untuk skin kartu.":s==="meja"?"Slot Meja hanya untuk skin meja.":"Kolektor hanya untuk slot As dan Joker.")}
  save(Object.assign({},U.equip,{[s]:k}));draw();sm("Terpasang.")}
 function pick(k,a){sel=k;act=a;draw();pv()}
-function pv(){if(isC(sel))return;try{const d=SKA.get(sel);playSetFx({t:d.t,v:d.v,k:d.k},uid,"",150,"Lawan")}catch(e){}}
+function pv(){if(isC(sel)||isM(sel))return;try{const d=SKA.get(sel);playSetFx({t:d.t,v:d.v,k:d.k},uid,"",150,"Lawan")}catch(e){}}
 function down(e,el){
  const k=el.dataset.k,x0=e.clientX,y0=e.clientY;let g=null;
  const mv=ev=>{

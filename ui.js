@@ -78,6 +78,8 @@ function playFx(m){
 
 function render(){
  if(!room)return;
+ // Skin Meja = milik host (players/{host}.mk).
+ {const b=$("#play .tb"),t=MJK.tm((players[hostId()]||{}).mk);if(b&&b.dataset.tm!==t){if(b.dataset.tm)b.classList.remove(b.dataset.tm);if(t)b.classList.add(t);b.dataset.tm=t}}
  if(st&&st.status==="play")mySkins();else if(!st||st.status==="lobby")MYSK=null;
  // Pemain yang di-kick host: beri tahu lalu keluar dari ruang.
  if(!kickOut&&st&&kicked(uid)){kickOut=true;alert("Kamu dikeluarkan dari ruang oleh host.");leave();return}
