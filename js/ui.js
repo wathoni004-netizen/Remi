@@ -95,7 +95,7 @@ function render(){
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
   const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
   lob.innerHTML=`<div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs||!me?"":`<div class="mut">Menunggu host memulai game…</div>`}<div class="act"><button class="pri sec" id="kx4">Keluar ruang</button></div>`;
-  $("#kx4").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
+  $("#kx4").onclick=async()=>{if(await ask("Keluar dari ruang?"))leave()};
   if(hs)$("#sb").onclick=start;
   else $("#rb").onclick=()=>Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc({ok:me?-1:gen()}))).catch(e=>msg("Gagal: "+(e.message||e.code)));
   return;
@@ -163,10 +163,10 @@ $("#setc").onclick=e=>{const b=e.target.closest("[data-sc]");if(b)go("set",b.dat
 $("#bl").onclick=()=>go("lay",sel.slice());
 $("#bx").onclick=()=>go("drop",sel[0]);
 // Klik Kick di ruang tunggu: host menandai pemain di st.kk (waktu kick).
-$("#lobby").onclick=e=>{
+$("#lobby").onclick=async e=>{
  const cp=e.target.closest("[data-cp]");if(cp){Promise.resolve(navigator.clipboard&&navigator.clipboard.writeText(cp.dataset.cp)).then(()=>{cp.textContent="Tersalin"},()=>msg("Gagal menyalin, salin kode manual."));return}
  const b=e.target.closest("[data-kick]");if(!b||hostId()!==uid)return;
- const i=b.dataset.kick;if(!confirm("Keluarkan "+nm(i)+" dari ruang?"))return;
+ const i=b.dataset.kick;if(!await ask("Keluarkan "+nm(i)+" dari ruang?"))return;
  const base=st||{status:"lobby",hist:[],host:uid,gen:0};
  save({...base,kk:{...(base.kk||{}),[i]:players[i].j||0}})};
 addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}},{once:true});

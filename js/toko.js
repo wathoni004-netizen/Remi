@@ -26,13 +26,13 @@ function buy(k){
  if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
  if((U.koin||0)<PR[k])return sm("Koin tidak cukup, perlu "+PR[k]+".");
  put(Object.assign({},U,{koin:U.koin-PR[k],[k]:(U[k]||0)+1}),"Berhasil beli 1 kartu "+k+".")}
-function buySkin(k){
+async function buySkin(k){
  if(busy)return;
  const d=SKA.get(k)||KSK.get(k)||MJK.get(k),p=P(d);
  if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
  if((U.skins||{})[k])return sm("Skin "+d.n+" sudah dimiliki.");
  if((U.koin||0)<p)return sm("Koin tidak cukup, perlu "+p+".");
- if(!confirm("Beli skin "+d.n+" ("+d.tn+") seharga "+p+" koin?"))return;
+ if(!await ask("Beli skin "+d.n+" ("+d.tn+") seharga "+p+" koin?"))return;
  put(Object.assign({},U,{koin:U.koin-p,skins:Object.assign({},U.skins,{[k]:true})}),"Berhasil beli skin "+d.n+".")}
 $("#tk").onclick=open;
 $("#twb").onclick=()=>{$("#tw").hidden=true;$("#home").hidden=false};

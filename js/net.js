@@ -81,6 +81,19 @@ $("#jb").onclick=async()=>{
 const gp=()=>new M.au.GoogleAuthProvider();
 // Di APK pop-up Google diblokir WebView: ambil idToken dari plugin native, lalu jadikan credential Firebase web (uid tetap sama).
 const NA=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+// Konfirmasi gaya game (pengganti confirm bawaan Android): await ask("teks") -> true/false.
+function ask(t){return new Promise(r=>{const o=document.createElement("div");o.className="ask";o.innerHTML='<div class="ab"><p></p><div class="act"><button class="pri sec">Batal</button><button class="pri">Ya</button></div></div>';o.querySelector("p").textContent=t;const[n,y]=o.querySelectorAll("button"),d=v=>{o.remove();r(v)};n.onclick=()=>d(false);y.onclick=()=>d(true);document.body.append(o)})}
+// Tombol Kembali HP (APK): selama bukan di menu utama ada 1 entri riwayat cadangan; Kembali = tutup dialog/panel, atau klik tombol kembali layar itu.
+// shortcut: layar lain wajib terdaftar di daftar B; di menu utama Kembali keluar dari app seperti biasa.
+if(NA){let on=false;const H=$("#home"),L=$("#ld"),vis=e=>e&&!e.hidden;
+ const B=[["#join","#jbk"],["#pg","#pbk"],["#tw","#twb"],["#iv","#ivb"],["#kp","#spb"],["#game",null]];
+ const sync=()=>{const away=H.hidden&&L.hidden;if(away&&!on){history.pushState(0,"");on=true}else if(!away&&on){on=false;history.back()}};
+ new MutationObserver(sync).observe(H,{attributes:true,attributeFilter:["hidden"]});new MutationObserver(sync).observe(L,{attributes:true,attributeFilter:["hidden"]});
+ addEventListener("popstate",()=>{if(!on)return;on=false;
+  const k=document.querySelector(".ask button"),o=$("#spo"),c=$("#chatbox"),m=$("#mbox");
+  if(k)k.click();else if(vis(o)&&$("#spl"))$("#spl").click();else if(vis(c)||vis(m)){c.hidden=true;m.hidden=true}
+  else{const x=B.find(b=>vis($(b[0])));if(x)$(x[1]||(vis($("#lobby"))?"#kx4":"#kx3")).click()}
+  sync()})}
 const gNat=async()=>M.au.GoogleAuthProvider.credential((await Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle({skipNativeAuth:true})).credential.idToken);
 const batal=e=>e.code==="auth/popup-closed-by-user"||/cancel/i.test(e.message||"");
 function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
@@ -98,7 +111,7 @@ $("#gi").onclick=async()=>{
  }catch(e){if(!batal(e))msg("Login Google gagal: "+(e.code||e.message))}};
 $("#go").onclick=async()=>{try{await M.au.signOut(auth);location.reload()}catch(e){msg("Gagal keluar: "+(e.code||e.message))}};
 $("#da").onclick=async()=>{
- if(!confirm("Hapus akun ini secara permanen? Data akun hilang dan tidak bisa dikembalikan."))return;
+ if(!await ask("Hapus akun ini secara permanen? Data akun hilang dan tidak bisa dikembalikan."))return;
  try{
   const u=auth.currentUser;
   await(NA?M.au.reauthenticateWithCredential(u,await gNat()):M.au.reauthenticateWithPopup(u,gp()));
@@ -158,7 +171,7 @@ document.querySelectorAll(".cfb").forEach(x=>x.onclick=()=>{const b=$("#chatbox"
 $("#cc").onclick=()=>{$("#chatbox").hidden=true};
 $("#mb").onclick=()=>{const b=$("#mbox");b.hidden=!b.hidden;$("#chatbox").hidden=true};
 $("#mc").onclick=()=>{$("#mbox").hidden=true};
-$("#kx3").onclick=()=>{if(confirm("Keluar dari ruang?"))leave()};
+$("#kx3").onclick=async()=>{if(await ask("Keluar dari ruang?"))leave()};
 function beat(){
  const p=players[uid];if(!room||!uid||!p||!p.name)return;
  try{Promise.resolve(db.doc(`rooms/${room}/players/${uid}`).set(pdoc())).catch(()=>{})}catch(e){}}
@@ -174,6 +187,6 @@ async function award(){
  catch(e){try{localStorage.removeItem("aw")}catch(_){}}
 }
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
-$("#ky").onclick=()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(confirm("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0,cr:Date.now()})};
+$("#ky").onclick=async()=>{if(!st||st.status!=="play"||hostId()!==uid)return;if(await ask("Akhiri game untuk semua pemain? Catatan poin dikosongkan dan putaran kembali ke kanan."))save({status:"lobby",hist:[],host:hostId()||uid,gen:st.gen||0,cr:Date.now()})};
 $("#ab").onclick=async()=>{if(!st)return;try{await db.doc(`rooms/${room}/players/${uid}`).set(pdoc({rd:(st.hist||[]).length}));msg("")}catch(e){msg("Gagal: "+(e.message||e.code))}};
 $("#kx2").onclick=leave;
