@@ -82,10 +82,10 @@ Lalu salin **google-services.json** ke `C:\KartuRemi\Remi-main\apk\android\app\`
 
 **Tidak perlu** (update otomatis): semua perubahan game (aturan, tampilan, skin, event, gambar).
 
-**Perlu APK baru**: ganti ikon/nama, plugin native baru (misal notifikasi atau pembelian), atau kalau update otomatis bermasalah. Caranya:
-1. Download ZIP terbaru, lalu timpa semua isi `Remi-main` **kecuali** folder `apk\android`.
-2. Buka `apk\android\app\build.gradle`, naikkan `versionCode` (1 menjadi 2, dst.) dan `versionName`.
-3. Jalankan `cd C:\KartuRemi\Remi-main\apk`, lalu `npm run siap`, lalu ulangi langkah F dengan keystore yang **sama**.
+**Perlu APK baru**: ganti ikon/nama, plugin native baru (misal tombol Kembali = `@capacitor/app`, notifikasi, pembelian), atau kalau update otomatis bermasalah. Caranya:
+1. Download ZIP terbaru, lalu timpa semua isi `Remi-main` **kecuali** folder `apk\android` (folder itu tidak ada di ZIP, jadi aman).
+2. `cd C:\KartuRemi\Remi-main\apk`, lalu `npm install` (mengambil plugin baru kalau ada), lalu `npm run siap`. Nomor `versionCode` dinaikkan otomatis lewat angka `VC` di `apk\salin.js` (sekarang 2; Claude menaikkannya tiap APK baru).
+3. Ulangi langkah F dengan keystore yang **sama**.
 
 ## Kalau update rusak (game layar putih)
 

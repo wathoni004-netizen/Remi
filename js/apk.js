@@ -30,6 +30,7 @@
   }
   await F.writeFile({path:dir+"/version.json",data:JSON.stringify(baru),directory:D,encoding:"utf8"});
   const{uri}=await F.getUri({path:dir,directory:D});
-  await W.setServerBasePath({path:uri.replace(/^file:\/\//,"")})// game dimuat ulang dari versi baru
+  await W.setServerBasePath({path:uri.replace(/^file:\/\//,"")});// game dimuat ulang dari versi baru
+  W.persistServerBasePath()// langsung diingat, jangan menunggu halaman baru (kalau tidak, buka ulang app memuat berkas bawaan lagi)
  }catch(e){console.log("Pembaruan APK gagal:",e);if(box)box.remove()}// gagal: tetap main versi lama, dicoba lagi saat dibuka berikutnya
 })();
