@@ -83,16 +83,17 @@ const gp=()=>new M.au.GoogleAuthProvider();
 const NA=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 // Konfirmasi gaya game (pengganti confirm bawaan Android): await ask("teks") -> true/false.
 function ask(t){return new Promise(r=>{const o=document.createElement("div");o.className="ask";o.innerHTML='<div class="ab"><p></p><div class="act"><button class="pri sec">Batal</button><button class="pri">Ya</button></div></div>';o.querySelector("p").textContent=t;const[n,y]=o.querySelectorAll("button"),d=v=>{o.remove();r(v)};n.onclick=()=>d(false);y.onclick=()=>d(true);document.body.append(o)})}
-// Tombol Kembali HP (APK): selama bukan di menu utama ada 1 entri riwayat cadangan; Kembali = tutup dialog/panel, atau klik tombol kembali layar itu.
-// shortcut: layar lain wajib terdaftar di daftar B; di menu utama Kembali keluar dari app seperti biasa.
+// Tombol Kembali HP (APK): satu entri riwayat cadangan selalu dipasang. Kembali = tutup dialog/panel atau klik tombol kembali layar itu;
+// di menu utama: peringatan "tekan sekali lagi", Kembali kedua (dalam 2 dtk) keluar app. shortcut: layar lain wajib terdaftar di B.
 if(NA){let on=false;const H=$("#home"),L=$("#ld"),vis=e=>e&&!e.hidden;
  const B=[["#join","#jbk"],["#pg","#pbk"],["#tw","#twb"],["#iv","#ivb"],["#kp","#spb"],["#game",null]];
- const sync=()=>{const away=H.hidden&&L.hidden;if(away&&!on){history.pushState(0,"");on=true}else if(!away&&on){on=false;history.back()}};
- new MutationObserver(sync).observe(H,{attributes:true,attributeFilter:["hidden"]});new MutationObserver(sync).observe(L,{attributes:true,attributeFilter:["hidden"]});
+ const sync=()=>{if(L.hidden&&!on){history.pushState(0,"");on=true}};
+ new MutationObserver(sync).observe(L,{attributes:true,attributeFilter:["hidden"]});
  addEventListener("popstate",()=>{if(!on)return;on=false;
   const k=document.querySelector(".ask button"),o=$("#spo"),c=$("#chatbox"),m=$("#mbox");
   if(k)k.click();else if(vis(o)&&$("#spl"))$("#spl").click();else if(vis(c)||vis(m)){c.hidden=true;m.hidden=true}
-  else{const x=B.find(b=>vis($(b[0])));if(x)$(x[1]||(vis($("#lobby"))?"#kx4":"#kx3")).click()}
+  else{const x=B.find(b=>vis($(b[0])));if(x)$(x[1]||(vis($("#lobby"))?"#kx4":"#kx3")).click();
+   else if(vis(H)){const t=document.createElement("div");t.className="tst";t.textContent="Tekan sekali lagi untuk keluar";document.body.append(t);setTimeout(()=>{t.remove();sync()},2e3);return}}
   sync()})}
 const gNat=async()=>M.au.GoogleAuthProvider.credential((await Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle({skipNativeAuth:true})).credential.idToken);
 const batal=e=>e.code==="auth/popup-closed-by-user"||/cancel/i.test(e.message||"");
