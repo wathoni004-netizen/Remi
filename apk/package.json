@@ -1,0 +1,19 @@
+{
+  "name": "kartu-remi-apk",
+  "private": true,
+  "scripts": {
+    "salin": "node salin.js",
+    "buat": "node salin.js && npx cap add android && npm run siap",
+    "siap": "node salin.js && npx capacitor-assets generate --android && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor-firebase/authentication": "^8.6.0",
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.6.2"
+  }
+}

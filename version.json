@@ -1,0 +1,22 @@
+{
+ "v": 2,
+ "files": [
+  "index.html",
+  "js/apk.js",
+  "js/game.js",
+  "js/inv.js",
+  "js/kartuskin.js",
+  "js/mejaskin.js",
+  "js/net.js",
+  "js/rules.js",
+  "js/setfx.js",
+  "js/skinart.js",
+  "js/spin.js",
+  "js/toko.js",
+  "js/ui.js",
+  "img/lbl-e.webp",
+  "img/lbl-k.webp",
+  "img/lbl-l.webp",
+  "img/lbl-s.webp"
+ ]
+}

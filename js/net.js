@@ -79,31 +79,36 @@ $("#jb").onclick=async()=>{
 // Akun: tamu = login anonim. "Masuk dengan Google" menautkan akun Google ke uid yang sama (data tamu ikut);
 // kalau Google itu sudah punya akun, pindah ke akun tersebut. Hapus akun: login ulang Google, hapus data ruang terakhir, hapus akun.
 const gp=()=>new M.au.GoogleAuthProvider();
+// Di APK pop-up Google diblokir WebView: ambil idToken dari plugin native, lalu jadikan credential Firebase web (uid tetap sama).
+const NA=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+const gNat=async()=>M.au.GoogleAuthProvider.credential((await Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle({skipNativeAuth:true})).credential.idToken);
+const batal=e=>e.code==="auth/popup-closed-by-user"||/cancel/i.test(e.message||"");
 function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
  $("#gi").hidden=g;$("#go").hidden=!g;$("#da").hidden=!g;
  $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu";menuUI()}
 function menuUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous,n=($("#nm").value||"").trim()||"Pemain";$("#mpn").textContent=n;$("#mav").textContent=n.slice(0,1).toUpperCase();$("#mpt").textContent=g?"Akun Google":"Tamu"}
 $("#gi").onclick=async()=>{
  try{
-  try{await M.au.linkWithPopup(auth.currentUser,gp())}
-  catch(e){if(e.code!=="auth/credential-already-in-use")throw e;await M.au.signInWithCredential(auth,M.au.GoogleAuthProvider.credentialFromError(e))}
+  const c=NA?await gNat():null;
+  try{await(NA?M.au.linkWithCredential(auth.currentUser,c):M.au.linkWithPopup(auth.currentUser,gp()))}
+  catch(e){if(e.code!=="auth/credential-already-in-use")throw e;await M.au.signInWithCredential(auth,c||M.au.GoogleAuthProvider.credentialFromError(e))}
   const u=auth.currentUser;uid=u.uid;
   if(!$("#nm").value)$("#nm").value=(u.displayName||"").split(" ")[0].slice(0,16);
   authUI();msg("")
- }catch(e){if(e.code!=="auth/popup-closed-by-user")msg("Login Google gagal: "+(e.code||e.message))}};
+ }catch(e){if(!batal(e))msg("Login Google gagal: "+(e.code||e.message))}};
 $("#go").onclick=async()=>{try{await M.au.signOut(auth);location.reload()}catch(e){msg("Gagal keluar: "+(e.code||e.message))}};
 $("#da").onclick=async()=>{
  if(!confirm("Hapus akun ini secara permanen? Data akun hilang dan tidak bisa dikembalikan."))return;
  try{
   const u=auth.currentUser;
-  await M.au.reauthenticateWithPopup(u,gp());
+  await(NA?M.au.reauthenticateWithCredential(u,await gNat()):M.au.reauthenticateWithPopup(u,gp()));
   let r="";try{r=localStorage.getItem("rr")||""}catch(e){}
   if(r)for(const p of["players","chat"])try{await db.doc(`rooms/${r}/${p}/${u.uid}`).set(null)}catch(e){}
   try{await db.doc("users/"+u.uid).set(null)}catch(e){}
   await M.au.deleteUser(u);
   try{["rn","rr","rid"].forEach(k=>localStorage.removeItem(k))}catch(e){}
   location.reload()
- }catch(e){if(e.code!=="auth/popup-closed-by-user")msg("Hapus akun gagal: "+(e.code||e.message))}};
+ }catch(e){if(!batal(e))msg("Hapus akun gagal: "+(e.code||e.message))}};
 
 $("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
 // Navigasi menu: kembali dari Masuk/Pengaturan; Toko dan Spin Skin belum ada (tile hanya penanda "Segera").
