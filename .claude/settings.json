@@ -6,7 +6,13 @@
       "Bash(git log:*)",
       "PowerShell(git status:*)",
       "PowerShell(git diff:*)",
-      "PowerShell(git log:*)"
+      "PowerShell(git log:*)",
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "PowerShell(git fetch:*)",
+      "PowerShell(git branch:*)",
+      "PowerShell(git show:*)"
     ],
     "ask": [
       "Bash(git commit:*)",
