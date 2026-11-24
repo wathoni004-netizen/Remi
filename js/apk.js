@@ -13,11 +13,11 @@ window.apkReady=(async()=>{
   // Capacitor kadang tidak mengingat folder unduhan: kembali sendiri ke unduhan terakhir (hanya bila lebih baru dari berkas bawaan), tanpa unduh ulang.
   const ud=localStorage.getItem("ud");
   if(ud&&!cur.includes("/up")){try{const bw=await(await ambil("version.json",5000)).json();
-   if(+ud.slice(2)>bw.v){await F.stat({path:ud+"/index.html",directory:D});const{uri}=await F.getUri({path:ud,directory:D});await W.setServerBasePath({path:uri.replace(/^file:\/\//,"")});await new Promise(()=>{})}}catch(e){localStorage.removeItem("ud")}}
+   if(+ud.slice(2)>bw.v){await F.stat({path:ud+"/index.html",directory:D});const{uri}=await F.getUri({path:ud,directory:D});await W.setServerBasePath({path:uri.replace(/^file:\/\//,"").replace(/\/+$/,"")});await new Promise(()=>{})}}catch(e){localStorage.removeItem("ud")}}
   if(cur.includes("/up")){
    await W.persistServerBasePath();// ingat versi ini; APK baru (versionCode naik) otomatis kembali ke berkas bawaan
-   const now=cur.split("/").pop();
-   for(const e of(await F.readdir({path:"",directory:D})).files)if(/^up\d+$/.test(e.name)&&e.name!==now)await F.rmdir({path:e.name,directory:D,recursive:true})
+   const now=cur.replace(/\/+$/,"").split("/").pop();// tanpa garis miring di akhir; kalau tidak, folder yang sedang dipakai ikut terhapus
+   if(/^up\d+$/.test(now))for(const e of(await F.readdir({path:"",directory:D})).files)if(/^up\d+$/.test(e.name)&&e.name!==now)await F.rmdir({path:e.name,directory:D,recursive:true})
   }
   const lok=await(await ambil("version.json",5000)).json(),baru=await(await ambil(S+"version.json?t="+Date.now(),5000)).json();
   if(!(baru.v>lok.v))return;
@@ -33,7 +33,7 @@ window.apkReady=(async()=>{
   await F.writeFile({path:dir+"/version.json",data:JSON.stringify(baru),directory:D,encoding:"utf8"});
   try{localStorage.setItem("ud",dir)}catch(e){}
   const{uri}=await F.getUri({path:dir,directory:D});
-  await W.setServerBasePath({path:uri.replace(/^file:\/\//,"")});// game dimuat ulang dari versi baru
+  await W.setServerBasePath({path:uri.replace(/^file:\/\//,"").replace(/\/+$/,"")});// game dimuat ulang dari versi baru
   W.persistServerBasePath();// langsung diingat, jangan menunggu halaman baru
   await new Promise(()=>{})// halaman sedang dimuat ulang: tahan layar loading sampai berganti
  }catch(e){console.log("Pembaruan APK gagal:",e);if(bar){bar.style.cssText="";tx.textContent="Memuat…"}}// gagal: tetap main versi lama, dicoba lagi saat dibuka berikutnya
