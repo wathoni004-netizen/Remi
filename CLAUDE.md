@@ -20,6 +20,14 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 - Setiap upload / perubahan game: `node apk/versi.js` (menaikkan `v` di `version.json` dan menyusun ulang daftar berkas dari `index.html`, `js/*`, `img/*`). Tanpa ini APK tidak ikut terbarui.
 - APK (dari `apk/`): `npm run salin` (salin berkas game ke `apk/www` sesuai `version.json`), `npm run siap` (salin + generate ikon + `cap sync android`), `npm run buat` (sekali, membuat proyek `android/`). Panduan lengkap: `apk/PANDUAN-APK.md`.
 
+## Git
+
+- Repo sudah aktif, branch `main`, remote `origin` = https://github.com/wathoni004-netizen/Remi (GitHub Pages tayang dari sini, jadi push = langsung tayang).
+- Push selalu minta izin Boss dulu. Perubahan game: jalankan `node apk/versi.js` sebelum commit supaya APK ikut terbarui.
+- Login GitHub tersimpan lewat Git Credential Manager (`credential.credentialStore=dpapi`, karena penyimpanan bawaan Windows error "string binding is invalid"). Login ulang hanya bisa dilakukan Boss lewat browser; jangan masukkan token/kata sandi sendiri.
+- Kalau `git` tidak dikenali di sesi/terminal lama (dibuka sebelum git terpasang), pakai `C:\Program Files\Git\cmd\git.exe` atau buka sesi baru.
+- Pesan commit berbahasa Indonesia, singkat.
+
 ## Aturan kerja (dari README)
 
 - Urutan tag `<script>` di `index.html` penting; jangan diubah. Semua skrip berbagi global scope (bukan modul).
