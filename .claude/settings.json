@@ -7,6 +7,8 @@
       "PowerShell(git status:*)",
       "PowerShell(git diff:*)",
       "PowerShell(git log:*)",
+      "Bash(npm install:*)",
+      "PowerShell(npm install:*)",
       "Bash(git fetch:*)",
       "Bash(git branch:*)",
       "Bash(git show:*)",
@@ -17,10 +19,8 @@
     "ask": [
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(npm install:*)",
       "PowerShell(git commit:*)",
-      "PowerShell(git push:*)",
-      "PowerShell(npm install:*)"
+      "PowerShell(git push:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",

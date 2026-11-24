@@ -9,7 +9,8 @@ Game kartu remi online 2-4 pemain. Web statis tanpa build/bundler (tayang di Git
 - Panggil user "Boss".
 - Bahasa Indonesia santai, singkat, langsung ke inti.
 - Tugas yang jelas: langsung kerjakan sampai jadi, jangan cuma kasih saran.
-- Minta izin dulu sebelum hal berisiko atau sulit dibatalkan (hapus file, push ke GitHub, ubah database/rules Firebase, install besar).
+- Tanpa izin (sudah disetujui Boss): hapus file/folder biasa, ubah Firebase/rules/database, `npm install` dan install besar. Tetap jelaskan singkat apa dan kenapa (terutama Firebase), tapi tidak perlu menunggu jawaban.
+- Tetap minta izin dulu: `git push` ke GitHub, dan melonggarkan blokir di `.claude/settings.json` (`rm -rf`, `push --force`, baca `.env`).
 
 ## Perintah
 
@@ -53,7 +54,7 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 - Node lain: `rooms/{room}/players/{uid}` (nama, heartbeat `t` tiap 30 dtk, `j` waktu masuk, `ok` siap, skin `ck`/`mk`), `rooms/{room}/chat/{uid}` (30 pesan terakhir per pemain), `users/{uid}` (koin, kartu spin `biru`/`merah`, `skins`, `equip`, statistik `st`, batas harian `hr`; hanya akun Google).
 - Field penting `state`: `status` (`lobby`/`play`/`done`), `order`, `hands`, `deck`, `pile`, `laid`, `turn`, `phase` (`draw`/`act`), `lb` (pembuang terakhir), `eat` (kartu yang dimakan dan wajib diturunkan), `dir` (arah putaran, berbalik setelah ronde berakhir dengan set), `hist` (skor per ronde), `host`, `gen`, `kk` (daftar kick).
 - Pemain "live" = heartbeat < 3 menit dan tidak di-kick. Host = `st.host` selama live, kalau tidak pemain live paling awal masuk. Ruang yang idle 30 menit di-reset ke lobby saat ada yang masuk (`idleCheck`).
-- Rules keamanan Firebase tidak ada di repo (diatur di console project `remi-online-69bb6`). Menambah field baru di `users/{uid}` bisa butuh perubahan rules — jelaskan ke Boss dulu.
+- Rules keamanan Firebase tidak ada di repo (diatur di console project `remi-online-69bb6`). Menambah field baru di `users/{uid}` bisa butuh perubahan rules — jelaskan ke Boss apa dan kenapa.
 
 **Pembaruan otomatis APK** (`apk.js`): saat dibuka, bandingkan `version.json` bawaan dengan milik GitHub Pages; kalau `v` lebih besar, unduh semua berkas di `files` ke folder `DATA/up<v>`, lalu `WebView.setServerBasePath` ke folder itu dan hapus folder `up*` lama. Karena itu setiap berkas baru yang dipakai game harus ada di `js/` atau `img/` (atau ditambahkan ke `versi.js`) agar ikut terdaftar.
 
