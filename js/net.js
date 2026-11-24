@@ -129,7 +129,7 @@ $("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
 $("#pbk").onclick=()=>{$("#pg").hidden=true;$("#home").hidden=false};
 const soon=t=>{msg(t+" segera hadir");setTimeout(()=>msg(""),2500)};
 
-$("#hr").onclick=()=>{const d=document.querySelector("details");d.open=true;d.scrollIntoView({behavior:"smooth"})};
+$("#hr").onclick=()=>{$("#mpb").click();const d=$("#ard");d.open=true;d.scrollIntoView({behavior:"smooth"})};
 // Buat ruang baru: kode acak 4 karakter (tanpa 0/O/1/I/L), dicek belum dipakai, lalu langsung masuk sebagai host.
 $("#mk").onclick=async()=>{
  const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let k="";
