@@ -19,7 +19,7 @@ const MCL=["",["#c4ccd2","#6f7a82"],["#e0985a","#8a4d1c"],["#f4f7f9","#8f9aa3"],
   5:`${PIT}<polygon points="${SEG}" fill="url(#mg5)" stroke="#d7263d" stroke-width="1.1"/><circle cx="12" cy="11" r="6.4" fill="none" stroke="#fff" stroke-opacity=".7"/>${CRN}`};
 window.medal=(g,z)=>{if(!(g>0&&g<6))return"";z=z||16;const c=MCL[g];
  return`<svg class="md" width="${z}" height="${z}" viewBox="0 0 24 24"><defs><linearGradient id="mg${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs>${g===5&&z>=40?LAU:""}${SHP[g]}</svg>`};
-window.GL=0;
+window.GG=0;
 function ui(){
  const g=isG();$("#pgl").hidden=g;$("#pgb").hidden=!(g&&U);$("#pgg").hidden=true;
  if(!(g&&U))return;
@@ -31,8 +31,8 @@ function ui(){
 async function load(){
  U=null;
  if(isG()){try{U=Object.assign({koin:0,biru:0,merah:0,skins:{}},await db.get("users/"+uid));U.skins=SKA.migrate(U.skins||{})}catch(e){}}
- GL=U?lv(U.st):0;ui()}
-window.pfUI=()=>{if(!$("#pg").hidden||(isG()&&!U))load();else if(!isG()){U=null;GL=0}};
+ GG=U?lv(U.st):0;ui()}
+window.pfUI=()=>{if(!$("#pg").hidden||(isG()&&!U))load();else if(!isG()){U=null;GG=0}};
 window.pfLv=lv;
 $("#mpb").onclick=()=>{menuUI();$("#home").hidden=true;$("#pg").hidden=false;load()};
 $("#mpb").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#mpb").click()}};

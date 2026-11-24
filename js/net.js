@@ -10,7 +10,7 @@ const save=async o=>{try{await db.doc("rooms/"+room).set(o);msg("")}catch(e){msg
 const hostId=()=>{const L=Object.keys(players).filter(live);if(st&&st.host&&L.includes(st.host))return st.host;return L.sort((a,b)=>(players[a].j||players[a].t)-(players[b].j||players[b].t))[0]||""};
 const gen=()=>(st&&st.gen)||0;
 const isOk=i=>i===hostId()||(!!players[i]&&players[i].ok===gen());
-const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok","ck","mk"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});if(window.GL)r.g=window.GL;return Object.assign(r,o||{})};
+const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok","ck","mk"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});if(window.GG)r.g=window.GG;return Object.assign(r,o||{})};
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
 const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
@@ -182,7 +182,7 @@ async function award(){
  if(!st||st.status!=="done"||!g||g.isAnonymous||!(st.order||[]).includes(uid))return;
  const win=st.winner===uid,k=room+":"+(st.gen||0)+":"+(st.hist||[]).length,kn=Math.max(0,Math.floor(((st.sc||{})[uid]||0)/2)),sx=st.sx;
  try{if(localStorage.getItem("aw")===k)return;localStorage.setItem("aw",k)}catch(e){}
- try{const v=(await db.get("users/"+uid))||{},o=v.st||{},ns={m:(o.m||0)+1,w:(o.w||0)+(win?1:0),s:(o.s||0)+(win&&sx?1:0)};if(!win){await db.doc("users/"+uid).set(Object.assign({},v,{st:ns}));window.GL=pfLv(ns);return}const t=new Date(),dy=t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate(),h=v.hr&&v.hr.d===dy?v.hr:{d:dy,b:0,m:0},j=sx&&isJ(sx),gb=sx&&!j&&h.b<10?1:0,gm=j&&h.m<5?1:0;await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+gb,merah:(v.merah||0)+gm,koin:(v.koin||0)+kn,hr:{d:dy,b:h.b+gb,m:h.m+gm},st:ns}));window.GL=pfLv(ns);msg("🎉 Menang ronde! "+(gm?"+1 kartu merah, ":gb?"+1 kartu biru, ":sx?"batas kartu hari ini tercapai, ":"")+"+"+kn+" koin")}
+ try{const v=(await db.get("users/"+uid))||{},o=v.st||{},ns={m:(o.m||0)+1,w:(o.w||0)+(win?1:0),s:(o.s||0)+(win&&sx?1:0)};if(!win){await db.doc("users/"+uid).set(Object.assign({},v,{st:ns}));window.GG=pfLv(ns);return}const t=new Date(),dy=t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate(),h=v.hr&&v.hr.d===dy?v.hr:{d:dy,b:0,m:0},j=sx&&isJ(sx),gb=sx&&!j&&h.b<10?1:0,gm=j&&h.m<5?1:0;await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+gb,merah:(v.merah||0)+gm,koin:(v.koin||0)+kn,hr:{d:dy,b:h.b+gb,m:h.m+gm},st:ns}));window.GG=pfLv(ns);msg("🎉 Menang ronde! "+(gm?"+1 kartu merah, ":gb?"+1 kartu biru, ":sx?"batas kartu hari ini tercapai, ":"")+"+"+kn+" koin")}
  catch(e){try{localStorage.removeItem("aw")}catch(_){}}
 }
 // Akhiri game: hanya pemilik room (host). Reset penuh: catatan poin dikosongkan, putaran kembali ke kanan (state lobby tanpa dir).
