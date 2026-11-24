@@ -14,7 +14,7 @@ function list(){
 async function open(){
  $("#home").hidden=true;$("#tw").hidden=false;U={koin:0,biru:0,merah:0,skins:{}};sm("");
  if(isG()){try{const v=await db.get("users/"+uid);if(v)U=Object.assign(U,v);U.skins=SKA.migrate(U.skins)}catch(e){sm("Gagal memuat: "+(e.code||e.message))}}
- else sm("Masuk dengan Google di Pengaturan agar koin dan kartu tersimpan.");
+ else sm("Masuk dengan Google di Profil agar koin dan kartu tersimpan.");
  counts();list()}
 async function put(nu,ok){
  busy=true;
@@ -23,13 +23,13 @@ async function put(nu,ok){
  busy=false}
 function buy(k){
  if(busy)return;
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U.koin||0)<PR[k])return sm("Koin tidak cukup, perlu "+PR[k]+".");
  put(Object.assign({},U,{koin:U.koin-PR[k],[k]:(U[k]||0)+1}),"Berhasil beli 1 kartu "+k+".")}
 async function buySkin(k){
  if(busy)return;
  const d=SKA.get(k)||KSK.get(k)||MJK.get(k),p=P(d);
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U.skins||{})[k])return sm("Skin "+d.n+" sudah dimiliki.");
  if((U.koin||0)<p)return sm("Koin tidak cukup, perlu "+p+".");
  if(!await ask("Beli skin "+d.n+" ("+d.tn+") seharga "+p+" koin?"))return;

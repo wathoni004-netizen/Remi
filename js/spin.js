@@ -33,7 +33,7 @@ async function open(){
  $("#home").hidden=true;$("#kp").hidden=false;$("#spq").hidden=true;
  U={biru:0,merah:0,skins:{}};sm("");
  if(isG()){try{const v=await db.get("users/"+uid);if(v)U=Object.assign(U,v);U.skins=SKA.migrate(U.skins)}catch(e){sm("Gagal memuat: "+(e.code||e.message))}}
- else sm("Masuk dengan Google di Pengaturan agar kartu dan skin tersimpan.");
+ else sm("Masuk dengan Google di Profil agar kartu dan skin tersimpan.");
  counts();setTab("biru")}
 async function put(nu){try{await db.doc("users/"+uid).set(nu);return true}catch(e){sm("Gagal menyimpan: "+(e.code||e.message));return false}}
 // Putaran strip (dipakai 1x dan tiap putaran 10x): berhenti di kartu w dalam d detik, lalu fn.
@@ -43,7 +43,7 @@ function roll(w,fn,d){d=d||4;
  setTimeout(fn,d*1000+300)}
 async function spin(){
  if(busy)return;
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U[tab]||0)<1)return sm("Kartu "+(tab==="biru"?"biru":"merah")+" tidak cukup.");
  const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!U.skins[w.key],nu=Object.assign({},U,{skins:z?U.skins:Object.assign({},U.skins,{[w.key]:true})});nu[tab]=U[tab]-1;
  busy=true;sm("");
@@ -52,7 +52,7 @@ async function spin(){
  roll(w,()=>{busy=false;reveal(w,dup)})}
 async function spin10(){
  if(busy)return;
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U[tab]||0)<10)return sm("Kartu "+(tab==="biru"?"biru":"merah")+" belum cukup, perlu 10.");
  const own=Object.assign({},U.skins),R=[];
  for(let i=0;i<10;i++){const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!own[w.key];if(!z)own[w.key]=true;R.push({w,z,dup})}
@@ -77,7 +77,7 @@ function reveal10(R){
  const best=Math.max(...R.map(r=>r.z?0:LV[r.w.t]));if(navigator.vibrate)navigator.vibrate(best>=4?[60,40,60,40,120]:best>=3?[60,40,60]:30)}
 async function swap(){
  if(busy)return;
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U.biru||0)<10)return sm("Kartu biru belum cukup, perlu 10.");
  const nu=Object.assign({},U,{biru:U.biru-10,merah:(U.merah||0)+2});
  if(await put(nu)){U=nu;counts();sm("Berhasil: 10 kartu biru jadi 2 kartu merah.")}}

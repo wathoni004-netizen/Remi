@@ -20,11 +20,11 @@ function draw(){
 async function open(){
  $("#home").hidden=true;$("#iv").hidden=false;U={skins:{},equip:{}};sel=null;act=null;sm("");
  if(isG()){try{const v=await db.get("users/"+uid);if(v)U=Object.assign(U,v);U.skins=SKA.migrate(U.skins);U.equip=SKA.migrateEquip(U.equip)}catch(e){sm("Gagal memuat: "+(e.code||e.message))}}
- else sm("Masuk dengan Google di Pengaturan agar skin tersimpan.");
+ else sm("Masuk dengan Google di Profil agar skin tersimpan.");
  draw()}
 // Simpan langsung ke tampilan dan MYEQ, lalu tulis; tiap tulisan membawa seluruh data terbaru.
 function save(q){
- if(!isG())return sm("Masuk dengan Google dulu (Pengaturan).");
+ if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  const nu=Object.assign({},U,{equip:q});U=nu;MYEQ=q;
  db.doc("users/"+uid).set(nu).catch(e=>sm("Gagal menyimpan: "+(e.code||e.message)))}
 function place(s,k){

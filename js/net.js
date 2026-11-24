@@ -97,7 +97,7 @@ const batal=e=>e.code==="auth/popup-closed-by-user"||/cancel/i.test(e.message||"
 function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
  $("#gi").hidden=g;$("#go").hidden=!g;$("#da").hidden=!g;
  $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu";menuUI()}
-function menuUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous,n=($("#nm").value||"").trim()||"Pemain";$("#mpn").textContent=n;$("#mav").textContent=n.slice(0,1).toUpperCase();$("#mpt").textContent=g?"Akun Google":"Tamu"}
+function menuUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous,n=($("#nm").value||"").trim()||"Pemain";$("#mpn").textContent=n;$("#mav").textContent=n.slice(0,1).toUpperCase();$("#mpt").textContent=g?"Akun Google":"Tamu";$("#pgn").textContent=n;$("#pav").textContent=$("#mav").textContent;$("#pgt").textContent=$("#mpt").textContent}
 $("#gi").onclick=async()=>{
  try{
   const c=NA?await gNat():null;
@@ -122,9 +122,9 @@ $("#da").onclick=async()=>{
  }catch(e){if(!batal(e))msg("Hapus akun gagal: "+(e.code||e.message))}};
 
 $("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
-// Navigasi menu: kembali dari Masuk/Pengaturan; Toko dan Spin Skin belum ada (tile hanya penanda "Segera").
+// Navigasi menu: kembali dari Masuk/Profil; Toko dan Spin Skin belum ada (tile hanya penanda "Segera").
 $("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
-$("#tpg").onclick=()=>{$("#home").hidden=true;$("#pg").hidden=false};
+$("#mpb").onclick=()=>{menuUI();$("#home").hidden=true;$("#pg").hidden=false};$("#mpb").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#mpb").click()}};
 $("#pbk").onclick=()=>{$("#pg").hidden=true;$("#home").hidden=false};
 const soon=t=>{msg(t+" segera hadir");setTimeout(()=>msg(""),2500)};
 
