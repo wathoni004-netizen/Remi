@@ -10,7 +10,7 @@ Game kartu remi online 2-4 pemain. Web statis tanpa build/bundler (tayang di Git
 - Bahasa Indonesia santai, singkat, langsung ke inti.
 - Tugas yang jelas: langsung kerjakan sampai jadi, jangan cuma kasih saran.
 - Tanpa izin (sudah disetujui Boss): hapus file/folder biasa, ubah Firebase/rules/database, `npm install` dan install besar. Tetap jelaskan singkat apa dan kenapa (terutama Firebase), tapi tidak perlu menunggu jawaban.
-- Tetap minta izin dulu: `git push` ke GitHub, dan melonggarkan blokir di `.claude/settings.json` (`rm -rf`, `push --force`, baca `.env`).
+- Tetap minta izin dulu: `git push` ke GitHub, dan melonggarkan blokir di `.claude/settings.json` (`push --force`, baca `.env`); `rm -rf` boleh tapi selalu tanya dulu.
 
 ## Perintah
 
