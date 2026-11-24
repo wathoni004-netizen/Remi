@@ -34,7 +34,10 @@ async function load(){
  GG=U?lv(U.st):0;ui()}
 window.pfUI=()=>{if(!$("#pg").hidden||(isG()&&!U))load();else if(!isG()){U=null;GG=0}};
 window.pfLv=lv;
-$("#mpb").onclick=()=>{menuUI();$("#home").hidden=true;$("#pg").hidden=false;load()};
+// Di APK: tampilkan versi game yang sedang jalan dan asalnya (unduhan = hasil pembaruan, bawaan APK = berkas di dalam APK).
+const ver=()=>{const C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))return;
+ fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(async j=>{const p=(await C.Plugins.WebView.getServerBasePath()).path||"";$("#pgv").textContent="Game v"+j.v+(p.includes("/up")?" · unduhan":" · bawaan APK")}).catch(()=>{})};
+$("#mpb").onclick=()=>{menuUI();ver();$("#home").hidden=true;$("#pg").hidden=false;load()};
 $("#mpb").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("#mpb").click()}};
 // Ganti nama: tekan sekali membuka kolom nama, tekan lagi menyimpan (nama dipakai saat masuk ruang).
 $("#pgr").onclick=()=>{const i=$("#pgi");
