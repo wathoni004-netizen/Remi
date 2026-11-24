@@ -1,10 +1,14 @@
-// Layar Profil: nama, saldo dan jumlah skin (users/{uid}), ganti nama. Dibuka dengan menekan blok pemain di menu.
+// Layar Profil: nama, gelar, saldo, statistik dan jumlah skin (users/{uid}), ganti nama. Dibuka dengan menekan blok pemain di menu.
 (()=>{
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 let U=null;
+// Gelar tertinggi yang sudah dicapai (dihitung dari statistik, tidak disimpan).
+const gelar=t=>t.w>=200?"Raja Kampung":t.s>=25?"Raja Set":t.w>=20?"Jago Kampung":t.m>=10?"Pemain Kampung":"Pemain Baru";
 function ui(){
- const g=isG();$("#pgl").hidden=g;$("#pgb").hidden=!(g&&U);
+ const g=isG();$("#pgl").hidden=g;$("#pgb").hidden=!(g&&U);$("#pgg").hidden=true;
  if(!(g&&U))return;
+ const t=U.st||{};
+ $("#stm").textContent=t.m||0;$("#stw").textContent=t.w||0;$("#sts").textContent=t.s||0;$("#pgg").textContent=gelar(t);$("#pgg").hidden=false;
  const all=[...SKA.list,...KSK.list,...MJK.list],n=all.filter(d=>U.skins[d.k]).length;
  $("#pgk").textContent=(U.koin||0).toLocaleString("id-ID");$("#pgu").textContent=U.biru||0;$("#pgm").textContent=U.merah||0;
  $("#pgo").textContent=n+" / "+all.length;$("#pgp").style.width=Math.round(n/all.length*100)+"%"}
