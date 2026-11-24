@@ -136,7 +136,7 @@ function render(){
   s="🏆 "+esc(nm(st.winner))+(st.sx&&v?" men-set "+esc(nm(v))+" (+"+FB[st.winner].st+")":"")+"<br>"+O.map(i=>{const f=FB[i];return esc(nm(i))+": "+(f?f.up+" − "+f.dn+(f.st?(f.st>0?" + ":" − ")+Math.abs(f.st):"")+" = ":"")+st.sc[i]}).join("<br>")}
  else if(!O.includes(uid))s="Menonton";
  else if(mine)s=ph==="draw"?(st.deck.length?"Giliranmu: cabut"+(cs?" atau Set!":""):"Tumpukan habis: makan / Set / Selesai"):st.eat?"Turunkan "+lbl(st.eat)+" dulu, lalu buang":"Turunkan (opsional), lalu buang 1";
- else s="Giliran "+esc(nm(st.turn))+" · "+esc(st.msg||"");
+ else{const n=nm(st.turn);let m=st.msg||"";if(m.startsWith(n+" "))m=m.slice(n.length+1);s="Giliran "+esc(n)+(m?" · "+esc(m):"")}// nama tidak dobel: "Giliran Andi · cabut"
  $("#st").innerHTML=s;
 
  $("#bd").hidden=!(mine&&ph==="draw");$("#bd").textContent=st.deck.length?"Cabut kartu":"Selesai";$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);

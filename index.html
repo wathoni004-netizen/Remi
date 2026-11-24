@@ -55,6 +55,11 @@ body.unr .ud{display:block}
 main:has(#play:not([hidden])) #cf{display:none}
 .xc{border:0;background:none;color:#fff;font-size:20px;padding:2px 6px}
 #game{padding-bottom:70px}
+/* Meja main memenuhi layar persis (tanpa padding main/#game), supaya baris emoji tidak terpotong di HP tegak. */
+main:has(#play:not([hidden])){padding:0}
+main:has(#play:not([hidden])) #game{padding-bottom:0}
+/* Tempat tombol aksi selalu dipesan, supaya layar tidak loncat saat tombol Cabut/Buang muncul-hilang. */
+#play .tb>.act:not(#qe):not(#again){min-height:46px}
 #cl{height:200px;overflow-y:auto;background:rgba(0,0,0,.22);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;margin:8px 0}
 #cl .mut{color:#d7e8dc}
 .cm{align-self:flex-start;max-width:80%;background:rgba(0,0,0,.4);color:#fff;border-radius:14px 14px 14px 3px;padding:4px 11px;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
@@ -110,7 +115,7 @@ main:has(#play[hidden]) #mbox{display:none}
 button.tci{color:#f2efe4;font-size:14px;font-weight:700;cursor:pointer}
 .tcd{width:46px;height:64px;box-sizing:border-box;border-radius:6px;border:2px solid #f2efe4;background:repeating-linear-gradient(45deg,var(--c) 0 6px,var(--d) 6px 9px);box-shadow:0 4px 12px rgba(0,0,0,.45);transition:transform .1s}
 button.tci:active .tcd{transform:scale(.94)}
-.tsk{display:flex;flex-wrap:wrap;gap:6px 14px;max-height:340px;overflow-y:auto;padding:8px 6px 2px}
+.tsk{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 6px 2px}
 .tsk .tci{width:60px;gap:3px;font-size:10px;font-weight:700}
 .tsk .tci.own{opacity:.4}
 .tsk .tci .sk{margin:6px 12px 14px}
@@ -154,6 +159,8 @@ button.tci:active .tcd{transform:scale(.94)}
 .ska.rv{position:absolute;left:-37.5px;top:-45px;width:225px;height:300px;overflow:visible}
 .ivl{display:flex;flex-wrap:wrap;gap:6px}
 .ivl .sk{cursor:grab}
+.ivi{display:flex;flex-direction:column;align-items:center;width:54px}.ivi>span{width:54px;font-size:10px;line-height:1.1;color:#9fb0a6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mw.pf #da{margin-left:auto;padding-right:0}
 .ivl .sk.on::after{content:"";position:absolute;inset:-2px;border:2px solid #e8b923;border-radius:8px;pointer-events:none}
 .ivu{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.ivu button{flex:none;padding:4px 12px}
 .ivp{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid #2f4238;border-radius:12px;background:#1f2b25}
@@ -282,7 +289,7 @@ main:has(#play:not([hidden])) h1{display:none}
 @media (orientation:landscape) and (max-height:520px){
 main:has(#play:not([hidden])){padding:0}
 main:has(#play:not([hidden])) #game{padding-bottom:0}
-#play .tb{display:grid;grid-template-columns:150px minmax(0,1fr) 230px;grid-template-rows:auto auto auto auto auto 1fr auto;grid-template-areas:"st top mine" "sl ctr qe" "sl ctr sp" "sl ctr act" "sl ctr again" "sl ctr hand" "sr sr hand";gap:4px 8px;align-items:start}
+#play .tb{display:grid;grid-template-columns:150px minmax(0,1fr) clamp(230px,38vw,380px);grid-template-rows:auto auto auto auto auto 1fr auto;grid-template-areas:"st top mine" "sl ctr qe" "sl ctr sp" "sl ctr act" "sl ctr again" "sl ctr hand" "sr sr hand";gap:4px 8px;align-items:start}
 #play .mid{display:contents}
 #play #st{grid-area:st;margin:0;padding:6px 0 0 44px;text-align:left;font-size:13px}
 #qe #mb{position:absolute;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top))}
@@ -317,6 +324,10 @@ main:has(#play:not([hidden])) #game{padding-bottom:0}
 #play .hw{grid-area:hand;align-self:end}
 #arr,#bar{display:none!important}
 #alr{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:30;margin:0}
+#play .tb>.act:not(#qe):not(#again){min-height:0}
+/* Obrolan: setinggi layar, daftar pesan yang menyusut, supaya kolom ketik + Kirim selalu terlihat. */
+#chatbox{top:8px;bottom:8px;max-height:none;display:flex;flex-direction:column;overflow:hidden}
+#cl{flex:1 1 auto;height:auto;min-height:40px}
 }
 /* HP miring: layar muat, ruang tunggu, menu, masuk, pengaturan, Spin, dan Toko disusun 2 kolom agar muat tanpa geser (gaya sama). */
 @media (orientation:landscape) and (max-height:520px){
@@ -352,14 +363,17 @@ main:not(:has(#play:not([hidden]))) .mw{gap:10px;padding:max(14px,env(safe-area-
 #kp #spn{grid-column:2;grid-row:5;min-height:48px!important}
 #kp #spn10{grid-column:2;grid-row:6;min-height:44px!important}
 #kp #spm{grid-column:1;grid-row:5;align-self:center}
+/* Toko: kiri = judul, keterangan koin, beli kartu spin (rapat di atas); kanan = daftar skin. Baris terakhir 1fr menyerap tinggi daftar skin. */
+#tw .mw{grid-template-rows:repeat(5,auto) 1fr;align-content:start}
 #tw .mw>*{grid-column:1}
 #tw .mw>:nth-child(n+6){grid-column:2}
 #tw .mw>:nth-child(1),#tw .mw>:nth-child(6){grid-row:1}
 #tw .mw>:nth-child(2){grid-row:2}
-#tw .mw>:nth-child(4){grid-row:3}
-#tw .mw>:nth-child(5){grid-row:4}
-#tw .mw>:nth-child(3),#tw .mw>:nth-child(8){grid-row:5}
-#tw .mw>:nth-child(7){grid-row:2/span 3}
+#tw .mw>:nth-child(3){grid-row:3}
+#tw .mw>:nth-child(4){grid-row:4}
+#tw .mw>:nth-child(5){grid-row:5}
+#tw .mw>:nth-child(7){grid-row:2/span 5}
+#tw .mw>:nth-child(8){grid-row:7}
 #lobby:has(.rc){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;grid-auto-flow:row dense;align-items:center}
 #lobby:has(.rc)>*{grid-column:2;margin:4px 0}
 #lobby:has(.rc)>:nth-child(-n+3){grid-column:1}
@@ -380,7 +394,7 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <h1>🃏 Kartu Remi</h1>
 <div id="err" class="mut" role="status"></div>
 <div id="ld" class="mw" style="align-items:center;text-align:center;padding:48px 20px 28px"><div class="hc"><i style="left:6px;top:12px;transform:rotate(-18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1C10 1 2 8 2 12C2 14.6 4 16 6 16C7.6 16 8.8 15.3 9.4 14.2C9.2 16.5 8.4 17.6 7 19H13C11.6 17.6 10.8 16.5 10.6 14.2C11.2 15.3 12.4 16 14 16C16 16 18 14.6 18 12C18 8 10 1 10 1Z"/></svg><b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18C2 12 1 8 1 6C1 3.2 3.2 1.5 5.5 1.5C7.4 1.5 9 2.6 10 4.4C11 2.6 12.6 1.5 14.5 1.5C16.8 1.5 19 3.2 19 6C19 8 18 12 10 18Z"/></svg><b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1L17 10L10 19L3 10Z"/></svg><b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.6" r="4.3"/><circle cx="5.2" cy="11.6" r="4.3"/><circle cx="14.8" cy="11.6" r="4.3"/><path d="M9.3 11L7.6 19H12.4L10.7 11Z"/></svg><b>H</b></i></div><div class="ht">Kartu Remi</div><div class="hs" style="margin:0">Game Kampung</div><div class="pb" style="width:100%"><i></i></div><div class="mut">Memuat…</div></div>
-<div id="home" hidden><div class="mw"><div class="mp" id="mpb" role="button" tabindex="0" aria-label="Buka profil"><div class="av" id="mav">P</div><div><div class="mpn" id="mpn">Pemain</div><div class="mps"><i class="dt"></i><span id="mpt">Tamu</span></div></div></div><div class="mh"><div class="hc" style="margin:0"><i style="left:6px;top:12px;transform:rotate(-18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1C10 1 2 8 2 12C2 14.6 4 16 6 16C7.6 16 8.8 15.3 9.4 14.2C9.2 16.5 8.4 17.6 7 19H13C11.6 17.6 10.8 16.5 10.6 14.2C11.2 15.3 12.4 16 14 16C16 16 18 14.6 18 12C18 8 10 1 10 1Z"/></svg><b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18C2 12 1 8 1 6C1 3.2 3.2 1.5 5.5 1.5C7.4 1.5 9 2.6 10 4.4C11 2.6 12.6 1.5 14.5 1.5C16.8 1.5 19 3.2 19 6C19 8 18 12 10 18Z"/></svg><b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1L17 10L10 19L3 10Z"/></svg><b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.6" r="4.3"/><circle cx="5.2" cy="11.6" r="4.3"/><circle cx="14.8" cy="11.6" r="4.3"/><path d="M9.3 11L7.6 19H12.4L10.7 11Z"/></svg><b>H</b></i></div></div><button class="mb" id="hp">MAIN</button><div id="rs" class="act" hidden style="align-items:center;justify-content:space-between;margin:0;padding:8px 8px 8px 16px;border:1px solid #e8b923;border-radius:14px"><span class="mut">Game berjalan: <b id="rsk" style="color:#f2efe4"></b></span><button class="pri" id="rg" style="flex:none;padding:8px 18px">Gabung</button></div><div class="mtl"><button id="tk"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Toko</button><button id="ts"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="10" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></svg>Spin Skin</button><button id="ti"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Inventori</button></div><button class="hb2" id="hr" style="margin:0">Cara main</button><div class="hf" style="text-align:center">2–4 pemain · versi 1.0</div></div></div>
+<div id="home" hidden><div class="mw"><div class="mp" id="mpb" role="button" tabindex="0" aria-label="Buka profil"><div class="av" id="mav">P</div><div><div class="mpn" id="mpn">Pemain</div><div class="mps"><i class="dt"></i><span id="mpt">Tamu</span></div></div></div><div class="mh"><div class="hc" style="margin:0"><i style="left:6px;top:12px;transform:rotate(-18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1C10 1 2 8 2 12C2 14.6 4 16 6 16C7.6 16 8.8 15.3 9.4 14.2C9.2 16.5 8.4 17.6 7 19H13C11.6 17.6 10.8 16.5 10.6 14.2C11.2 15.3 12.4 16 14 16C16 16 18 14.6 18 12C18 8 10 1 10 1Z"/></svg><b>W</b></i><i class="r" style="left:40px;top:2px;transform:rotate(-6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18C2 12 1 8 1 6C1 3.2 3.2 1.5 5.5 1.5C7.4 1.5 9 2.6 10 4.4C11 2.6 12.6 1.5 14.5 1.5C16.8 1.5 19 3.2 19 6C19 8 18 12 10 18Z"/></svg><b>U</b></i><i class="r" style="left:74px;top:2px;transform:rotate(6deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1L17 10L10 19L3 10Z"/></svg><b>C</b></i><i style="left:108px;top:12px;transform:rotate(18deg)"><svg class="gl gk" viewBox="0 0 10 14" style="width:0.70em" aria-hidden="true"><path d="M1.2 12.8L5 1.2L8.8 12.8M2.8 8.8H7.2" transform="translate(0 0)"/></svg><br><svg class="gl gs" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.6" r="4.3"/><circle cx="5.2" cy="11.6" r="4.3"/><circle cx="14.8" cy="11.6" r="4.3"/><path d="M9.3 11L7.6 19H12.4L10.7 11Z"/></svg><b>H</b></i></div></div><button class="mb" id="hp">MAIN</button><div id="rs" class="act" hidden style="align-items:center;justify-content:space-between;margin:0;padding:8px 8px 8px 16px;border:1px solid #e8b923;border-radius:14px"><span class="mut">Game berjalan: <b id="rsk" style="color:#f2efe4"></b></span><button class="pri" id="rg" style="flex:none;padding:8px 18px">Gabung</button></div><div class="mtl"><button id="tk"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Toko</button><button id="ts"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="10" height="15" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></svg>Spin Skin</button><button id="ti"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b923" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Inventori</button></div><button class="hb2" id="hr" style="margin:0">Cara main</button><div class="hf" id="hv" style="text-align:center">2–4 pemain</div></div></div>
 <div id="join" class="box" hidden>
 <div class="act" style="margin:0 0 6px"><button class="pri sec" id="jbk" style="flex:none;padding:6px 14px">‹ Menu</button></div>
 <label class="mut" for="nm">Nama kamu</label><input id="nm" maxlength="16" placeholder="Contoh: Boss">
@@ -443,9 +457,9 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <script src="js/mejaskin.js?v=1"></script>
 <script src="js/skinart.js?v=6"></script>
 <script src="js/setfx.js?v=5"></script>
-<script src="js/ui.js?v=30"></script>
+<script src="js/ui.js?v=31"></script>
 <script src="js/spin.js?v=11"></script>
 <script src="js/toko.js?v=11"></script>
-<script src="js/inv.js?v=10"></script>
-<script src="js/profil.js?v=6"></script>
+<script src="js/inv.js?v=11"></script>
+<script src="js/profil.js?v=7"></script>
 </body></html>

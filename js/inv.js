@@ -15,7 +15,7 @@ function draw(){
  const p=$("#ivp");p.hidden=!sel;
  if(sel){const d=D(sel);p.innerHTML=`<div class="ivh">${face(sel,"",1)}<div style="flex:1;min-width:0"><b>${d.n}</b><div class="mut" style="font-size:12px">${d.tn}${d.t==="K"?" · hanya As dan Joker":""}</div></div>${isC(sel)||isM(sel)?"":'<button class="pri sec" data-a="play" style="flex:none;padding:4px 10px">Putar</button>'}</div>`+(act?'<div class="ivu"><button class="pri sec" data-a="off">Lepas</button></div>':`<div class="ivu"><span class="mut" style="font-size:12px">Pakai di</span>${(isC(sel)?[SL[1]]:isM(sel)?[SL[0]]:NS).filter(([s])=>SKA.canSlot(sel,s)).map(([s,n])=>`<button class="pri" data-a="on" data-s="${s}">${n}</button>`).join("")}</div>`)}
  const ks=Object.keys(U.skins||{}).sort((a,b)=>LV[D(b).t]-LV[D(a).t]||(a<b?-1:1));
- $("#ivl").innerHTML=ks.length?ks.map(k=>face(k,k===sel&&!act?" on":"")).join(""):'<span class="mut">Belum ada skin. Putar di Spin Skin atau beli di Toko.</span>';
+ $("#ivl").innerHTML=ks.length?ks.map(k=>`<div class="ivi">${face(k,k===sel&&!act?" on":"")}<span>${D(k).n}</span></div>`).join(""):'<span class="mut">Belum ada skin. Putar di Spin Skin atau beli di Toko.</span>';
  $("#ivl").querySelectorAll(".sk").forEach(el=>el.onpointerdown=e=>down(e,el))}
 async function open(){
  $("#home").hidden=true;$("#iv").hidden=false;U={skins:{},equip:{}};sel=null;act=null;sm("");
