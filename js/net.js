@@ -44,6 +44,7 @@ const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
   $("#rm").value=ur;
   if(sr)db.get(`rooms/${sr}/state`).then(s=>{if(s&&(s.status==="play"||s.status==="done")&&(s.order||[]).includes(uid)){$("#rsk").textContent=sr.toUpperCase();$("#rs").hidden=false}}).catch(()=>{});
   $("#rg").onclick=()=>{$("#rm").value=sr;$("#jb").click()};
+  if(window.apkReady)await window.apkReady;// APK: layar loading ini sekaligus mengecek (dan menampilkan) pembaruan
   await new Promise(r=>setTimeout(r,Math.max(0,1200-(Date.now()-t0))));
   menuUI();$("#ld").hidden=true;$("#home").hidden=false;
  }catch(e){$("#ld").hidden=true;msg("Gagal menghubungkan Firebase: "+(e.message||e.code||"Periksa koneksi dan pengaturan Firebase."))}
