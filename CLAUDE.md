@@ -15,7 +15,7 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 
 - Jalankan lokal: sajikan folder root dengan server statis (mis. `npx http-server .`), buka `index.html`. Firebase SDK diimpor dinamis dari CDN gstatic, jadi butuh internet.
 - Uji multi-pemain di satu browser: tambahkan `?u=<id>` di URL tiap tab supaya id pemain berbeda; `?r=<kode>` mengisi kode ruang.
-- Setiap upload / perubahan game: `node apk/versi.js` (menaikkan `v` di `version.json` dan menyusun ulang daftar berkas dari `index.html`, `js/*`, `img/*`). Tanpa ini APK tidak ikut terbarui.
+- Setiap upload / perubahan game: `node apk/versi.js` (menaikkan `v` di `version.json` dan menyusun ulang daftar berkas dari `index.html`, `js/*`, `img/*`, `snd/*`). Tanpa ini APK tidak ikut terbarui.
 - APK (dari `apk/`): `npm run salin` (salin berkas game ke `apk/www` sesuai `version.json`), `npm run siap` (salin + generate ikon + `cap sync android`), `npm run buat` (sekali, membuat proyek `android/`). Panduan lengkap: `apk/PANDUAN-APK.md`.
 
 ## Git
@@ -41,6 +41,7 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 3. `net.js` — init Firebase, wrapper `db`, akun (anonim ↔ Google, hapus akun), masuk/buat ruang, host, heartbeat, chat, hadiah (`award`), tombol Kembali Android.
 4. `game.js` — mesin giliran: `start()` (host), `go(aksi, arg)` untuk `draw`/`take`/`set`/`lay`/`drop`, `fin()` hitung skor ronde.
 5. `kartuskin.js`, `mejaskin.js`, `skinart.js`, `setfx.js` — registri skin (`KSK`, `MJK`, `SKA`) dan efek animasi saat men-set (`skinFx`).
+5b. `suara.js` — efek suara WebAudio; efek Set memakai naskah per skin (`SC`) dari sampel `snd/*.ogg` (Kenney.nl, CC0) + lapisan sintetis, watak berbeda per tier (`TC`).
 6. `ui.js` — `render()` meja, tangan, tumpukan, papan skor.
 7. `spin.js`, `toko.js`, `inv.js`, `profil.js` — Spin, Toko, Inventori (pasang skin), Profil/level; semua membaca/menulis `users/{uid}`.
 
@@ -53,6 +54,6 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 - Pemain "live" = heartbeat < 3 menit dan tidak di-kick. Host = `st.host` selama live, kalau tidak pemain live paling awal masuk. Ruang yang idle 30 menit di-reset ke lobby saat ada yang masuk (`idleCheck`).
 - Rules keamanan Firebase tidak ada di repo (diatur di console project `remi-online-69bb6`). Menambah field baru di `users/{uid}` bisa butuh perubahan rules — jelaskan ke Boss apa dan kenapa.
 
-**Pembaruan otomatis APK** (`apk.js`): saat dibuka, bandingkan `version.json` bawaan dengan milik GitHub Pages; kalau `v` lebih besar, unduh semua berkas di `files` ke folder `DATA/up<v>`, lalu `WebView.setServerBasePath` ke folder itu dan hapus folder `up*` lama. Karena itu setiap berkas baru yang dipakai game harus ada di `js/` atau `img/` (atau ditambahkan ke `versi.js`) agar ikut terdaftar.
+**Pembaruan otomatis APK** (`apk.js`): saat dibuka, bandingkan `version.json` bawaan dengan milik GitHub Pages; kalau `v` lebih besar, unduh semua berkas di `files` ke folder `DATA/up<v>`, lalu `WebView.setServerBasePath` ke folder itu dan hapus folder `up*` lama. Karena itu setiap berkas baru yang dipakai game harus ada di `js/`, `img/`, atau `snd/` (atau ditambahkan ke `versi.js`) agar ikut terdaftar.
 
 **Event skin**: ada skill `kartu-remi-event` untuk membuat/mengubah event skin terbatas (token bintang, spin meteor, Toko Event, kristal).

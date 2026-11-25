@@ -1,12 +1,13 @@
 // Efek suara game, disintesis dengan WebAudio (tanpa berkas audio, jadi tidak menambah ukuran unduhan APK).
 // SND(nama[,arg]) dipanggil dari ui.js (aksi kartu, giliran, menang/set), setfx.js (tiap gerakan efek Set: tebas, ledakan, petir, api, kaca, ...) dan spin.js.
-// Efek Set: suara mengikuti gerakan animasi skin, sesuai tema: lemparan = desis angin, ledakan = dentum, cahaya = denting terang, petir = setrum, dst. Nada dasar dari kunci skin, jadi tiap skin terdengar beda.
+// Efek Set: tiap skin punya naskah suara sendiri (SC, sampel rekaman snd/*.ogg + lapisan sintetis), waktunya mengikuti animasi; makin tinggi tier makin berat, bergema, dan berlapis.
 // Nyala/mati disimpan di localStorage "snd" (variabel snd di net.js); tombolnya di Profil dan di menu meja (☰).
 (()=>{
 try{snd=localStorage.getItem("snd")!=="0"}catch(e){}
 let OUT=null,NB=null,CX={t:"S",m:1};const last={};
 function ac(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
- if(!OUT||OUT.context!==AC){const c=AC.createDynamicsCompressor(),g=AC.createGain();g.gain.value=.8;c.connect(g);g.connect(AC.destination);OUT=c;NB=null}
+ if(!OUT||OUT.context!==AC){const c=AC.createDynamicsCompressor(),g=AC.createGain();g.gain.value=.8;c.connect(g);g.connect(AC.destination);OUT=c;NB=null;RVN={}}
+ loadS();
  return AC}catch(e){return null}}
 function noiseBuf(){if(NB)return NB;const n=AC.sampleRate,b=AC.createBuffer(1,n,n),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return NB=b}
 // Nada: frekuensi f (bisa meluncur ke o.to), durasi d, bentuk gelombang o.w, volume o.v, serang o.a.
@@ -50,6 +51,7 @@ const S={
  // Hantaman & ledakan
  thud:t=>{nz(t,.06,{ft:"highpass",f:1500,v:.3});tone(t,140*CX.m,.18,{to:55,v:.4})},
  impact:t=>S.thud(t),
+ sub:t=>{tone(t,75,.6,{to:30,v:.5});tone(t,110,.3,{w:"triangle",to:45,v:.2})},
  whomp:t=>{tone(t,170*CX.m,.25,{to:60,v:.2});nz(t,.18,{ft:"lowpass",f:700,f2:150,v:.12})},
  boom:t=>{tone(t,120*CX.m,.7,{to:32,v:.55});nz(t,.9,{ft:"lowpass",f:1800,f2:90,v:.42,a:.004});nz(t,.12,{f:900,q:.7,v:.3});for(let i=0;i<6;i++)nz(t+.05+R(0,.5),.03,{ft:"highpass",f:R(1500,4000),v:.08})},
  bigboom:t=>{tone(t,90,1.4,{to:25,v:.7});tone(t,60,1.6,{w:"triangle",to:22,v:.3});nz(t,1.8,{ft:"lowpass",f:2500,f2:60,v:.55,a:.003});nz(t+.04,.25,{f:700,q:.6,v:.35});for(let i=0;i<14;i++)nz(t+.1+R(0,1.2),.03,{ft:"highpass",f:R(1200,4500),v:.1})},
@@ -90,14 +92,65 @@ const S={
  tinkle:t=>{for(let i=0;i<12;i++)tone(t+R(.05,1.1),R(3000,6000),R(.05,.15),{v:.03})},
  glass:t=>{nz(t,.35,{ft:"highpass",f:4500,v:.2});for(let i=0;i<10;i++)tone(t+R(0,.25),R(2800,6500),R(.06,.2),{v:.04})},
  poof:t=>nz(t,.22,{ft:"lowpass",f:900,f2:200,v:.2,a:.02})};
-// Nama gerakan setfx.js -> suara
-const MAP={ring:"whomp",bolt:"zap",shake:"rumble",fire:"roar",burn:"crackle",embers:"crackle",split:"crack",crackLater:"crack",glass:"ting",shards:"tinkle",shatterNP:"glass"};
 window.SND=(k,x)=>{
- if(!snd)return;k=MAP[k]||k;const f=S[k];if(!f||!ac())return;
+ if(!snd)return;const f=S[k];if(!f||!ac())return;
  const now=AC.currentTime,gap=k==="draw"||k==="sel"?.02:.06;if(last[k]&&now-last[k]<gap)return;last[k]=now;
  try{f(now+.01,x)}catch(e){}};
-// Dipanggil setfx.js saat efek Set mulai: nada dasar dari kunci skin.
-window.SNDset=sk=>{const k=String(sk&&sk.k||""),h=[...k].reduce((a,c)=>a+c.charCodeAt(0),0);CX={t:sk&&sk.t||"S",m:[.85,.94,1,1.06,1.12,1.19][h%6]}};
+// ---------- Sampel rekaman untuk efek Set ----------
+// Berkas snd/*.ogg dari pack Kenney.nl (CC0, bebas dipakai). Dimuat sekali saat suara pertama dibunyikan.
+// Waktu di naskah = saat PUNCAK suara (PK, diukur otomatis) jatuh, jadi dentum/sabetan pas dengan animasi.
+const SN="bong_001 bookFlip1 bookFlip2 cloth1 cloth2 cloth3 cloth4 confirmation_002 drawKnife2 engineCircular_000 explosionCrunch_000 explosionCrunch_001 explosionCrunch_002 explosionCrunch_003 explosionCrunch_004 forceField_000 forceField_002 glass_001 glass_004 handleCoins impactBell_heavy_000 impactBell_heavy_001 impactGlass_heavy_000 impactGlass_heavy_001 impactGlass_medium_000 impactMetal_heavy_000 impactMining_000 impactPlank_medium_000 impactPunch_heavy_000 impactPunch_heavy_002 impactPunch_medium_000 impactSoft_heavy_000 impactTin_medium_000 impactWood_light_000 impactWood_light_001 impactWood_light_002 knifeSlice knifeSlice2 laserLarge_000 laserLarge_002 lowFrequency_explosion_000 lowFrequency_explosion_001 maximize_005 metalClick metalLatch phaseJump1 phaserUp3 powerUp1 powerUp10 powerUp3 slime_000 spaceEngineLow_002 thrusterFire_000 zap1 zap2".split(" "),SB={},PK={};
+let LD=0,RVN={};
+function loadS(){if(LD||!AC)return;LD=1;SN.forEach(n=>fetch("snd/"+n+".ogg").then(r=>r.arrayBuffer()).then(b=>new Promise((ok,no)=>AC.decodeAudioData(b,ok,no))).then(b=>{SB[n]=b;const d=b.getChannelData(0);let p=0,pi=0;for(let i=0;i<d.length;i+=4){const a=Math.abs(d[i]);if(a>p){p=a;pi=i}}PK[n]=pi/b.sampleRate}).catch(()=>{}))}
+// Watak tier: makin tinggi makin berat (nada turun), gema makin panjang & basah, ada lapisan bass.
+const TC={S:{rv:.06,rl:.5,r:1.06},E:{rv:.2,rl:1.3,r:1},L:{rv:.34,rl:2.6,r:.9},K:{rv:.45,rl:3.4,r:.86}};
+function REV(){const k=CX.t;if(RVN[k])return RVN[k];const c=TC[k]||TC.S,n=AC.sampleRate*c.rl|0,b=AC.createBuffer(2,n,AC.sampleRate);
+ for(let h=0;h<2;h++){const d=b.getChannelData(h);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3)}const v=AC.createConvolver();v.buffer=b;v.connect(OUT);return RVN[k]=v}
+// Putar sampel n pada waktu t. o: v volume, r kecepatan/nada, lp lowpass, d potong (detik, fade), pk:false = mulai tepat di t (bukan puncaknya).
+function smp(n,t,o){o=o||{};const b=SB[n];if(!b)return;const c=TC[CX.t]||TC.S,r=(o.r||1)*c.r,s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;s.playbackRate.value=r;
+ let st=t-(o.pk===false?0:(PK[n]||0)/r),off=0;const now=AC.currentTime;if(st<now){off=(now-st)*r;st=now}
+ let x=s;if(o.lp){const f=AC.createBiquadFilter();f.type="lowpass";f.frequency.value=o.lp;s.connect(f);x=f}x.connect(g);const v=o.v??.8;g.gain.value=v;g.connect(OUT);
+ const rv=o.rv??c.rv;if(rv>0){const sg=AC.createGain();sg.gain.value=rv;g.connect(sg);sg.connect(REV())}
+ if(o.d){g.gain.setValueAtTime(v,st+Math.max(0,o.d-.25));g.gain.linearRampToValueAtTime(.0001,st+o.d);s.start(st,off);s.stop(st+o.d+.05)}else s.start(st,off)}
+// Lapisan bersama per tier (D = waktu dampak utama / finale)
+const hitE=D=>[[D,"impactPunch_heavy_000",{v:.85}],[D,"~sub"],[D+40,"~twinkle",.7]],
+ finL=D=>[[D,"lowFrequency_explosion_000",{v:1}],[D,"explosionCrunch_004",{v:.85}],[D,"~bigboom"],[D+150,"thrusterFire_000",{pk:false,d:1.6,v:.4,r:.8}],[D+250,"~twinkle",1.6]],
+ finK=D=>[[D-150,"glass_004",{v:.5}],[D,"lowFrequency_explosion_000",{v:1}],[D,"explosionCrunch_003",{v:.7,r:.75}],[D,"~bigboom"],[D+80,"impactGlass_heavy_001",{v:1}],[D+100,"impactGlass_medium_000",{v:.8,r:.8}],[D+250,"powerUp1",{pk:false,v:.3,r:1.25}],[D+300,"~tinkle"]],
+ fl="bookFlip2",ws=(t,v,r)=>[t,["cloth1","cloth2","cloth3","cloth4"][t%4],{v:v||.55,r:r||1}];
+// Naskah suara per skin: [ms, sampel | "~sintetis", opsi]. Waktu mengikuti animasi varian skin itu di setfx.js.
+const SC={
+ // SPESIAL: kering & ringan, satu-dua lapis
+ S01:[[0,fl,{v:.5}],ws(420),[430,"knifeSlice",{v:.9}],[440,"impactPunch_medium_000",{v:.7}],[480,"drawKnife2",{v:.35,r:1.2}]],
+ S02:[[0,fl,{v:.5}],[0,"~fly",.65],[650,"knifeSlice2",{v:.85}],[650,"impactPunch_medium_000",{v:.7}],ws(1250,.4),[1300,"impactWood_light_000",{v:.35}]],
+ S03:[[0,"bookFlip1",{pk:false,v:.55}],ws(880),[1000,"knifeSlice",{v:.85}],[1000,"impactPunch_heavy_002",{v:.7}],[1080,"knifeSlice2",{v:.8,r:1.1}]],
+ S04:[[0,fl,{v:.5}],[240,"impactWood_light_000",{v:.75}],[480,"impactWood_light_001",{v:.75,r:1.1}],ws(700,.5),[720,"impactPlank_medium_000",{v:.85}],[720,"impactPunch_medium_000",{v:.5}]],
+ S05:[[0,fl,{v:.5}],ws(220,.6),[230,"impactGlass_heavy_000",{v:.85}],[240,"knifeSlice2",{v:.6,r:1.3}],ws(420,.35,1.3)],
+ S06:[[0,fl,{v:.5}],[0,"~fly",.9],ws(450,.4),[900,"impactSoft_heavy_000",{v:.85}],[900,"phaserUp3",{v:.45}],[950,"maximize_005",{pk:false,v:.35}]],
+ S07:[[80,"metalLatch",{v:.75}],[450,"metalClick",{v:.6}],[935,"bong_001",{v:.4}],ws(1560,.5,1.2),[1600,"explosionCrunch_000",{v:.8,r:1.4,d:.5}],[1600,"impactGlass_heavy_001",{v:.6}]],
+ S08:[[0,fl,{v:.5}],ws(330),[350,"impactMetal_heavy_000",{v:.8}],[350,"engineCircular_000",{pk:false,d:.9,v:.45,r:1.5}],[1250,"knifeSlice",{v:.85}],[1260,"impactTin_medium_000",{v:.7}]],
+ S09:[[0,"cloth3",{pk:false,v:.5}],...[0,1,2,3,4,5].map(i=>[830+i*120,"impactWood_light_00"+(i%3),{v:.6,r:.9+i*.05}]),[1430,"impactPlank_medium_000",{v:.75}]],
+ S10:[[0,fl,{v:.5}],[250,"impactSoft_heavy_000",{v:.5,r:1.3}],[500,"impactSoft_heavy_000",{v:.55,r:1.2}],[750,"impactSoft_heavy_000",{v:.6,r:1.1}],[1000,"impactPunch_heavy_000",{v:.8}],[1000,"impactSoft_heavy_000",{v:.6,r:.8}]],
+ S11:[[0,fl,{v:.5}],[0,"~fly",1.3],[650,"impactWood_light_002",{v:.4}],[1300,"knifeSlice2",{v:.8}],[1300,"impactPunch_medium_000",{v:.75}]],
+ S12:[[0,"explosionCrunch_002",{v:.85,r:1.1}],[0,"lowFrequency_explosion_001",{v:.6}],ws(280,.5),[300,"explosionCrunch_000",{v:.85}],[300,"impactPunch_heavy_000",{v:.8}]],
+ // EPIK: + bass, gema sedang, suara energi
+ E01:[[0,"~dark",2.6],[0,"forceField_000",{pk:false,v:.35,r:.7}],[200,"powerUp3",{pk:false,v:.4,r:.8}],[1050,"zap2",{v:.8}],[1090,"zap1",{v:.6}],[1150,"explosionCrunch_003",{v:.9,r:.75,lp:3500}],...hitE(1160)],
+ E02:[[0,"~dark",2.4],...[0,1,2,3,4].flatMap(i=>[[i*180,"~fall",.42],[420+i*180,"explosionCrunch_00"+(i%3),{v:.55,r:1.1,d:.6}]]),[1150,"lowFrequency_explosion_000",{v:.9}],...hitE(1150)],
+ E03:[[0,"forceField_002",{pk:false,v:.6}],[350,"forceField_000",{pk:false,v:.6,r:1.15}],[500,"slime_000",{v:.5}],[520,"phaseJump1",{v:.6,r:.8}],[820,"phaseJump1",{pk:false,v:.6,r:1.1}],ws(1180,.4),[1200,"powerUp10",{v:.4}],...hitE(1200)],
+ E04:[ws(360),[380,"impactSoft_heavy_000",{v:.7}],[380,"spaceEngineLow_002",{pk:false,d:1.2,v:.7,r:.8}],[400,"~vortex",1.1],[1300,"slime_000",{v:.55,r:.7}],[1500,"explosionCrunch_001",{v:.8,r:.8}],...hitE(1500)],
+ E05:[[380,"laserLarge_002",{pk:false,v:.5,r:.6}],[500,"forceField_002",{pk:false,v:.5,r:.6,d:.9}],[780,"laserLarge_000",{v:.8,r:.7}],[790,"knifeSlice",{v:.6}],...hitE(790)],
+ E06:[[0,fl,{v:.5}],[350,"bookFlip1",{pk:false,v:.6}],[350,"powerUp1",{pk:false,v:.35}],ws(1080),[1100,"impactPunch_heavy_002",{v:.7}],[1100,"confirmation_002",{pk:false,v:.3}],...hitE(1100)],
+ // LEGENDA: sinematis, latar gelap berdengung, dentum besar + api
+ L01:[[0,"~dark",3.6],[200,"thrusterFire_000",{pk:false,v:.5,r:.55,d:1.6}],[300,"~growl"],[400,"spaceEngineLow_002",{pk:false,v:.45,r:.6,d:1.4}],ws(1700,.6,.7),...finL(1800)],
+ L02:[[0,"~dark",3.6],[0,fl,{v:.5}],[400,"impactBell_heavy_001",{pk:false,v:.5,r:.6}],[400,"~shine",1.4],[500,"thrusterFire_000",{pk:false,v:.45,r:.7,d:1.4}],...finL(1900)],
+ L03:[[0,"~dark",3.4],[300,"impactBell_heavy_000",{pk:false,v:.55,r:.45}],[300,"~void",1.7],[600,"cloth1",{pk:false,v:.5,r:.7}],[1100,"slime_000",{v:.5,r:.6}],[1100,"~vortex",.8],...finL(2000)],
+ L04:[[0,"~dark",3.8],[100,"handleCoins",{pk:false,v:.5}],[640,"impactBell_heavy_001",{v:.6,r:1.2}],[700,"~twinkle",1],[900,"powerUp3",{pk:false,v:.5,r:.7}],[1700,"laserLarge_002",{pk:false,v:.7,r:.5}],[1700,"~beam",1],...finL(1900)],
+ // KOLEKTOR: paling megah, gema panjang, kaca/kristal pecah
+ K01:[[0,"~dark",4.2],[0,"cloth3",{pk:false,v:.5}],[500,"spaceEngineLow_002",{pk:false,v:.6,r:.7,d:1.5}],[500,"~fall",1.5],[1990,"impactPunch_heavy_000",{v:1,r:.6}],[2000,"impactMining_000",{v:.8,r:.7}],...finK(2000)],
+ K02:[[0,"~dark",5],[0,fl,{v:.5}],[520,"impactBell_heavy_000",{pk:false,v:.5,r:.4}],[520,"spaceEngineLow_002",{pk:false,v:.8,r:.6,d:1.85}],[900,"~vortex",1.4],[1250,"phaseJump1",{v:.4,r:.6}],[1600,"phaseJump1",{v:.45,r:.5}],[1900,"phaseJump1",{v:.5,r:.4}],...finK(2350),[2350,"explosionCrunch_004",{v:1,r:.6}],[2350,"thrusterFire_000",{pk:false,v:.5,r:.5,d:2}]]};
+// Dipanggil setfx.js saat efek Set mulai: pilih naskah skin (atau skin setier dengan varian sama), lalu jadwalkan.
+window.SNDset=sk=>{if(!snd||!sk||!ac())return;CX={t:sk.t||"S",m:1};
+ const L=(window.SKA&&SKA.list)||[],sc=SC[sk.k]||SC[(L.find(d=>d.t===sk.t&&d.v===sk.v)||{}).k]||SC[{S:"S01",E:"E01",L:"L01",K:"K02"}[sk.t]];if(!sc)return;
+ const t0=AC.currentTime+.03;sc.forEach(([ms,n,o])=>{const t=t0+ms/1000;try{if(n[0]==="~"){const f=S[n.slice(1)];if(f)f(t,o)}else smp(n,t,o)}catch(e){}})};
 // Tombol Suara: Nyala / Mati
 const lbl=()=>"Suara: "+(snd?"Nyala":"Mati");
 window.sndUI=()=>document.querySelectorAll(".snb").forEach(b=>{b.textContent=lbl();b.setAttribute("aria-pressed",snd)});
