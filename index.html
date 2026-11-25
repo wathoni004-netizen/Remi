@@ -336,7 +336,9 @@ main:has(#play[hidden]),main:not(:has(#game:not([hidden]))){padding:8px max(16px
 main:not(:has(#play:not([hidden]))) h1{font-size:18px;margin:0 0 6px}
 main:not(:has(#play:not([hidden]))) .mw{gap:10px;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));align-content:center;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;align-items:start}
 #iv .mw>*{grid-column:1}
-#iv .mw>#ivr{grid-column:2;grid-row:1/span 4}
+main:not(:has(#play:not([hidden]))) :is(#pg,#kp,#iv,#tw) .mw{align-content:start}
+#iv .mw>.mhd{grid-column:1/-1;grid-row:1}
+#iv .mw>#ivr{grid-column:2;grid-row:2/span 3}
 #ld{padding:20px!important;align-items:center!important}
 #ld .hc{grid-column:1;grid-row:1/span 4;margin:0 auto}
 #ld>:not(.hc){grid-column:2}
@@ -354,27 +356,24 @@ main:not(:has(#play:not([hidden]))) .mw{gap:10px;padding:max(14px,env(safe-area-
 #join>.act:nth-of-type(2){grid-column:1;grid-row:4}
 #join>.act:last-child{grid-column:2;grid-row:4}
 #pg .mw>*{grid-column:1/-1}
-#pg #pbk{justify-self:start}
-#kp .mw>:nth-child(1){grid-column:1;grid-row:1}
-#kp .mw>:nth-child(2){grid-column:1;grid-row:2}
-#kp .tsh{grid-column:1;grid-row:3}
-#kp #spx{grid-column:1;grid-row:4}
-#kp #spw{grid-column:2;grid-row:1/span 3;align-self:center}
+#kp .mw>.mhd{grid-column:1/-1;grid-row:1}
+#kp .tsh{grid-column:1;grid-row:2}
+#kp #spx{grid-column:1;grid-row:3}
+#kp #spm{grid-column:1;grid-row:4;align-self:center}
+#kp #spw{grid-column:2;grid-row:2/span 2;align-self:center}
 #kp #spr{grid-column:2;grid-row:4;min-height:0}
 #kp #spn{grid-column:2;grid-row:5;min-height:48px!important}
 #kp #spn10{grid-column:2;grid-row:6;min-height:44px!important}
-#kp #spm{grid-column:1;grid-row:5;align-self:center}
-/* Toko: kiri = judul, keterangan koin, beli kartu spin (rapat di atas); kanan = daftar skin. Baris terakhir 1fr menyerap tinggi daftar skin. */
-#tw .mw{grid-template-rows:repeat(5,auto) 1fr;align-content:start}
+/* Toko: header selebar layar; kiri = keterangan koin, beli kartu spin; kanan = daftar skin. Baris 1fr menyerap tinggi daftar skin. */
+#tw .mw{grid-template-rows:auto auto auto auto 1fr auto}
 #tw .mw>*{grid-column:1}
-#tw .mw>:nth-child(n+6){grid-column:2}
-#tw .mw>:nth-child(1),#tw .mw>:nth-child(6){grid-row:1}
+#tw .mw>.mhd{grid-column:1/-1;grid-row:1}
 #tw .mw>:nth-child(2){grid-row:2}
 #tw .mw>:nth-child(3){grid-row:3}
 #tw .mw>:nth-child(4){grid-row:4}
-#tw .mw>:nth-child(5){grid-row:5}
-#tw .mw>:nth-child(7){grid-row:2/span 5}
-#tw .mw>:nth-child(8){grid-row:7}
+#tw .mw>:nth-child(5){grid-column:2;grid-row:2}
+#tw .mw>:nth-child(6){grid-column:2;grid-row:3/span 3}
+#tw .mw>:nth-child(7){grid-column:2;grid-row:6}
 #lobby:has(.rc){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;grid-auto-flow:row dense;align-items:center}
 #lobby:has(.rc)>*{grid-column:2;margin:4px 0}
 #lobby:has(.rc)>:nth-child(-n+3){grid-column:1}
@@ -389,6 +388,12 @@ main:has(#join:not([hidden])),main:has(#game:not([hidden]) #lobby:not([hidden]))
 .sko>:last-child{align-self:start;justify-self:center}
 }
 .mw .ar h5{color:#f2efe4}#ld{justify-content:center}
+/* Header halaman menu (Profil, Toko, Spin, Inventori): sama persis — tombol ‹ Menu di kiri, judul di sampingnya, saldo di kanan, tinggi tetap. */
+.mhd{display:flex;align-items:center;gap:10px;min-height:44px;margin:0}
+.mw button.pri.sec.mbk{flex:none;min-height:40px;padding:6px 14px;font-size:16px}
+.mht{font-weight:800;font-size:20px;white-space:nowrap}
+.mhr{margin-left:auto;display:flex;gap:5px;align-items:center}
+.mhr+.skq{margin:0 -8px 0 -6px}
 @media (orientation:portrait) and (min-width:560px){.mw{padding-left:calc((100% - 480px)/2);padding-right:calc((100% - 480px)/2)}}
 /* Mode menu: kartu menu menempel ke tepi layar, tanpa bingkai. Letakkan terakhir agar mengalahkan padding main di atas. */
 main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden]),#tw:not([hidden]),#ld:not([hidden])){padding:0}
@@ -406,13 +411,12 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <div class="mut" style="text-align:center">atau</div>
 <div class="act"><button class="pri sec" id="mk">+ Buat ruang baru</button></div>
 </div>
-<div id="pg" hidden><div class="mw pf"><div class="pft"><button class="pri sec" id="pbk" style="flex:none;padding:6px 14px">‹ Menu</button><b>Profil</b><i></i></div><div class="mp pfi"><div class="av" id="pav">P</div><div><div class="mpn" id="pgn">Pemain</div><div class="mps"><i class="dt"></i><span id="pgt">Tamu</span></div><div class="pgg" id="pgg" hidden></div><input id="pgi" maxlength="16" aria-label="Nama kamu" hidden></div></div><div class="mut" id="gm" hidden>Main sebagai tamu</div>
+<div id="pg" hidden><div class="mw pf"><div class="mhd"><button class="pri sec mbk" id="pbk">‹ Menu</button><b class="mht">Profil</b></div><div class="mp pfi"><div class="av" id="pav">P</div><div><div class="mpn" id="pgn">Pemain</div><div class="mps"><i class="dt"></i><span id="pgt">Tamu</span></div><div class="pgg" id="pgg" hidden></div><input id="pgi" maxlength="16" aria-label="Nama kamu" hidden></div></div><div class="mut" id="gm" hidden>Main sebagai tamu</div>
 <div id="pgl" class="pfs"><b>Simpan progresmu</b><div class="mut">Masuk dengan Google agar koin dan skin tersimpan dan bisa dipakai di HP lain.</div><button class="pri" id="gi">Masuk dengan Google</button></div>
 <div id="pgb" hidden><div class="pfs"><div class="pfh">Saldo</div><div class="pfr"><span><i class="pd" style="background:#e8b923"></i><b id="pgk">0</b></span><span><i class="pd" style="background:#2f6bff"></i><b id="pgu">0</b></span><span><i class="pd" style="background:#e53935"></i><b id="pgm">0</b></span></div></div><div class="pfs"><div class="pfh">Statistik</div><div class="pst"><div><b id="stm">0</b><span>Main</span></div><div><b id="stw">0</b><span>Menang</span></div><div><b id="sts">0</b><span>Set</span></div></div></div><div class="pfs"><div class="pfh">Skin</div><div class="pfl"><span>Dimiliki</span><b id="pgo">0 / 0</b></div><div class="pb"><i id="pgp" style="animation:none;margin:0;width:0"></i></div></div></div>
 <div class="pfs"><div class="pfl" style="align-items:center"><span>Efek suara</span><button class="pri sec snb" style="flex:none;padding:6px 14px" aria-pressed="true">Suara: Nyala</button></div></div><div class="pfs"><div class="act" style="margin:0"><button class="pri sec lk" id="pgr">Ganti nama</button><button class="pri sec lk" id="go" hidden>Keluar akun</button><button class="pri sec dn lk" id="da" hidden>Hapus akun</button></div><details class="mut" id="ard"><summary>Aturan main</summary><div class="ar"><h5>Poin kartu</h5><ul><li>2-10 = 5</li><li>J / Q / K = 10</li><li>A = 15</li><li>Joker = 25 (di dalam seri/rell, poin joker ikut kartu pendampingnya)</li></ul><h5>Kombinasi</h5><ul><li>Seri = 3-4 kartu berurutan satu jenis. Angka 2-10 hanya dengan angka; J-Q-K hanya dengan J-Q-K.</li><li>A-A-A atau A-A-A-A dihitung seri sekaligus rell.</li><li>Rell = 3-4 kartu angka sama.</li><li>Joker (hitam/merah) bisa menggantikan kartu apa saja, maksimal 1 joker per kombinasi (3 atau 4 kartu).</li><li>Seri harus turun dulu sebelum rell. Kalau menurunkan rell saat seri masih di tangan, seri itu ikut turun otomatis lebih dulu.</li></ul><h5>Giliran</h5><ul><li>Cabut 1, lalu buang 1.</li><li>Kartu buangan boleh dimakan sejak awal, hanya dari 5 kartu teratas (kalau kartu di bawah belum sampai 5, semuanya boleh dimakan). Semua kartu di atasnya ikut terambil.</li><li>Kartu yang dimakan wajib langsung diturunkan dalam kombinasi sebelum boleh membuang.</li><li>Joker tidak boleh dibuang ke bawah. Joker hanya keluar dari tangan lewat 2 cara: diturunkan sebagai bagian kombinasi (jadi poin) atau menjadi kartu Set.</li><li>Kartu di tangan bisa disusun sendiri (seret dengan jari) atau otomatis berkelompok saat sudah hidup.</li></ul><h5>Set</h5><ul><li>Kalau kartu buangan pemain sebelumnya membuat semua kartumu jadi (dengan 1 kartu pengganti), kamu bisa men-set.</li><li>Rell baru dihitung hidup dan bisa dipakai men-set kalau sudah punya seri (di tangan atau sudah diturunkan). Di tangan, rell tanpa seri berwarna kuning; jadi hijau setelah ada seri.</li><li>Pen-set mendapat nilai kartu pengganti × 10: 2-10 = 50, J/Q/K = 100, As = 150, joker = 250.</li><li>Pemain yang di-set kehilangan poin yang sama, lalu game selesai.</li><li>Pemain yang siap men-set diberi garis merah dan tanda SET di namanya (terlihat pemain lain), tanpa menyebut kartu yang ditunggu.</li><li>Kartu set dilempar ke tumpukan buangan dan tampil sedikit terpisah: lebih besar, agak miring, bergaris merah, dengan pita SET di sudut kanan bawah.</li></ul><h5>Akhir ronde</h5><ul><li>Kartu hidup yang masih di tangan turun otomatis jadi poin (seri lebih dulu kalau belum ada seri di meja).</li><li>Kartu yang belum jadi mengurangi poin, lalu poin set dihitung. Contoh: hidup 15 − belum jadi 20 − set 50 = −55.</li><li>Ada set: pen-set jadi pemenang ronde. Tanpa set (tumpukan habis): pemenang = poin terbanyak.</li><li>Pilih Lanjut atau Keluar. Catatan poin tiap ronde muncul di bawah.</li></ul><h5>Putaran</h5><ul><li>Ronde pertama berputar ke kanan (berlawanan arah jarum jam).</li><li>Ronde yang berakhir dengan set membuat ronde berikutnya berbalik arah. Tanpa set, arah tetap.</li><li>Arah berlanjut antarronde selama pemain menekan Lanjut.</li><li>Panah kuning di sudut meja dan susunan kartu buangan mengikuti arah putaran.</li></ul><h5>Akhiri game</h5><ul><li>Hanya pemilik room yang bisa menekan Akhiri game (tombol ☰ di samping emoji, bagian bawah) untuk kembali ke ruang tunggu.</li><li>Permainan direset: catatan poin dikosongkan dan putaran kembali ke kanan.</li></ul></div></details><div class="mut" id="pgv">Kartu Remi · Game Kampung · v1.0</div></div></div></div>
 <div id="kp" hidden><div class="mw" style="position:relative">
-<div style="display:flex;align-items:center;gap:6px"><button class="pri sec" id="spb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="margin-left:auto;display:flex;gap:5px"><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="spcb">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="spcm">0</b></span></span><button class="skq" id="kpi" aria-label="Lihat peluang"><span>?</span></button></div>
-<div style="font-weight:800;font-size:20px">Spin Skin</div>
+<div class="mhd"><button class="pri sec mbk" id="spb">‹ Menu</button><b class="mht">Spin Skin</b><span class="mhr"><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="spcb">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="spcm">0</b></span></span><button class="skq" id="kpi" aria-label="Lihat peluang"><span>?</span></button></div>
 <div class="tsh"><button class="tci on" id="spt1" aria-label="Spin Biasa, pakai kartu biru"><span class="tcd" style="--c:#2f6fe0;--d:#1c4aa8"></span>Biasa</button><button class="tci" id="spt2" aria-label="Spin Legenda, pakai kartu merah"><span class="tcd" style="--c:#d63a3a;--d:#8e1f1f"></span>Legenda</button></div>
 <div id="spw" class="skw"><div id="spt" class="skt"></div><div class="skp"></div></div>
 <div id="spr" class="skr">Putar untuk dapat skin</div>
@@ -422,10 +426,9 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <div class="mut" id="spm" style="text-align:center;font-size:12px;min-height:16px"></div>
 <div id="spq" class="skq2" hidden></div>
 </div><div id="spo" class="sko" hidden></div></div>
-<div id="iv" hidden><div class="mw"><div style="display:flex;align-items:center;gap:10px"><button class="pri sec" id="ivb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="font-weight:800;font-size:20px">Inventori</span></div><div class="mut" id="ivm" style="font-size:12px;min-height:16px"></div><div class="ivs" id="ivs"></div><div class="ivp" id="ivp" hidden></div><div id="ivr"><div class="mut" style="margin-bottom:6px;font-size:12px">Skin dimiliki: tarik ke slot</div><div class="ivl" id="ivl"></div></div></div></div>
+<div id="iv" hidden><div class="mw"><div class="mhd"><button class="pri sec mbk" id="ivb">‹ Menu</button><b class="mht">Inventori</b></div><div class="mut" id="ivm" style="font-size:12px;min-height:16px"></div><div class="ivs" id="ivs"></div><div class="ivp" id="ivp" hidden></div><div id="ivr"><div class="mut" style="margin-bottom:6px;font-size:12px">Skin dimiliki: tarik ke slot</div><div class="ivl" id="ivl"></div></div></div></div>
 <div id="tw" hidden><div class="mw">
-<div style="display:flex;align-items:center;gap:6px"><button class="pri sec" id="twb" style="flex:none;padding:6px 14px">‹ Menu</button><span style="margin-left:auto;display:flex;gap:5px"><span class="tc" aria-label="Koin"><i style="background:#e8b923;border-radius:50%;height:10px"></i><b id="twk">0</b></span><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="twb1">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="twm2">0</b></span></span></div>
-<div style="font-weight:800;font-size:20px">Toko</div>
+<div class="mhd"><button class="pri sec mbk" id="twb">‹ Menu</button><b class="mht">Toko</b><span class="mhr"><span class="tc" aria-label="Koin"><i style="background:#e8b923;border-radius:50%;height:10px"></i><b id="twk">0</b></span><span class="tc" aria-label="Kartu biru"><i style="background:#2f6fe0"></i><b id="twb1">0</b></span><span class="tc" aria-label="Kartu merah"><i style="background:#d63a3a"></i><b id="twm2">0</b></span></span></div>
 <div class="mut" style="font-size:12px">Koin didapat dari menang ronde (50% dari poin ronde).</div>
 <div style="font-weight:800;font-size:16px">Beli kartu spin</div>
 <div class="tsh"><button class="tci" id="tw1" aria-label="Beli 1 kartu biru, 50 koin"><span class="tcd" style="--c:#2f6fe0;--d:#1c4aa8"></span><span class="tpr"><i></i>50</span></button><button class="tci" id="tw2" aria-label="Beli 1 kartu merah, 650 koin"><span class="tcd" style="--c:#d63a3a;--d:#8e1f1f"></span><span class="tpr"><i></i>650</span></button></div>
@@ -465,5 +468,5 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <script src="js/spin.js?v=12"></script>
 <script src="js/toko.js?v=11"></script>
 <script src="js/inv.js?v=11"></script>
-<script src="js/profil.js?v=7"></script>
+<script src="js/profil.js?v=8"></script>
 </body></html>

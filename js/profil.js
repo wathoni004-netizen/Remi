@@ -36,7 +36,7 @@ window.pfUI=()=>{if(!$("#pg").hidden||(isG()&&!U))load();else if(!isG()){U=null;
 window.pfLv=lv;
 // Di APK: tampilkan versi game yang sedang jalan dan asalnya (unduhan = hasil pembaruan, bawaan APK = berkas di dalam APK).
 // Menu utama: versi game dari version.json (sama dengan yang dipakai pembaruan APK).
-fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("#hv").textContent="2–4 pemain · versi "+j.v}).catch(()=>{});
+fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("#hv").textContent="2–4 pemain · versi "+j.v;const C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))$("#pgv").textContent="Kartu Remi · Game Kampung · v"+j.v}).catch(()=>{});
 const ver=()=>{const C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))return;
  fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(async j=>{const p=(await C.Plugins.WebView.getServerBasePath()).path||"";$("#pgv").textContent="Game v"+j.v+(p.includes("/up")?" · unduhan":" · bawaan APK")}).catch(()=>{})};
 $("#mpb").onclick=()=>{menuUI();ver();$("#home").hidden=true;$("#pg").hidden=false;load()};
