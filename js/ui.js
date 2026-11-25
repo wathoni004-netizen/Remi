@@ -47,7 +47,7 @@ const ckey=i=>(players[hostId()]&&players[hostId()].ck)||"",kb=i=>KSK.kb(ckey(i)
 const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map(c=>card(c,"span",0,(i===uid?"sm":"mn")+" lc",0,kf(i))).join("")}</span>`).join("");
 
 // Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
-function kickBtn(i){return hostId()===uid&&i!==uid&&st?`<button class="pri sec" data-kick="${i}" style="flex:none;margin-left:6px;padding:0 8px;font-size:12px;border-radius:999px">Kick</button>`:""}
+function kickBtn(i){return !window.BOT&&hostId()===uid&&i!==uid&&st?`<button class="pri sec" data-kick="${i}" style="flex:none;margin-left:6px;padding:0 8px;font-size:12px;border-radius:999px">Kick</button>`:""}
 
 // Animasi kartu (FLIP): posisi kartu sebelum render dicatat, lalu kartu yang pindah meluncur dari posisi lama.
 const REDUCE=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};

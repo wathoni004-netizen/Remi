@@ -56,7 +56,7 @@ function go(k,a){
   if(!c)return msg("Belum bisa men-set");
   s.hands[uid]=[...h.filter(z=>z!==c),X];s.pile.pop();s.pile.push(c);s.sx=c;sel=[];
   // Efek skin: hanya jika pen-set memasang skin di slot kelompok kartu set ini (Inventori; setfx.js).
-  const fx=skinFx(c);if(fx)s.sk=fx;else delete s.sk;
+  const fx=window.BOT&&uid!==BOT.me?null:skinFx(c);if(fx)s.sk=fx;else delete s.sk;
   return fin(s,uid,c);
  }else if(k==="lay"){
   if(s.phase!=="act"||!a.every(c=>h.includes(c))||!meld(a))return msg("Kombinasi tidak valid");

@@ -1,8 +1,9 @@
 {
- "v": 24,
+ "v": 25,
  "files": [
   "index.html",
   "js/apk.js",
+  "js/bot.js",
   "js/event.js",
   "js/game.js",
   "js/info.js",
