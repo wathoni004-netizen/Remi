@@ -1,9 +1,10 @@
 {
- "v": 18,
+ "v": 19,
  "files": [
   "index.html",
   "js/apk.js",
   "js/game.js",
+  "js/info.js",
   "js/inv.js",
   "js/kartuskin.js",
   "js/mejaskin.js",
