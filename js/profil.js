@@ -49,7 +49,7 @@ $("#pgr").onclick=()=>{const i=$("#pgi");
  i.hidden=true;$("#pgr").textContent="Ganti nama";menuUI()};
 // Riwayat: daftar users/{uid}/rh (ditulis award() di net.js). Tekan baris = tabel per ronde (scoreHtml di ui.js). Tombol Tutup paling depan untuk tombol Kembali HP.
 $("#prh").onclick=()=>{const R=(U&&U.rh)||[],o=document.createElement("div");o.className="ask";
- const tg=t=>{const d=new Date(t);return d.getDate()+"/"+(d.getMonth()+1)+" "+hh(t)},tot=e=>{const T={};e.r.forEach(r=>{for(const i in r.sc||{})T[i]=(T[i]||0)+r.sc[i]});return T};
+ const tg=t=>{const d=new Date(t);return d.getDate()+"/"+(d.getMonth()+1)+" "+hh(t)},tot=e=>{const T={};e.r.forEach(r=>{for(const i in r.sc||{})T[i]=(T[i]||0)+(Number(r.sc[i])||0)});return T};
  const list=()=>R.length?R.map((e,k)=>{const T=tot(e),w=Object.keys(T).sort((a,b)=>T[b]-T[a])[0],n=i=>esc((e.n||{})[i]||"?");
   return`<button class="pri sec" data-k="${k}" style="display:block;width:100%;text-align:left;margin:0 0 6px;padding:8px 10px;font-size:13px;line-height:1.4"><b>${tg(e.d)}</b> · ${e.r.length} ronde${e.r.some(r=>r.vic)?' · <b style="color:#e53935">SET</b>':""}<br>${Object.keys(T).map(n).join(", ")}<br>🏆 ${n(w)} · poin kamu: <b>${T[uid]||0}</b></button>`}).join(""):'<div class="mut">Belum ada riwayat</div>';
  const show=h=>{o.innerHTML=`<div class="ab" style="display:flex;flex-direction:column;max-height:85vh"><div class="act" style="order:9"><button class="pri sec" data-x="1">Tutup</button></div><p><b>Riwayat</b></p><div style="overflow:auto">${h}</div></div>`};

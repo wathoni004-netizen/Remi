@@ -13,7 +13,18 @@ const isOk=i=>i===hostId()||(!!players[i]&&players[i].ok===gen());
 const pdoc=o=>{const p=players[uid]||{},r={name:p.name||"Pemain",t:Date.now()};["rd","j","ok","ck","mk"].forEach(k=>{if(p[k]!=null)r[k]=p[k]});if(window.GG)r.g=window.GG;return Object.assign(r,o||{})};
 const FBC={apiKey:"AIzaSyD7iXbT11b_qqc0n97JhQ0SxdhBzx-UDg8",authDomain:"remi-online-69bb6.firebaseapp.com",databaseURL:"https://remi-online-69bb6-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"remi-online-69bb6",storageBucket:"remi-online-69bb6.firebasestorage.app",messagingSenderId:"386908271555",appId:"1:386908271555:web:e9a238988ceb869ecb8376"};
 const CDN="https://www.gstatic.com/firebasejs/10.12.2/";
-const norm=v=>{if(!v)return v;v.deck=v.deck||[];v.pile=v.pile||[];v.laid=v.laid||{};v.eat=v.eat||"";v.hist=v.hist||[];v.fb=v.fb||{};v.hands=v.hands||{};(v.order||[]).forEach(i=>{v.hands[i]=v.hands[i]||[]});return v};
+// State ruang ditulis pemain lain: JANGAN dipercaya. Kartu harus kode yang sah, angka dipaksa angka (sebagian masuk innerHTML).
+const KR=c=>typeof c==="string"&&/^([SHDC]([2-9]|1[0-4])|X[12])$/.test(c);
+const obj=o=>o&&typeof o==="object"?o:{},peta=(o,f)=>Object.fromEntries(Object.entries(obj(o)).map(([k,x])=>[k,f(x)]));
+const krt=a=>Object.values(obj(a)).filter(KR),ang=x=>Number(x)||0;
+const norm=v=>{if(!v)return v;v.deck=krt(v.deck);v.pile=krt(v.pile);v.hands=peta(v.hands,krt);
+ v.laid=peta(v.laid,L=>Object.values(obj(L)).filter(m=>typeof m==="string"&&m.split(",").every(KR)));
+ v.order=Object.values(obj(v.order)).filter(i=>typeof i==="string");v.order.forEach(i=>{v.hands[i]=v.hands[i]||[]});
+ v.eat=KR(v.eat)?v.eat:"";if(!KR(v.sx))delete v.sx;
+ const d=v.sk&&SKA.get(v.sk.k);if(d)v.sk={t:d.t,v:d.v,k:d.k};else delete v.sk;
+ if(v.sc)v.sc=peta(v.sc,ang);v.fb=peta(v.fb,f=>peta(f,ang));
+ v.hist=Object.values(obj(v.hist)).map(r=>Object.assign({},obj(r),{sc:peta(obj(r).sc,ang)}));
+ return v};
 const map=p=>p.replace(/^rooms\/([^/]+)$/,"rooms/$1/state");
 (async()=>{
  const t0=Date.now();

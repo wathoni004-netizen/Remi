@@ -1,8 +1,8 @@
 function scoreHtml(H){
  const ids=[],nmx={};
  H.forEach(r=>Object.keys(r.sc||{}).forEach(i=>{if(!ids.includes(i))ids.push(i);nmx[i]=(r.names&&r.names[i])||nmx[i]||"?"}));
- const tot=ids.map(i=>H.reduce((t,r)=>t+((r.sc||{})[i]||0),0)),mx=Math.max(...tot);
- const cell=(r,i)=>{const v=(r.sc||{})[i];if(v==null)return"<td>-</td>";return`<td class="${r.vic===i?"vc":r.win===i?"wn":""}">${v}</td>`};
+ const tot=ids.map(i=>H.reduce((t,r)=>t+(Number((r.sc||{})[i])||0),0)),mx=Math.max(...tot);
+ const cell=(r,i)=>{let v=(r.sc||{})[i];if(v==null)return"<td>-</td>";v=Number(v)||0;return`<td class="${r.vic===i?"vc":r.win===i?"wn":""}">${v}</td>`};
  return `<b>Catatan poin</b><div style="overflow-x:auto;margin-top:6px"><table class="tbl"><tr><th>Ronde</th>${ids.map(i=>`<th>${esc(nmx[i])}</th>`).join("")}</tr>${H.map((r,k)=>`<tr><td>${k+1}</td>${ids.map(i=>cell(r,i)).join("")}</tr>`).join("")}<tr class="tt"><th>Total poin</th>${tot.map(t=>`<th>${t}${t===mx?" 👑":""}</th>`).join("")}</tr></table></div><div class="mut" style="margin-top:6px">Hijau = menang ronde · Merah = terkena set</div>`}
 // live = hidup (hijau); half = rell yang belum hidup karena belum punya seri (kuning).
 function handView(h,hs){
