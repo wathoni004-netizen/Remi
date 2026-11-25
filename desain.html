@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Desain Kartu Remi</title>
+<style>
+body{margin:0;padding:12px;background:#0d1210;color:#f2efe4;font:14px system-ui,sans-serif}
+.bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+button{padding:8px 12px;border-radius:999px;border:1px solid #3b5246;background:#1f2b25;color:#f2efe4;font:inherit;cursor:pointer}
+button.on{background:#e8b923;color:#14110a;border-color:#e8b923;font-weight:700}
+#wrap{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.hp{border:6px solid #333;border-radius:18px;overflow:hidden;position:relative}
+iframe{border:0;transform-origin:0 0;display:block}
+textarea{width:100%;height:120px;box-sizing:border-box;background:#14201a;color:#cfe;border:1px solid #3b5246}
+</style>
+<div class="bar" id="sc"></div>
+<div class="bar"><button id="ed">✋ Mode geser: mati</button><button id="tx">+ Teks</button><button id="bt">+ Tombol</button><button id="ub">✏️ Ubah tulisan</button><button id="hp">🗑 Hapus</button><button id="rs">↺ Reset layar ini</button><button id="ex">📋 Salin perubahan</button></div>
+<div class="bar" id="info">Nyalakan Mode geser, lalu seret tombol. Ketuk satu benda untuk memilihnya (garis kuning).</div>
+<div id="wrap"></div>
+<textarea id="out" hidden readonly></textarea>
+<script>
+// Editor tata letak: memuat game asli (index.html) di dua bingkai HP. Perubahan hanya disimpan di browser ini (localStorage "desain"), game tidak diubah.
+const $=s=>document.querySelector(s),SC={menu:"Menu",masuk:"Masuk ruang",tunggu:"Ruang tunggu",main:"Permainan",selesai:"Selesai ronde",profil:"Profil"};
+const UK={berdiri:[390,844],baring:[844,390]};
+let D={};try{D=JSON.parse(localStorage.getItem("desain"))||{}}catch(e){}
+let scr="menu",edit=false,sel=null;// sel={o:orientasi,el}
+const F={};
+const simpan=()=>{try{localStorage.setItem("desain",JSON.stringify(D))}catch(e){}};
+const data=o=>D[o+"/"+scr]=D[o+"/"+scr]||{ubah:{},baru:[]};
+// Pemilih CSS: dari id terdekat, lalu urutan anak.
+const path=e=>{const p=[];while(e&&e.tagName!=="BODY"){if(e.id){p.unshift("#"+e.id);break}p.unshift(e.tagName.toLowerCase()+":nth-child("+([...e.parentNode.children].indexOf(e)+1)+")");e=e.parentElement}return p.join(">")};
+const teks=e=>{const w=e.ownerDocument.createTreeWalker(e,4);let n;while((n=w.nextNode()))if(n.textContent.trim())return n;return null};
+function terap(o){
+ const doc=F[o].contentDocument,d=data(o);if(!doc||!doc.body)return;
+ d.baru.forEach((b,i)=>{let e=doc.getElementById("ds"+i);if(!e){e=doc.createElement(b.jenis==="tombol"?"button":"div");e.id="ds"+i;if(b.jenis==="tombol")e.className="pri";e.style.cssText="position:fixed;z-index:70;width:max-content;margin:0;left:20px;top:"+(60+i*10)+"px;color:"+(b.jenis==="tombol"?"":"#fff");e.textContent=b.isi;doc.body.append(e)}});
+ let css=edit?"*{touch-action:none!important;user-select:none!important}.dsel{outline:2px dashed #ffd23f!important;outline-offset:2px}":"";
+ for(const s in d.ubah){const u=d.ubah[s];if(u.x||u.y)css+=`${s}{translate:${u.x||0}px ${u.y||0}px!important}`;if(u.hilang)css+=`${s}{display:none!important}`;
+  if(u.teks!=null){const e=doc.querySelector(s),n=e&&teks(e);if(n&&n.textContent!==u.teks)n.textContent=u.teks}}
+ let st=doc.getElementById("dscss");if(!st){st=doc.createElement("style");st.id="dscss";doc.head.append(st)}if(st.textContent!==css)st.textContent=css}
+function pilih(o,el){if(sel&&sel.el)sel.el.classList.remove("dsel");sel=el?{o,el,s:path(el)}:null;if(el)el.classList.add("dsel")}
+function pasang(o){
+ const doc=F[o].contentDocument;let g=null;
+ const stop=e=>{if(!edit)return;e.preventDefault();e.stopImmediatePropagation()};
+ ["click","dblclick","pointercancel","contextmenu","dragstart"].forEach(k=>doc.addEventListener(k,stop,true));
+ doc.addEventListener("pointerdown",e=>{if(!edit)return;stop(e);
+  const t=e.target,el=t.closest("button,a,input,summary,.c,.mp,.pl")||t.closest("svg")?.parentElement||t;
+  if(el===doc.body||el===doc.documentElement)return pilih(o,null);
+  pilih(o,el);const u=data(o).ubah[sel.s]||{};g={x:e.clientX,y:e.clientY,x0:u.x||0,y0:u.y||0,s:sel.s}},true);
+ doc.addEventListener("pointermove",e=>{if(!g)return;stop(e);const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.abs(dx)+Math.abs(dy)<4)return;
+  const u=data(o).ubah[g.s]=data(o).ubah[g.s]||{};u.x=Math.round(g.x0+dx);u.y=Math.round(g.y0+dy);terap(o)},true);
+ doc.addEventListener("pointerup",e=>{if(g){stop(e);g=null;simpan()}},true)}
+// Siapkan layar di dalam game. Pemain lain palsu; window.BOT membuat tidak ada yang ditulis ke Firebase.
+const MAIN='$("#nm").value="Boss";window.BOT={lv:1,b:{},me:uid};room="bot";players={[uid]:{name:"Boss",t:9e15,j:1,ok:0},b1:{name:"Andi",t:9e15,j:2,ok:0},b2:{name:"Budi",t:9e15,j:3,ok:0},b3:{name:"Cici",t:9e15,j:4,ok:0}};$("#home").hidden=true;$("#game").hidden=false;';
+const SIAP={menu:"",masuk:'$("#hp").click()',profil:'$("#mpb").click()',tunggu:MAIN+'room="k7q2";st=null;render()',main:MAIN+'st=null;start()',selesai:MAIN+'st=null;start();setTimeout(()=>fin(JSON.parse(JSON.stringify(st))),300)'};
+function muat(){
+ pilih(null,null);$("#wrap").innerHTML="";
+ for(const o in UK){const[w,h]=UK[o],k=Math.min(1,(innerWidth-40)/w),d=document.createElement("div");
+  d.innerHTML=`<b>HP ${o}</b><div class="hp" style="width:${w*k}px;height:${h*k}px"><iframe style="width:${w}px;height:${h}px;transform:scale(${k})"></iframe></div>`;$("#wrap").append(d);
+  const f=F[o]=d.querySelector("iframe"),s=scr;
+  f.onload=()=>{const W=f.contentWindow,t=setInterval(()=>{if(!f.isConnected)return clearInterval(t);if(W.document.querySelector("#home").hidden)return;clearInterval(t);W.eval(SIAP[s]);pasang(o);terap(o);const r=setInterval(()=>{if(!f.isConnected)return clearInterval(r);terap(o)},500)},200)};
+  f.src="index.html"}}
+for(const k in SC){const b=document.createElement("button");b.textContent=SC[k];b.dataset.k=k;b.onclick=()=>{scr=k;tab();muat()};$("#sc").append(b)}
+const tab=()=>[...$("#sc").children].forEach(b=>b.className=b.dataset.k===scr?"on":"");
+$("#ed").onclick=()=>{edit=!edit;$("#ed").className=edit?"on":"";$("#ed").textContent="✋ Mode geser: "+(edit?"nyala":"mati");if(!edit)pilih(null,null);for(const o in F)terap(o)};
+const tambah=jenis=>{const isi=prompt(jenis==="tombol"?"Tulisan tombol:":"Tulisan:");if(!isi)return;for(const o in UK){data(o).baru.push({jenis,isi});terap(o)}simpan();if(!edit)$("#ed").click()};
+$("#tx").onclick=()=>tambah("teks");$("#bt").onclick=()=>tambah("tombol");
+const butuh=()=>{if(sel)return true;alert("Nyalakan Mode geser, lalu ketuk benda yang mau diubah.");return false};
+const ubah=v=>{const u=data(sel.o).ubah;u[sel.s]=Object.assign(u[sel.s]||{},v);terap(sel.o);simpan()};
+$("#ub").onclick=()=>{if(!butuh())return;const n=teks(sel.el);if(!n)return alert("Benda ini tidak punya tulisan.");const t=prompt("Tulisan baru:",n.textContent);if(t!=null)ubah({teks:t})};
+$("#hp").onclick=()=>{if(butuh()){ubah({hilang:true});pilih(null,null)}};
+$("#rs").onclick=()=>{if(!confirm("Kembalikan layar "+SC[scr]+" (berdiri dan baring) ke asli?"))return;for(const o in UK)delete D[o+"/"+scr];simpan();muat()};
+$("#ex").onclick=()=>{const o={};for(const k in D)if(Object.keys(D[k].ubah).length||D[k].baru.length){const doc=k.endsWith("/"+scr)&&F[k.split("/")[0]].contentDocument;
+  // Posisi benda baru dicatat sebagai geseran dari left:20px; top:60px+urutan*10.
+  o[k]=D[k]}
+ const t=JSON.stringify(o);$("#out").hidden=false;$("#out").value=t;$("#out").select();navigator.clipboard?.writeText(t).then(()=>$("#info").textContent="Tersalin. Tempel di chat Claude supaya diterapkan ke game.",()=>{})};
+tab();muat();
+</script>
+</html>
