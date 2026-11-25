@@ -1,0 +1,60 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": "auth != null",
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['name','t']) && newData.child('name').isString() && newData.child('name').val().length <= 16 && newData.child('t').isNumber()"
+          }
+        },
+        "state": {
+          ".write": "auth != null && root.child('rooms').child($room).child('players').child(auth.uid).exists() && (!data.exists() || data.child('status').val() !== 'play' || data.child('turn').val() === auth.uid || data.child('host').val() === auth.uid || !root.child('rooms').child($room).child('players').child(data.child('host').val()).exists())",
+          ".validate": "newData.hasChildren(['status']) && newData.child('status').isString()"
+        },
+        "chat": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('rooms').child($room).child('players').child(auth.uid).exists()",
+            ".validate": "newData.hasChildren(['n','x','t']) && newData.child('n').isString() && newData.child('n').val().length <= 16 && newData.child('x').isString() && newData.child('x').val().length <= 80 && newData.child('t').isNumber()"
+          }
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous'",
+        "biru":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999" },
+        "merah": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999" },
+        "koin":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999" },
+        "skins": { "$k": { ".validate": "newData.isBoolean()" } },
+        "pakai": { ".validate": "newData.isString() && newData.val().length < 30" },
+        "equip": { "$s": { ".validate": "($s === 'k2' || $s === 'kqj' || $s === 'as' || $s === 'jk' || $s === 'kartu' || $s === 'meja') && newData.isString() && newData.val().length < 8" } },
+        "hr": {
+          "d": { ".validate": "newData.isString() && newData.val().length <= 12" },
+          "b": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99" },
+          "m": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99" },
+          "$o": { ".validate": false }
+        },
+        "st": {
+  "m": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999" },
+  "w": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999" },
+  "s": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999" },
+  "$o": { ".validate": false }
+},
+"tok": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999" },
+"ev": {
+  "id": { ".validate": "newData.isString() && newData.val().length <= 20" },
+  "kr": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999" },
+  "p":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9" },
+  "$o": { ".validate": false }
+},
+"rh": {
+  "$i": { ".validate": "$i.matches(/^[0-9]$/) && newData.hasChildren(['id','d','r']) && newData.child('id').isString() && newData.child('id').val().length <= 40 && newData.child('d').isNumber()" }
+},
+"$other": { ".validate": false }
+      }
+    }
+  }
+}
