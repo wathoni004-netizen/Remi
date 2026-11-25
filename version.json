@@ -1,5 +1,5 @@
 {
- "v": 16,
+ "v": 17,
  "files": [
   "index.html",
   "js/apk.js",
@@ -13,6 +13,7 @@
   "js/setfx.js",
   "js/skinart.js",
   "js/spin.js",
+  "js/suara.js",
   "js/toko.js",
   "js/ui.js",
   "img/lbl-e.webp",

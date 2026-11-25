@@ -108,8 +108,11 @@ function render(){
   if($("#sb"))$("#sb").onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
  const O=st.order,h=(st.hands&&st.hands[uid])||[],done=st.status==="done",mine=!done&&st.turn===uid,ph=st.phase;
- {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph;
-  if(sig&&sg!==sig){if(done&&!wasDone)beep(st.sx?"set":"win");else if(!done&&mine&&!wasMine){beep("turn");buzz()}else if(!done)beep("tick")}
+ {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph+"|"+Object.values(st.laid||{}).reduce((a,v)=>a+v.length,0);
+  // Suara: aksi terakhir (dari st.msg) di semua HP; Set dengan skin: fanfare setelah efek lemparan selesai.
+  if(sig&&sg!==sig){const m=st.msg||"",a=/ buang /.test(m)?"drop":/ makan /.test(m)?"take":/ turun/.test(m)?"lay":/ cabut$/.test(m)?"draw":"tick";
+   if(done&&!wasDone){if(st.sx&&st.sk)setTimeout(()=>beep("set"),500+({S:3000,E:3800,L:4600,K:5000}[st.sk.t]||0));else beep(st.sx?"set":"win")}
+   else if(!done){beep(a);if(mine&&!wasMine){setTimeout(()=>beep("turn"),220);buzz()}}}
   sig=sg;wasDone=done;wasMine=!done&&mine;
   document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Kartu Remi"}
  sel=sel.filter(c=>h.includes(c));
@@ -154,7 +157,7 @@ function render(){
   const md=document.querySelector(".tb .mid");$("#dirw").style.height=md.offsetTop+md.offsetHeight+28+"px"}
  playFx(fxB);
 }
-$("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];render()};
+$("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];beep("sel");render()};
 $("#pile").onclick=e=>{const b=e.target.closest("[data-c]");if(b)go("take",b.dataset.c)};
 $("#bd").onclick=()=>go("draw");$("#deck").onclick=()=>go("draw");
 $("#bs").onclick=()=>go("set");
@@ -170,13 +173,7 @@ $("#lobby").onclick=async e=>{
  const base=st||{status:"lobby",hist:[],host:uid,gen:0};
  save({...base,kk:{...(base.kk||{}),[i]:players[i].j||0}})};
 addEventListener("pointerdown",()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}},{once:true});
-function beep(k){
- if(!snd)return;
- try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
-  const Q={turn:[[660,.12],[880,.2]],tick:[[520,.05]],pop:[[700,.06],[920,.08]],set:[[392,.15],[523,.15],[659,.15],[784,.35]],win:[[523,.12],[659,.12],[784,.12],[1047,.3]]};
-  let t=AC.currentTime;
-  (Q[k]||[]).forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.2,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);t+=d})
- }catch(e){}}
+function beep(k){if(window.SND)SND(k)}// suara ada di suara.js
 function buzz(){try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
 {const HD=$("#hand");
  HD.addEventListener("pointerdown",e=>{const b=e.target.closest("[data-c]");if(!b)return;drag={el:b,c:b.dataset.c,x0:e.clientX,pid:e.pointerId,on:false}});

@@ -40,7 +40,7 @@ async function put(nu){try{await db.doc("users/"+uid).set(nu);return true}catch(
 function roll(w,fn,d){d=d||4;
  strip(w);const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";void t.offsetWidth;
  t.style.transition="transform "+d+"s cubic-bezier(.1,.75,.15,1)";t.style.transform="translateX(-"+(24*90+35-$("#spw").clientWidth/2)+"px)";
- setTimeout(fn,d*1000+300)}
+ if(window.SND)SND("spin",d);setTimeout(fn,d*1000+300)}
 async function spin(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Profil).");
@@ -74,7 +74,7 @@ function reveal10(R){
  o.innerHTML=`<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px"><div style="font-size:22px;font-weight:900;letter-spacing:.1em;animation:skPop .5s ease-out both">HASIL 10x</div><div style="display:grid;grid-template-columns:repeat(5,56px);gap:16px 6px;animation:skFade .5s ease-out .2s both">${R.map(cell).join("")}</div><div style="font-size:14px;color:#d9e7de;text-align:center">${nw} skin baru · ${R.length-nw-zk} ulang · ${zk} zonk</div><button class="skl" id="spl" style="animation-delay:.6s">Lanjut</button></div>`;
  o.hidden=false;$("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
  $("#spr").textContent="10x: "+nw+" skin baru, "+zk+" zonk";
- const best=Math.max(...R.map(r=>r.z?0:LV[r.w.t]));if(navigator.vibrate)navigator.vibrate(best>=4?[60,40,60,40,120]:best>=3?[60,40,60]:30)}
+ const best=Math.max(...R.map(r=>r.z?0:LV[r.w.t]));if(window.SND)SND("rev"+best);if(navigator.vibrate)navigator.vibrate(best>=4?[60,40,60,40,120]:best>=3?[60,40,60]:30)}
 async function swap(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Profil).");
@@ -89,7 +89,7 @@ function reveal(w,dup){
   o.innerHTML=`<div style="position:relative;width:150px;height:210px;box-sizing:border-box;border-radius:14px;background:#222a26;border:5px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 64px/1 system-ui;animation:skShake .5s ease-in-out .6s 1">✕</div><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;animation:skPop .5s ease-out .4s both"><div style="font-size:26px;font-weight:900;letter-spacing:.12em;color:#8a8f8c">ZONK</div><div style="font-size:14px;color:#d9e7de">Kartu hangus, tidak dapat skin</div></div><button class="skl" id="spl">Lanjut</button>`;
   o.hidden=false;$("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
   $("#spr").innerHTML=`<b style="color:#8a8f8c">Zonk · tidak dapat skin</b>`;
-  if(navigator.vibrate)navigator.vibrate(30);return}
+  if(window.SND)SND("rev0");if(navigator.vibrate)navigator.vibrate(30);return}
  if(l===4)h+=`<div class="skx" style="top:0;left:0;right:0;bottom:0;background:#fff7d6;animation:skFlash .9s ease-out both"></div>`;
  if(l>=3){
   h+=`<div class="skx" style="left:50%;top:50%;width:640px;height:640px;margin:-350px 0 0 -320px;border-radius:50%;background:repeating-conic-gradient(from 0deg,${l===4?"rgba(232,185,35,.55)":"rgba(165,107,255,.4)"} 0deg 9deg,transparent 9deg 24deg);-webkit-mask-image:radial-gradient(circle,#000 18%,transparent 68%);mask-image:radial-gradient(circle,#000 18%,transparent 68%);animation:skRays ${l===4?6:12}s linear infinite"></div>`;
@@ -102,7 +102,7 @@ function reveal(w,dup){
  o.innerHTML=h;o.hidden=false;
  $("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
  $("#spr").innerHTML=`<div class="sks" style="width:36px;height:50px">${SKA.svg(w.key,"ska sm")}</div><b style="color:${c}">${w.n} · skin ${w.t}</b>`;
- if(navigator.vibrate)navigator.vibrate(l>=4?[60,40,60,40,120]:l>=3?[60,40,60]:30)}
+ if(window.SND)SND("rev"+l);if(navigator.vibrate)navigator.vibrate(l>=4?[60,40,60,40,120]:l>=3?[60,40,60]:30)}
 $("#ts").onclick=open;
 $("#spb").onclick=()=>{$("#kp").hidden=true;$("#home").hidden=false};
 $("#spt1").onclick=()=>{if(!busy)setTab("biru")};

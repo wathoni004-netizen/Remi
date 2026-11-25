@@ -163,7 +163,7 @@ function sendChat(x){
  const c=chat[uid]||{},cr=(st&&st.cr)||0,t=Date.now(),h=[...(c.h||(c.x?[{x:c.x,t:c.t}]:[])).filter(m=>m.t>cr),{x,t}].slice(-CHN);
  Promise.resolve(db.doc(`rooms/${room}/chat/${uid}`).set({n:(players[uid]||{}).name||"?",x,t,h})).catch(e=>msg("Chat gagal: "+(e.message||e.code)))}
 setInterval(drawChat,5000);
-document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b)sendChat(b.dataset.e)});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b){sendChat(b.dataset.e);if(window.SND)SND("emo")}});
 $("#cs").onclick=()=>{sendChat($("#ci").value);$("#ci").value=""};
 $("#ci").onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){sendChat(e.target.value);e.target.value=""}};
 document.querySelectorAll(".cfb").forEach(x=>x.onclick=()=>{const b=$("#chatbox");b.hidden=!b.hidden;$("#mbox").hidden=true;if(!b.hidden){document.body.classList.remove("unr");$("#cl").scrollTop=$("#cl").scrollHeight}});
