@@ -134,11 +134,6 @@ function render(){
  SP=pos;$("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
  $("#info").textContent="";
  $("#dkn").hidden=true;$("#deck").className="c back lg"+kb(uid)+(mine&&ph==="draw"?" tk":"");$("#deck").innerHTML=`<b class="dcn">${st.deck.length}</b>`;$("#deck").setAttribute("aria-label","Cabut kartu, sisa "+st.deck.length);
- const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
- const PL=pileLay(np,RW,RH,(st.dir||1)>0);
- $("#pile").innerHTML=np?st.pile.map((c,i)=>{
-  const hl=np-i<=5;
-  return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada buangan</span>';
  $("#mine").innerHTML=laid(uid);
  let s;
  // Akhir ronde: ringkas dari data skor (st.fb), bukan dari st.msg yang panjang.
@@ -159,6 +154,13 @@ function render(){
  hd.innerHTML=hs.map(c=>card(c,"button",true,"lg"+(sel.includes(c)?" sl":"")+(V.live.has(c)?" lv":V.half.has(c)?" lh":"")+(V.starts.has(c)?" gs":"")+(mine&&st.eat===c?" ea":""),0,kf(uid))).join("");
  $("#arr").hidden=true;$("#aut").hidden=!O.includes(uid);$("#aut").classList.toggle("on",auto);$("#aut").setAttribute("aria-pressed",auto);
  $("#again").hidden=!done;
+ // Meja harus pas satu layar: kalau masih kepanjangan, rapatkan bertahap (k1, k2) sebelum tumpukan buang diukur.
+ {const tb=$("#play .tb");tb.classList.remove("k1","k2");tb.classList.toggle("selesai",done);for(const k of["k1","k2"]){if(tb.scrollHeight<=tb.clientHeight+1)break;tb.classList.add(k)}}
+ const ring=$("#ring"),RW=ring.clientWidth||200,RH=ring.clientHeight||230,np=st.pile.length;
+ const PL=pileLay(np,RW,RH,(st.dir||1)>0);
+ $("#pile").innerHTML=np?st.pile.map((c,i)=>{
+  const hl=np-i<=5;
+  return pcard(c,i,canTake&&hl,hl,done&&st.sx===c,i===np-1,PL.p[i],PL)}).join(""):'<span class="lab">Belum ada buangan</span>';
  // Panah arah putaran di 4 sudut meja; panah bawah di celah 28px antara kursi samping dan kartu turun kita (tidak menimpa kartu).
  {const cw=(st.dir||1)<0,a=cw?'<path d="M4 22Q4 4 20 4"/><polygon points="17,0 17,8 25,4"/>':'<path d="M22 4Q4 4 4 20"/><polygon points="0,17 8,17 4,25"/>';
   $("#dirw").innerHTML=["tl","tr","br","bl"].map(c=>`<svg class="da ${c}" viewBox="0 0 26 26">${a}</svg>`).join("");

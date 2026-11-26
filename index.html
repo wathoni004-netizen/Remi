@@ -288,6 +288,7 @@ main:has(#play:not([hidden])) h1{display:none}
 .sfx-me{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#e8b923;color:#14201a;font-size:14px;font-weight:700;padding:5px 14px;border-radius:8px;white-space:nowrap}
 /* Tata letak meja v32: punggung kartu lawan setengah, nama kecil (kiri/kanan tegak), kartu turun kita di atas tombol. */
 .seat .nm{font-size:11px;padding:2px 8px;white-space:nowrap}
+#play .c.sm{min-width:0;padding:0}/* .sm milik tombol lain jangan melebarkan kartu */
 .seat .bk .c{height:22px;border-top-width:0;border-radius:0 0 4px 4px}
 .top .bk .c{margin-left:calc(min(18px,108px / (var(--n) - 1)) - 30px)}
 #sT>div{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;align-items:start;justify-items:start}
@@ -319,6 +320,28 @@ main:has(#play:not([hidden])) h1{display:none}
 #mine .c.sm.lc{font-size:14px}
 #play .mt{margin:0;gap:0}
 #mine .mt .c{margin-left:-10px}#mine .mt .c:first-child{margin-left:0}
+/* Pas satu layar HP (tegak maupun miring): tinggi meja = tinggi layar, area tumpukan yang menyesuaikan. */
+#play .tb{height:100vh;height:100dvh;min-height:0;overflow-x:hidden;overflow-y:auto}
+#play .tb>*{flex-shrink:0}
+#play .tb>.mid{flex:1 0 auto}
+#ring{min-height:150px}
+#play .tb.k1{gap:3px}
+#play .tb.k1 .mid{margin-bottom:6px}
+#play .tb.k1 .hand{padding:10px 4px 2px;min-height:0}
+#play .tb.k1 .mine{gap:3px 6px}
+#play .tb.k1 #mine .c.sm{width:26px;height:36px;font-size:12px}
+#play .tb.k1 .msg{font-size:13px;line-height:1.25}
+#play .tb.k1 .side .c.mn,#play .tb.k1 #sT .c.mn{height:24px}
+#play .tb.k1 .side>div{row-gap:2px}
+#play .tb.k1 .act .pri{padding-top:8px;padding-bottom:8px;min-height:0}
+#play .tb.k2 #ring{min-height:120px}
+#play .tb.k2 .mid{margin-bottom:0}
+#play .tb.k2 .msg{font-size:12px;line-height:1.2}
+#play .tb.k2 #mine .c.sm{width:22px;height:30px;font-size:10px}
+#play .tb.k2 .hand .c.lg{height:62px}
+#play .tb.k2 .hand{padding-top:8px}
+#play .tb.k2 .side .nm{max-height:90px;overflow:hidden}
+#play .tb.k2 #qe .qb{font-size:16px;padding:2px 4px}
 /* HP miring: posisi meja diatur ulang (gaya sama dengan HP tegak). Hanya untuk layar pendek mendatar. */
 @media (orientation:landscape) and (max-height:520px){
 main:has(#play:not([hidden])){padding:0}
@@ -339,7 +362,8 @@ main:has(#play:not([hidden])) #game{padding-bottom:0}
 #sR .bk .c:first-child{margin:0}
 #sR .ml{grid-column:2;grid-row:1/span 2;justify-content:flex-start;align-self:center;margin:0}
 #sR .stg{top:auto;bottom:calc(100% + 1px);transform:translateX(-50%)}
-#mine{grid-area:mine;min-height:0;align-content:center;align-self:stretch;gap:3px 6px}
+#mine{grid-area:mine;display:block;min-height:0;align-self:center;text-align:center;line-height:0}
+#mine .mt{display:inline-flex;margin:1px 3px;vertical-align:top}#play #mine .mt{margin:1px 3px}
 #mine .c.sm{width:32px;height:44px;font-size:15px}
 #mine .c.sm.lc{font-size:15px}
 #play .ctr{grid-area:ctr;align-self:stretch}
@@ -357,6 +381,15 @@ main:has(#play:not([hidden])) #game{padding-bottom:0}
 #arr,#bar{display:none!important}
 #alr{position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:30;margin:0}
 #play .tb>.act:not(#qe):not(#again){min-height:0}
+/* Akhir ronde di HP miring: skor dan kartu turun kita dirapatkan supaya tidak menimpa tombol. */
+#play .tb.selesai .msg{font-size:11px;line-height:1.15}
+#play .tb.selesai .hand{padding:4px 4px 0;min-height:0}
+#play .tb.selesai{gap:2px 8px}
+#play .tb.selesai .act .pri{padding-top:7px;padding-bottom:7px;min-height:0}
+#play .tb.selesai #mine{gap:3px 5px}
+#play .tb.selesai #mine .c.sm{width:22px;height:30px;font-size:11px}
+#play .tb.selesai #mine .mt .c{margin-left:-7px}
+#play .tb.selesai #mine .mt .c:first-child{margin-left:0}
 /* Obrolan: setinggi layar, daftar pesan yang menyusut, supaya kolom ketik + Kirim selalu terlihat. */
 #chatbox{top:8px;bottom:8px;max-height:none;display:flex;flex-direction:column;overflow:hidden}
 #cl{flex:1 1 auto;height:auto;min-height:40px}
@@ -487,7 +520,7 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 </div><div id="score" class="box" hidden></div><button id="cf" class="cfb" aria-label="Buka obrolan">💬<i class="ud"></i></button><div id="chatbox" class="box" hidden><div style="display:flex;align-items:center;justify-content:space-between"><b>Obrolan meja</b><span><span id="cr" class="lab"></span><button id="cc" class="xc" aria-label="Tutup obrolan">✕</button></span></div><div id="cl"></div><div class="row" style="margin:8px 0"><button class="chip" data-e="Cepat dong!">Cepat dong!</button><button class="chip" data-e="Mantap!">Mantap!</button><button class="chip" data-e="Wah, sial!">Wah, sial!</button><button class="chip" data-e="Sabar ya">Sabar ya</button></div><div class="act"><input id="ci" aria-label="Pesan obrolan" enterkeyhint="send" maxlength="40" placeholder="Ketik pesan singkat" style="flex:1;margin:0;width:auto"><button class="pri" id="cs" style="flex:none;padding:10px 16px">Kirim</button></div></div><div id="mbox" class="box" hidden><div style="display:flex;align-items:center;justify-content:space-between"><b>Skor &amp; menu</b><button class="xc" id="mc" aria-label="Tutup">✕</button></div><div id="msc" style="margin:8px 0"></div><div class="act"><button class="pri sec snb" aria-pressed="true">Suara: Nyala</button><button class="pri sec" id="ky" hidden>Akhiri game</button><button class="pri sec" id="kx3">Keluar ruang</button></div></div></div>
 </main>
 <script src="js/rules.js?v=6"></script>
-<script src="js/apk.js?v=5"></script>
+<script src="js/apk.js?v=6"></script>
 <script src="js/net.js?v=40"></script>
 <script src="js/game.js?v=12"></script>
 <script src="js/kartuskin.js?v=3"></script>
@@ -495,7 +528,7 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <script src="js/skinart.js?v=6"></script>
 <script src="js/setfx.js?v=8"></script>
 <script src="js/suara.js?v=3"></script>
-<script src="js/ui.js?v=40"></script>
+<script src="js/ui.js?v=41"></script>
 <script src="js/spin.js?v=12"></script>
 <script src="js/toko.js?v=11"></script>
 <script src="js/inv.js?v=11"></script>

@@ -1,12 +1,16 @@
 // Hanya jalan di APK (Capacitor); di web langsung berhenti.
 // Pembaruan otomatis: saat game dibuka, cek version.json di GitHub Pages; kalau lebih baru, tampil layar
-// "Memperbarui game" di layar loading game, unduh semua berkas ke HP, lalu game dimuat ulang dengan versi baru.
+// "Memperbarui game" di layar loading game, susun semua berkas versi baru di HP, lalu game dimuat ulang.
+// Hemat: berkas yang sidiknya (version.json "h") sama dengan milik versi sekarang disalin dari HP; hanya yang berubah diunduh.
 window.apkReady=(async()=>{
  const C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))return;
  const S="https://wathoni004-netizen.github.io/Remi/",F=C.Plugins.Filesystem,W=C.Plugins.WebView,D="DATA";
  // Batas waktu per permintaan: cek versi 5 detik, unduh berkas 15 detik (sinyal jelek tidak membuat layar macet).
  const ambil=async(u,ms)=>{const a=new AbortController(),t=setTimeout(()=>a.abort(),ms||15000);
   try{const r=await fetch(u,{cache:"no-store",signal:a.signal});if(!r.ok)throw Error(r.status+" "+u);return r}finally{clearTimeout(t)}};
+ // Sidik berkas (sama dengan apk/versi.js): SHA-256, 16 hex pertama; CR diabaikan di berkas teks (Windows vs GitHub).
+ const sidik=async(f,b)=>{let a=new Uint8Array(await b.arrayBuffer());if(/\.(html|js|json|css)$/.test(f))a=a.filter(c=>c!==13);
+  return[...new Uint8Array(await crypto.subtle.digest("SHA-256",a))].slice(0,8).map(x=>x.toString(16).padStart(2,"0")).join("")};
  const ld=document.getElementById("ld"),bar=ld&&ld.querySelector(".pb i"),tx=ld&&ld.querySelector(".mut");
  try{
   const cur=(await W.getServerBasePath()).path||"";
@@ -25,10 +29,13 @@ window.apkReady=(async()=>{
   const n=baru.files.length,dir="up"+baru.v;
   bar.style.cssText="animation:none;width:0;transition:width .2s";tx.textContent="Memperbarui game…";
   for(let i=0;i<n;i++){
-   const f=baru.files[i],b=await(await ambil(S+f+"?t="+baru.v)).blob();
+   const f=baru.files[i],h=baru.h&&baru.h[f];let b=null;
+   // Pakai berkas di HP hanya kalau persis sama; ragu atau gagal = unduh seperti biasa.
+   if(h)try{const x=await(await ambil(f,5000)).blob();if(await sidik(f,x)===h)b=x}catch(e){}
+   if(!b)b=await(await ambil(S+f+"?t="+baru.v)).blob();
    const data=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=no;r.readAsDataURL(b)});
    await F.writeFile({path:dir+"/"+f,data,directory:D,recursive:true});
-   bar.style.width=Math.round((i+1)/n*100)+"%";tx.textContent="Memperbarui game… "+(i+1)+" / "+n
+   bar.style.width=Math.round((i+1)/n*100)+"%";tx.textContent="Memperbarui game… "+Math.round((i+1)/n*100)+"%"
   }
   await F.writeFile({path:dir+"/version.json",data:JSON.stringify(baru),directory:D,encoding:"utf8"});
   try{localStorage.setItem("ud",dir)}catch(e){}

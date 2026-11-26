@@ -15,7 +15,7 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 
 - Jalankan lokal: sajikan folder root dengan server statis (mis. `npx http-server .`), buka `index.html`. Firebase SDK diimpor dinamis dari CDN gstatic, jadi butuh internet.
 - Uji multi-pemain di satu browser: tambahkan `?u=<id>` di URL tiap tab supaya id pemain berbeda; `?r=<kode>` mengisi kode ruang.
-- Setiap upload / perubahan game: `node apk/versi.js` (menaikkan `v` di `version.json` dan menyusun ulang daftar berkas dari `index.html`, `js/*`, `img/*`, `snd/*`). Tanpa ini APK tidak ikut terbarui.
+- Setiap upload / perubahan game: `node apk/versi.js` (menaikkan `v` di `version.json`, menyusun ulang daftar berkas dari `index.html`, `js/*`, `img/*`, `snd/*`, dan sidik tiap berkas `h`). Jalankan setelah semua suntingan selesai. Tanpa ini APK tidak ikut terbarui.
 - APK (dari `apk/`): `npm run salin` (salin berkas game ke `apk/www` sesuai `version.json`), `npm run siap` (salin + generate ikon + `cap sync android`), `npm run buat` (sekali, membuat proyek `android/`). Panduan lengkap: `apk/PANDUAN-APK.md`.
 
 ## Git
@@ -54,6 +54,6 @@ Tidak ada build, lint, atau test otomatis. Uji manual di browser.
 - Pemain "live" = heartbeat < 3 menit dan tidak di-kick. Host = `st.host` selama live, kalau tidak pemain live paling awal masuk. Ruang yang idle 30 menit di-reset ke lobby saat ada yang masuk (`idleCheck`).
 - Rules keamanan Firebase tidak ada di repo (diatur di console project `remi-online-69bb6`). Menambah field baru di `users/{uid}` bisa butuh perubahan rules — jelaskan ke Boss apa dan kenapa.
 
-**Pembaruan otomatis APK** (`apk.js`): saat dibuka, bandingkan `version.json` bawaan dengan milik GitHub Pages; kalau `v` lebih besar, unduh semua berkas di `files` ke folder `DATA/up<v>`, lalu `WebView.setServerBasePath` ke folder itu dan hapus folder `up*` lama. Karena itu setiap berkas baru yang dipakai game harus ada di `js/`, `img/`, atau `snd/` (atau ditambahkan ke `versi.js`) agar ikut terdaftar.
+**Pembaruan otomatis APK** (`apk.js`): saat dibuka, bandingkan `version.json` bawaan dengan milik GitHub Pages; kalau `v` lebih besar, susun semua berkas di `files` ke folder `DATA/up<v>` (yang sidiknya sama disalin dari versi di HP, sisanya diunduh), lalu `WebView.setServerBasePath` ke folder itu dan hapus folder `up*` lama. Karena itu setiap berkas baru yang dipakai game harus ada di `js/`, `img/`, atau `snd/` (atau ditambahkan ke `versi.js`) agar ikut terdaftar.
 
 **Event skin**: ada skill `kartu-remi-event` untuk membuat/mengubah event skin terbatas (token bintang, spin meteor, Toko Event, kristal).
