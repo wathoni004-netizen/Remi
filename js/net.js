@@ -75,13 +75,27 @@ function idleCheck(){
  if(Object.keys(players).some(i=>i!==uid&&players[i]&&players[i].t>lim))return;
  save({status:"lobby",hist:[],host:uid,gen:st.gen||0,cr:Date.now()})}
 
+// Skin Kartu (equip.kartu) dan Meja (equip.meja) yang dipasang ikut ke data pemain agar terlihat semua orang; hanya akun Google.
+async function skinku(){const r={};try{const g=auth&&auth.currentUser;if(g&&!g.isAnonymous){const v=await db.get("users/"+uid),k=v&&v.equip&&v.equip.kartu,m=v&&v.equip&&v.equip.meja;if(k&&KSK.get(k)&&v.skins&&v.skins[k])r.ck=k;if(m&&MJK.get(m)&&v.skins&&v.skins[m])r.mk=m}}catch(e){}return r}
+// Dari ruang tunggu boleh ke menu tanpa keluar ruang (heartbeat jalan terus). Tombol MAIN jadi "Kembali ke ruang tunggu";
+// kalau game dimulai selagi kita di menu, layar game dibuka otomatis (balikGame, dipanggil render()).
+let diMenu=false;
+function tandaMain(){const b=$("#hp");b.textContent=diMenu?"KEMBALI KE RUANG TUNGGU":"MAIN";b.style.fontSize=diMenu?"17px":""}
+function keMenu(){diMenu=true;tandaMain();menuUI();$("#chatbox").hidden=true;$("#mbox").hidden=true;$("#game").hidden=true;$("#home").hidden=false}
+function keRuang(){diMenu=false;tandaMain();msg("");$("#home").hidden=true;$("#game").hidden=false;render();drawChat()}
+async function segarSkin(){const sk=await skinku(),r=pdoc();delete r.ck;delete r.mk;try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign(r,sk))}catch(e){}}
+function balikGame(){
+ document.querySelectorAll(".ask").forEach(x=>x.remove());
+ ["#home","#join","#pg","#tw","#iv","#kp"].forEach(i=>{$(i).hidden=true});if(window.evTutupPaksa)evTutupPaksa();
+ keRuang();beep("turn");buzz()}
+const diRuang=()=>{if(diMenu)msg("Keluar dari ruang tunggu dulu.");return diMenu};
+
 $("#jb").onclick=async()=>{
  const name=$("#nm").value.trim()||"Pemain";
  room=$("#rm").value.trim().toLowerCase().replace(/[^a-z0-9-]/g,"");if(!room)return msg("Isi kode ruang, atau tekan Buat ruang baru.");
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
- // Skin Kartu (equip.kartu) dan Meja (equip.meja) yang dipasang ikut ke data pemain agar terlihat semua orang; hanya akun Google.
- let ck="",mk="";try{const g=auth&&auth.currentUser;if(g&&!g.isAnonymous){const v=await db.get("users/"+uid),k=v&&v.equip&&v.equip.kartu,m=v&&v.equip&&v.equip.meja;if(k&&KSK.get(k)&&v.skins&&v.skins[k])ck=k;if(m&&MJK.get(m)&&v.skins&&v.skins[m])mk=m}}catch(e){}
- try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign({name,t:Date.now(),j:Date.now()},Object.assign(ck?{ck}:{},mk?{mk}:{})))}catch(e){const x=e.message||e.code;return msg(/permission/i.test(x)?"Game di ruang ini sedang berjalan. Coba lagi setelah ronde selesai.":"Gagal masuk: "+x)}
+ const sk=await skinku();
+ try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign({name,t:Date.now(),j:Date.now()},sk))}catch(e){const x=e.message||e.code;return msg(/permission/i.test(x)?"Game di ruang ini sedang berjalan. Coba lagi setelah ronde selesai.":"Gagal masuk: "+x)}
  $("#home").hidden=true;$("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
@@ -102,7 +116,7 @@ if(NA&&Capacitor.Plugins.App){const A=Capacitor.Plugins.App,H=$("#home"),vis=e=>
  A.addListener("backButton",()=>{
   const k=document.querySelector(".ask button"),o=$("#spo"),c=$("#chatbox"),m=$("#mbox");
   if(k)k.click();else if(vis(o)&&$("#spl"))$("#spl").click();else if(vis(c)||vis(m)){c.hidden=true;m.hidden=true}
-  else{const x=B.find(b=>vis($(b[0])));if(x)$(x[1]||(vis($("#lobby"))?"#kx4":"#kx3")).click();
+  else{const x=B.find(b=>vis($(b[0])));if(x)$(x[1]||(vis($("#lobby"))?"#kmn":"#kx3")).click();
    else if(vis(H)){if(Date.now()-ex<2e3)return A.exitApp();ex=Date.now();const t=document.createElement("div");t.className="tst";t.textContent="Tekan sekali lagi untuk keluar";document.body.append(t);setTimeout(()=>t.remove(),2e3)}}})}
 const gNat=async()=>M.au.GoogleAuthProvider.credential((await Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle({skipNativeAuth:true})).credential.idToken);
 const batal=e=>e.code==="auth/popup-closed-by-user"||/cancel/i.test(e.message||"");
@@ -111,6 +125,7 @@ function authUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous;
  $("#gm").textContent=g?"Masuk sebagai "+(u.email||u.displayName||"akun Google"):"Main sebagai tamu";menuUI()}
 function menuUI(){const u=auth&&auth.currentUser,g=!!u&&!u.isAnonymous,n=($("#nm").value||"").trim()||"Pemain";$("#mpn").textContent=n;$("#mav").textContent=n.slice(0,1).toUpperCase();$("#mpt").textContent=g?"Akun Google":"Tamu";$("#pgn").textContent=n;$("#pav").textContent=$("#mav").textContent;$("#pgt").textContent=$("#mpt").textContent;if(window.pfUI)pfUI()}
 $("#gi").onclick=async()=>{
+ if(diRuang())return;
  try{
   const c=NA?await gNat():null;
   try{await(NA?M.au.linkWithCredential(auth.currentUser,c):M.au.linkWithPopup(auth.currentUser,gp()))}
@@ -119,7 +134,7 @@ $("#gi").onclick=async()=>{
   if(!$("#nm").value)$("#nm").value=(u.displayName||"").split(" ")[0].slice(0,16);
   authUI();msg("")
  }catch(e){if(!batal(e))msg("Login Google gagal: "+(e.code||e.message))}};
-$("#go").onclick=async()=>{try{await M.au.signOut(auth);location.reload()}catch(e){msg("Gagal keluar: "+(e.code||e.message))}};
+$("#go").onclick=async()=>{if(diRuang())return;try{await M.au.signOut(auth);location.reload()}catch(e){msg("Gagal keluar: "+(e.code||e.message))}};
 $("#da").onclick=async()=>{
  if(!await ask("Hapus akun ini secara permanen? Data akun hilang dan tidak bisa dikembalikan."))return;
  try{
@@ -133,7 +148,7 @@ $("#da").onclick=async()=>{
   location.reload()
  }catch(e){if(!batal(e))msg("Hapus akun gagal: "+(e.code||e.message))}};
 
-$("#hp").onclick=()=>{$("#home").hidden=true;$("#join").hidden=false};
+$("#hp").onclick=()=>{if(diMenu){keRuang();segarSkin();return}$("#home").hidden=true;$("#join").hidden=false};
 // Navigasi menu: kembali dari Masuk/Profil; Toko dan Spin Skin belum ada (tile hanya penanda "Segera").
 $("#jbk").onclick=()=>{menuUI();$("#join").hidden=true;$("#home").hidden=false};
 

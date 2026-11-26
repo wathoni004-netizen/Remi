@@ -91,7 +91,17 @@ const S={
  ting:t=>notes(t,[2637,3520].map(f=>f*CX.m),.05,.6,{v:.06}),
  tinkle:t=>{for(let i=0;i<12;i++)tone(t+R(.05,1.1),R(3000,6000),R(.05,.15),{v:.03})},
  glass:t=>{nz(t,.35,{ft:"highpass",f:4500,v:.2});for(let i=0;i<10;i++)tone(t+R(0,.25),R(2800,6500),R(.06,.2),{v:.04})},
- poof:t=>nz(t,.22,{ft:"lowpass",f:900,f2:200,v:.2,a:.02})};
+ poof:t=>nz(t,.22,{ft:"lowpass",f:900,f2:200,v:.2,a:.02}),
+ // Tombol menu
+ ui:t=>{tone(t,620,.06,{w:"triangle",to:920,v:.09});nz(t,.025,{ft:"highpass",f:3000,v:.06})},
+ // Event: meteor meluncur, pecah tiap naik tingkat (lv), ledakan (q = 0 kristal .. 4 Kolektor), kartu terbuka
+ evspin:t=>{S.rocket(t,.9);S.vortex(t+.5,3.2);S.twinkle(t+1,2.5)},
+ evpecah:(t,lv)=>{S.crack(t);S.ping(t+.03,lv+1);S.ping(t+.1,lv+3)},
+ evledak:(t,q)=>{if(!q){S.poof(t);S.stars(t+.05);return}S.boom(t);S.stars(t+.15);
+  if(q>=2){S.glass(t+.1);notes(t+.1,[523,659,784,1047].slice(0,q+1),.08,.45,{w:"triangle",v:.14})}if(q>=3)S.bigboom(t+.2);if(q>=4){S.shine(t+.5,1.4);S.crown(t+.8)}},
+ evkartu:(t,q)=>{S.draw(t);if(q>0)S.ping(t+.04,q+1);if(q>=3)S.stars(t+.12)}};
+// Semua tombol berbunyi "ui". Dikecualikan yang sudah punya suara sendiri: kartu, emoji (data-e), tombol Suara (.snb).
+document.addEventListener("click",e=>{const b=e.target.closest("button,[role=button],summary,[data-pl]");if(b&&!b.closest(".c,[data-e],.snb")&&window.SND)SND("ui")},true);
 window.SND=(k,x)=>{
  if(!snd)return;const f=S[k];if(!f||!ac())return;
  const now=AC.currentTime,gap=k==="draw"||k==="sel"?.02:.06;if(last[k]&&now-last[k]<gap)return;last[k]=now;

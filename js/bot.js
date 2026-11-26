@@ -31,7 +31,7 @@ function mulai(n,L){
  window.BOT={lv:L,b:B,me:uid};room="bot";players=P;st=null;
  $("#home").hidden=true;$("#game").hidden=false;start()}
 // Dialog pilihan: tombol Batal paling depan di DOM supaya tombol Kembali HP (net.js, klik .ask button pertama) menutupnya.
-$("#hb").onclick=()=>{let n=1,L=1;const o=document.createElement("div");o.className="ask";
+$("#hb").onclick=()=>{if(diRuang())return;let n=1,L=1;const o=document.createElement("div");o.className="ask";
  const draw=()=>{o.innerHTML=`<div class="ab" style="display:flex;flex-direction:column;gap:8px"><div class="act" style="order:9"><button class="pri sec" data-x="1">Batal</button><button class="pri" data-go="1">Mulai</button></div><p><b>Lawan Bot</b></p><div class="mut">Jumlah bot</div><div class="act" style="margin:0">${[1,2,3].map(k=>`<button class="pri${k===n?"":" sec"}" data-n="${k}">${k}</button>`).join("")}</div><div class="mut">Tingkat</div><div class="act" style="margin:0">${LV.map((t,k)=>`<button class="pri${k===L?"":" sec"}" data-l="${k}">${t}</button>`).join("")}</div><div class="mut" style="font-size:12px">Latihan di HP, tanpa hadiah dan statistik.</div></div>`};
  o.onclick=e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;if(d.n)n=+d.n;else if(d.l)L=+d.l;else{o.remove();if(d.go)mulai(n,L);return}draw()};
  draw();document.body.append(o)};

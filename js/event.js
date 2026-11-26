@@ -138,7 +138,7 @@ const burst=(n,sp,c,o)=>burstAt(CX,CY,n,sp,c,o),ring=(c,sp,w,x,y)=>R.push({x:x??
 function bolt(c){const p=[[CX,CY]];let x=CX,y=CY,a=Math.random()*7;for(let i=0;i<9;i++){a+=(Math.random()-.5)*1.2;x+=Math.cos(a)*24*S;y+=Math.sin(a)*24*S;p.push([x,y])}A.push({p,c,life:.4})}
 function rain(n,c,life){for(let i=0;i<n;i++){const a=Math.random()*7,v=4.5*S*Math.random();add(CX,CY,Math.cos(a)*v,Math.sin(a)*v-1,pk(c),1.7*S,life,{gr:.022,dr:.99,tr:true})}}
 const tm=[],later=(f,ms)=>tm.push(setTimeout(f,ms));
-function ledak(t){const c=CL[t];flash={F:.3,S:.55,E:.75,L:1,K:1}[t];shake={F:2,S:4,E:7,L:11,K:16}[t];
+function ledak(t){const c=CL[t];bunyi("evledak",ORD.indexOf(t));flash={F:.3,S:.55,E:.75,L:1,K:1}[t];shake={F:2,S:4,E:7,L:11,K:16}[t];
  if(t==="F"){burst(50,3.2,c);for(let i=0;i<8;i++)add(CX,CY,(Math.random()-.5)*2.4,-1.5-Math.random(),"#ffe14f",3*S,1.6)}
  if(t==="S"){burst(160,6.5,c);ring("#4fff9b",5,4);later(()=>burst(70,3.5,["#fff","#b8ffd6"]),220);later(()=>rain(60,["#4fff9b","#b8ffd6"],1.6),350)}
  if(t==="E"){burst(190,7.5,c);ring("#b07cff",6,5);later(()=>{ring("#e2c9ff",8,3);burst(100,5,c)},200);for(let i=0;i<10;i++)later(()=>bolt(pk(["#fff","#d9b8ff","#b07cff"])),i*70);later(()=>rain(80,c,1.8),400)}
@@ -173,11 +173,11 @@ function mulaiAnim(top,done){
  const st=top==="E"?["E"]:top==="L"?["E","L"]:top==="K"?["E","L","K"]:[];
  const hs=[[CX,H+30],[W+30,-30],[-30,-30]].map(o=>({x:o[0],y:o[1],h:Math.atan2(CY-o[1],CX-o[0]),col:["#d8dcef"],w:3.2*S,tr:[]}));
  const sc=[];let tt=TD+TF;st.forEach(s=>{sc.push({at:tt,s});tt+=TS});
- run={top,hs,st,sc,si:0,t0:performance.now(),end:tt,boom:false,lv:0,done}}
+ run={top,hs,st,sc,si:0,t0:performance.now(),end:tt,boom:false,lv:0,done};bunyi("evspin")}
 function langkah(now,dt){const f=dt*60,el=(now-run.t0)/1000;
  if(run.si<run.sc.length&&el>=run.sc[run.si].at){const cols=SPL[run.sc[run.si].s];run.si++;run.lv++;const nh=[];
   run.hs.forEach(m=>{burstAt(m.x,m.y,16,3,cols);ring(cols[0],3,2,m.x,m.y);GH.push({tr:m.tr,c:m.col[0],w:m.w,a:1});[-.55,.55].forEach(d=>nh.push({x:m.x,y:m.y,h:m.h+d,col:cols,w:Math.max(1.8*S,m.w*.85),tr:[[m.x,m.y]]}))});
-  run.hs=nh;flash=.22+run.lv*.08;shake=3+run.lv*2.5}
+  run.hs=nh;flash=.22+run.lv*.08;shake=3+run.lv*2.5;bunyi("evpecah",run.lv)}
  if(el<=TD)return;
  const conv=el>run.end,ck=conv?Math.min(1,(el-run.end)/TC):0,sp=(2.6+run.lv*.5+ck*4)*f*S;
  for(const m of run.hs){const dx=CX-m.x,dy=CY-m.y,ds=Math.hypot(dx,dy)/S;let off=(ds<80?1.45:ds<160?1.2:.85)*(1-ck*.8);
@@ -229,7 +229,7 @@ async function spin(n){
 function selesai(){$e("#evres").hidden=true;$e("#evres").innerHTML="";run=null;busy=false;ui(true);angka()}
 function teks(r){return r.k?NMT[r.t]+": "+SKA.get(r.k).n+(r.dup?` (dobel, +${DUP[r.t]} kristal)`:""):"+"+DROP+" kristal"}
 function satu(r){const o=$e("#evres");o.hidden=false;
- o.innerHTML=cardHTML(r,130)+`<div style="margin-top:14px;font-size:15px;font-weight:700;color:${BRD[r.t]}">${teks(r)}</div><button class="evok">OK</button>`;
+ bunyi("evkartu",ORD.indexOf(r.t));o.innerHTML=cardHTML(r,130)+`<div style="margin-top:14px;font-size:15px;font-weight:700;color:${BRD[r.t]}">${teks(r)}</div><button class="evok">OK</button>`;
  requestAnimationFrame(()=>o.querySelector(".evcard").classList.add("on"));o.querySelector(".evok").onclick=selesai}
 function sepuluh(R,anim){const o=$e("#evres");o.hidden=false;
  const urut=R.map((r,i)=>i).sort((a,b)=>ORD.indexOf(R[a].t)-ORD.indexOf(R[b].t));
@@ -237,7 +237,7 @@ function sepuluh(R,anim){const o=$e("#evres");o.hidden=false;
  const el=[...o.querySelectorAll(".evcard")],cnt={};R.forEach(r=>cnt[r.t]=(cnt[r.t]||0)+1);
  const akhir=()=>{o.querySelector(".evsum").innerHTML=["K","L","E","S"].filter(t=>cnt[t]).map(t=>NMT[t]+" x"+cnt[t]).join(" · ")+(cnt.F?"<br>+"+cnt.F*DROP+" kristal":"")+(R.some(r=>r.dup)?"<br>Skin dobel jadi kristal":"");const b=o.querySelector(".evok");b.hidden=false;b.onclick=selesai};
  if(!anim){el.forEach(e=>e.classList.add("on"));return akhir()}
- urut.forEach((i,k)=>later(()=>{el[i].classList.add("on");const t=R[i].t,q=ORD.indexOf(t);
+ urut.forEach((i,k)=>later(()=>{el[i].classList.add("on");const t=R[i].t,q=ORD.indexOf(t);bunyi("evkartu",q);
   if(q>=2){const a=el[i].getBoundingClientRect();burstAt(a.left+a.width/2,a.top+a.height/2,q*25,3+q,CL[t]);if(q>=3){flash=.3;shake=4}}},k*260));
  later(akhir,urut.length*260+300)}
 
@@ -265,7 +265,7 @@ evt.addEventListener("click",async e=>{if(busy)return;
  else{const d=SKA.get(s.dataset.k),h=HRG[d.t];if(U.skins[d.k])return pesan(d.n+" sudah dimiliki.",1);if(U.ev.kr<h)return pesan("Kristal kurang, perlu "+h+".",1);
   if(!confirm("Tukar "+h+" kristal dengan skin "+d.n+"?"))return;
   nu=Object.assign({},U,{skins:Object.assign({},U.skins,{[d.k]:true}),ev:Object.assign({},U.ev,{kr:U.ev.kr-h})});ok="Dapat skin "+d.n}
- busy=true;const sukses=await simpan(nu);busy=false;if(sukses){toko();pesan(ok)}});
+ busy=true;const sukses=await simpan(nu);busy=false;if(sukses){toko();pesan(ok);if(window.SND)SND("rev1")}});
 
 // ---------- buka/tutup ----------
 async function buka(){
@@ -273,6 +273,9 @@ async function buka(){
  try{if(!await muat())pesan("Masuk dengan Google di Pengaturan agar token dan skin tersimpan.",1)}catch(e){pesan("Gagal memuat: "+(e.code||e.message),1)}
  angka();last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}
 function tutup(){if(busy||run)return;evs.hidden=true;evt.hidden=true;cancelAnimationFrame(raf);$("#home").hidden=false}
+// Game ruang dimulai selagi layar event terbuka: tutup paksa (hasil spin sudah tersimpan).
+window.evTutupPaksa=()=>{if(evs.hidden&&evt.hidden)return;tm.forEach(clearTimeout);tm.length=0;$e("#evskip").hidden=true;selesai();evs.hidden=true;evt.hidden=true;cancelAnimationFrame(raf)};
+const bunyi=(k,x)=>{if(window.SND&&!evs.hidden)SND(k,x)};
 $e("#evx").onclick=tutup;$e("#ev1").onclick=()=>spin(1);$e("#ev10").onclick=()=>spin(10);
 $e("#evtoko").onclick=()=>{if(run)return;evs.hidden=true;evt.hidden=false;toko()};
 $e("#evinfo").onclick=()=>alert(`${EV.nm} · event ${EV.hari} hari (sisa ${sisa()})\n\nPeluang per spin:\n${PEL.map(([t,p])=>NMT[t]+(t==="F"?" (+"+DROP+")":"")+": "+String(p).replace(".",",")+"%").join("\n")}\n\nTiap 10 spin tanpa skin, spin ke-10 pasti skin.\nSkin dobel jadi kristal: Spesial ${DUP.S}, Epik ${DUP.E}, Legenda ${DUP.L}, Kolektor ${DUP.K}.\nKristal hangus saat event selesai. Sisa token jadi koin (1 token = ${SISA} koin).`);
