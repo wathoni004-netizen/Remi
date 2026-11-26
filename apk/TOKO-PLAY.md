@@ -44,5 +44,5 @@ Foto profil Google tersimpan di Firebase Auth: kalau formulir menanyakan "Foto",
 ## Aset yang masih harus disiapkan
 Ikon 512×512, feature graphic 1024×500, minimal 2 screenshot HP.
 
-## Belum ada di game
-Kebijakan konten buatan pengguna Play meminta cara **melaporkan dan memblokir** pemain di dalam aplikasi karena ada chat. Sekarang baru ada Kick oleh host.
+## Konten buatan pengguna (chat)
+Di game: aturan chat (privasi.html#chat) dengan persetujuan di layar Masuk; ketuk nama pemain untuk Blokir atau Lapor (email ke karturemi.kontak@gmail.com); host bisa Kick. Laporan di email harus rutin dibaca dan ditindaklanjuti.

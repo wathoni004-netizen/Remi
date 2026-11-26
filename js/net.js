@@ -151,22 +151,42 @@ $("#mk").onclick=async()=>{
 // Pop-up di meja (#ct) hanya 10 detik; riwayat (#cl) tetap ada sampai ronde baru.
 const CHN=30,hh=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+"."+String(d.getMinutes()).padStart(2,"0")};
 let clSig="";
+// Blokir & lapor pemain (syarat Play untuk game ber-chat). Blokir disimpan di HP; lapor lewat email ke pengelola.
+// Elemen mana pun ber-data-pl="uid" membuka menunya.
+const EML="karturemi.kontak@gmail.com";
+let blk=new Set();try{blk=new Set(JSON.parse(localStorage.getItem("blk"))||[])}catch(e){}
+function setBlk(){try{localStorage.setItem("blk",JSON.stringify([...blk]))}catch(e){}clSig="";drawChat()}
+function plMenu(i){
+ if(i===uid||window.BOT)return;
+ const c=chat[i]||{},n=c.n||nm(i),o=document.createElement("div");o.className="ask";
+ o.innerHTML=`<div class="ab"><p></p><div class="act"><button class="pri sec" data-a="x">Batal</button><button class="pri sec" data-a="b">${blk.has(i)?"Buka blokir":"Blokir"}</button><button class="pri" data-a="l">Lapor</button></div></div>`;
+ const p=o.querySelector("p");p.textContent=n+": blokir (chatnya disembunyikan di HP ini) atau laporkan ke pengelola?";
+ o.onclick=e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
+  if(a==="b"){blk.has(i)?blk.delete(i):blk.add(i);setBlk()}
+  if(a!=="l")return o.remove();
+  const isi=Object.values(c.h||{}).filter(m=>m&&m.x).slice(-10).map(m=>"- "+hh(m.t)+" "+m.x).join("\n");
+  location.href="mailto:"+EML+"?subject="+encodeURIComponent("Lapor pemain Kartu Remi")+"&body="+encodeURIComponent("Alasan (tulis di sini):\n\n\n---\nRuang: "+room+"\nNama: "+n+"\nID pemain: "+i+"\nID pelapor: "+uid+"\nWaktu: "+new Date().toISOString()+"\nChat terakhir:\n"+(isi||"(tidak ada)"));
+  p.textContent="Kirim email yang terbuka ke "+EML+". Kalau aplikasi email tidak terbuka, kirim manual dengan menyebut kode ruang "+room.toUpperCase()+" dan nama pemain.";
+  o.querySelector(".act").innerHTML='<button class="pri" data-a="x">Tutup</button>'};
+ document.body.append(o)}
+document.addEventListener("click",e=>{if(e.target.closest("[data-kick]"))return;if(e.target.closest("[data-ub]")){blk.clear();return setBlk()}const x=e.target.closest("[data-pl]");if(x)plMenu(x.dataset.pl)});
 function chatList(){
  const cr=Math.max((st&&st.cr)||0,!st||st.status==="lobby"?Date.now()-3e5:0),L=[];
- for(const i in chat){const c=chat[i];if(!c)continue;Object.values(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
+ for(const i in chat){const c=chat[i];if(!c||blk.has(i))continue;Object.values(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
  return L.sort((a,b)=>a.t-b.t)}
 function drawChat(){
  const L=chatList(),P=Object.values(Object.fromEntries(L.filter(m=>m.t>Date.now()-1e4).map(m=>[m.i,m])));
  $("#cr").textContent=st&&st.status==="play"?"Ronde "+((st.hist||[]).length+1):"";
  $("#ct").innerHTML=P.map(m=>`<span class="cb"><b>${esc(m.n)}</b> ${esc(m.x)}</span>`).join("");$("#ct").hidden=!P.length;
- const lg=$("#cl"),last=L[L.length-1],sg=L.length+"|"+(last?last.t:0);
+ const lg=$("#cl"),last=L[L.length-1],sg=L.length+"|"+(last?last.t:0)+"|"+blk.size;
  if(sg===clSig)return;clSig=sg;
  const bot=lg.scrollHeight-lg.scrollTop-lg.clientHeight<40||(last&&last.i===uid);
- lg.innerHTML=L.length?L.map(m=>{const me=m.i===uid;return `<div class="cm${me?" me":""}">${me?"":`<div class="cn">${esc(m.n)}</div>`}<div>${esc(m.x)}</div><div class="cmt">${hh(m.t)}</div></div>`}).join(""):'<div class="mut" style="text-align:center">Belum ada pesan</div>';
+ lg.innerHTML=L.length?L.map(m=>{const me=m.i===uid;return `<div class="cm${me?" me":""}">${me?"":`<div class="cn" data-pl="${esc(m.i)}" role="button" style="cursor:pointer">${esc(m.n)} ⋮</div>`}<div>${esc(m.x)}</div><div class="cmt">${hh(m.t)}</div></div>`}).join(""):'<div class="mut" style="text-align:center">Belum ada pesan</div>';
+ if(blk.size)lg.insertAdjacentHTML("beforeend",`<button class="pri sec" data-ub="1" style="font-size:12px">Buka semua blokir (${blk.size})</button>`);
  if(bot)lg.scrollTop=lg.scrollHeight}
 function onChat(sn){
  const m={};sn.docs.forEach(d=>{m[d.id]=d.data()});
- if(chatInit)for(const i in m)if(i!==uid&&m[i]&&m[i].t>((chat[i]||{}).t||0)){beep("pop");if($("#chatbox").hidden)document.body.classList.add("unr")}
+ if(chatInit)for(const i in m)if(i!==uid&&!blk.has(i)&&m[i]&&m[i].t>((chat[i]||{}).t||0)){beep("pop");if($("#chatbox").hidden)document.body.classList.add("unr")}
  chat=m;chatInit=true;drawChat()}
 let lastSend=0;
 function sendChat(x){
