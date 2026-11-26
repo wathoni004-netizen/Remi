@@ -16,16 +16,23 @@ function handView(h,hs){
  return{live,half,starts}}
 // m = true: susunan dicerminkan kiri-kanan (putaran ke kanan / berlawanan arah jarum jam).
 const pileLay=(n,RW,RH,m)=>{
- const r=125/175,W=Math.min(RW/9.24,RH*r/7.11,28),H=W/r,ox=(RW-9.24*W)/2,oy=(RH-7.11*H)/2,out=[];
+ // Jumlah kartu per sisi dipilih otomatis sesuai bentuk area (A = kolom kanan, B = baris bawah, satuan kartu) supaya kartu sebesar mungkin.
+ // Syarat: muat minimal 40 kartu di lingkar luar dan lubang tengah cukup untuk dek.
+ const r=125/175,cnt=(A,B)=>[Math.round((A-.5-1.56)/.515)+1,Math.round((B-1)/.511)+1,Math.round((A-1)/.515)+1,Math.round((B-1.5)/.511)+1];
+ let A=7.21,B=6.11,W=0;
+ for(let nt=6;nt<=18;nt++)for(let nv=5;nv<=14;nv++){const a=1.56+.515*(nt-1)+.5,b=.511*(nv-1)+1,w=Math.min(RW/(a+1),RH*r/(b+1),34),q=cnt(a,b);
+  if(q.reduce((x,y)=>x+y)>=40&&(a-1)*w>=64&&(b-1)*w/r>=88&&w>W+.01){W=w;A=a;B=b}}
+ if(!W)W=Math.min(RW/(A+1),RH*r/(B+1),34);
+ const H=W/r,ox=(RW-(A+1)*W)/2,oy=(RH-(B+1)*H)/2,out=[],[nt,nr,nb,nl]=cnt(A,B);
  const seg=(x0,y0,x1,y1,k,e)=>{for(let j=0;j<k&&out.length<n;j++){const t=k>1?j/(k-1):0;out.push({x:ox+(x0+(x1-x0)*t)*W,y:oy+(y0+(y1-y0)*t)*H,e})}};
- seg(1.56,0,7.74,0,13,"T");seg(8.24,.5,8.24,5.61,11,"R");seg(7.74,6.11,.5,6.11,15,"B");seg(0,5.61,0,1,10,"L");
- if(out.length<n){const d=1,a=8.24-d,b=6.11-d;
+ seg(1.56,0,A-.5,0,nt,"T");seg(A,.5,A,B-.5,nr,"R");seg(A-.5,B,.5,B,nb,"B");seg(0,B-.5,0,1,nl,"L");
+ if(out.length<n){const d=1,a=A-d,b=B-d;
   seg(d-1,d,a-.52,d,Math.round((a-.52-d+1)/.515)+1,"T");seg(a,d,a,b-.5,Math.round((b-.5-d)/.511)+1,"R");
   seg(a-.5,b,d+.5,b,Math.round((a-d-1)/.515)+1,"B");seg(d,b-.5,d,d+1,Math.round((b-.5-d-1)/.511)+1,"L")}
  while(out.length<n)out.push(Object.assign({},out[out.length-1]||{x:ox,y:oy,e:"T"}));
  if(m)out.forEach(p=>{p.x=RW-W-p.x});
  // HP miring: area buangan lebar dan pendek, jadi jarak kartu dilebarkan mendatar (ukuran kartu tetap).
- try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches){const k=Math.max(1,Math.min(1.9,(RW-64)/(9.24*W)));out.forEach(p=>{p.x=RW/2+(p.x+W/2-RW/2)*k-W/2})}}catch(e){}
+ try{if(matchMedia("(orientation:landscape) and (max-height:520px)").matches){const k=Math.max(1,Math.min(1.9,(RW-64)/((A+1)*W)));out.forEach(p=>{p.x=RW/2+(p.x+W/2-RW/2)*k-W/2})}}catch(e){}
  return{p:out,W,H,m,SX:.515*W,SY:.511*H,fs:Math.max(8,Math.round(W*.35))}};
 const pcard=(c,i,on,hl,xs,nw,p,L)=>{
  const j=isJ(c),s=GL.su(j?"X":suit(c)),r=GL.rk(j?"JK":(RK[rank(c)]||rank(c))),e=p.e,v=e==="T"||e==="B",ex=xs||nw,W=L.W,H=L.H,f=n=>n.toFixed(1),sw=f(L.SX-1);
@@ -121,7 +128,7 @@ function render(){
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
  // Pemain yang siap men-set ditandai garis merah dan tab SET di namanya (CSS .rdy .nm, .stg), tanpa banner.
  const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used,hasSeri((st.laid||{})[i])));
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${window.titik?titik(i):""}${window.medal?medal((players[i]||{}).g,14):""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn",0,kf(i))).join("")}</div>`:`<div class="bk">${`<span class="c back sm${kb(i)}"></span>`.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${window.titik?titik(i):""}${window.medal?medal((players[i]||{}).g,14):""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn",0,kf(i))).join("")}</div>`:`<div class="bk" style="--n:${Math.max(2,Math.min(st.hands[i].length,20))}">${`<span class="c back sm${kb(i)}"></span>`.repeat(Math.min(st.hands[i].length,20))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  // Kursi diputar dari posisi kita: pemain berikutnya (urutan order) di kanan, lalu atas, lalu kiri.
  const k0=O.indexOf(uid),op=k0<0?O:[...O.slice(k0+1),...O.slice(0,k0)],pos=op.length<2?[0,op[0],0]:op.length===2?[op[1],0,op[0]]:[op[2],op[1],op[0]];
  SP=pos;$("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
@@ -155,7 +162,7 @@ function render(){
  // Panah arah putaran di 4 sudut meja; panah bawah di celah 28px antara kursi samping dan kartu turun kita (tidak menimpa kartu).
  {const cw=(st.dir||1)<0,a=cw?'<path d="M4 22Q4 4 20 4"/><polygon points="17,0 17,8 25,4"/>':'<path d="M22 4Q4 4 4 20"/><polygon points="0,17 8,17 4,25"/>';
   $("#dirw").innerHTML=["tl","tr","br","bl"].map(c=>`<svg class="da ${c}" viewBox="0 0 26 26">${a}</svg>`).join("");
-  const md=document.querySelector(".tb .mid");$("#dirw").style.height=md.offsetTop+md.offsetHeight+28+"px"}
+  const md=document.querySelector(".tb .mid");$("#dirw").style.setProperty("--tp",md.offsetTop+"px");$("#dirw").style.height=md.offsetTop+md.offsetHeight+28+"px"}
  playFx(fxB);
 }
 $("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if(!b)return;const c=b.dataset.c;sel=sel.includes(c)?sel.filter(x=>x!==c):[...sel,c];beep("sel");render()};

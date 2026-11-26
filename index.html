@@ -221,7 +221,7 @@ button.c:not(:disabled){cursor:pointer}
 .pk .bd{box-sizing:border-box;border-radius:50%;background:#fff;border:2px solid #e8b923;box-shadow:0 0 4px 1px rgba(232,185,35,.7);display:flex;align-items:center;justify-content:center;line-height:1;z-index:3}
 .pk .sp{color:#e8b923;transform:translate(-50%,-50%);line-height:1}
 .pk .rb{box-sizing:border-box;border-radius:3px;background:#e53935;color:#fff;font-weight:700;text-align:center;z-index:3}
-.ring{position:relative;z-index:0;width:100%;height:230px}
+.ring{position:relative;z-index:0;width:100%;height:clamp(230px,38vh,290px)}
 .ring .c{position:absolute}
 .ring .c.sm{min-width:30px}
 .ring #deck{left:50%;top:50%;transform:translate(-50%,-50%)}
@@ -286,32 +286,62 @@ main:has(#play:not([hidden])) h1{display:none}
 .sfx.tb .sfx-np{top:-14px}
 .sfx.tb .sfx-me{bottom:auto;top:-14px}
 .sfx-me{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#e8b923;color:#14201a;font-size:14px;font-weight:700;padding:5px 14px;border-radius:8px;white-space:nowrap}
+/* Tata letak meja v32: punggung kartu lawan setengah, nama kecil (kiri/kanan tegak), kartu turun kita di atas tombol. */
+.seat .nm{font-size:11px;padding:2px 8px;white-space:nowrap}
+.seat .bk .c{height:22px;border-top-width:0;border-radius:0 0 4px 4px}
+.top .bk .c{margin-left:calc(min(18px,108px / (var(--n) - 1)) - 30px)}
+#sT>div{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;align-items:start;justify-items:start}
+#sT .bk{grid-column:1;grid-row:1;margin-top:-8px}
+#sT .nm{grid-column:1;grid-row:2;margin-top:3px}
+#sT .ml{grid-column:2;justify-content:center;justify-self:center;margin:0}
+.seat.top{padding-top:0}
+.top .stg{left:calc(100% + 4px);right:auto}
+.side{width:62px}
+.mid{gap:2px;margin-left:-4px;margin-right:-4px}
+.da.tl,.da.tr{top:calc(var(--tp,0px) + 2px)}
+.side>div{display:grid;grid-template-columns:auto auto;column-gap:4px;row-gap:5px;align-items:center;justify-content:start}
+#sR>div{justify-content:end}
+.side .bk{grid-column:1;grid-row:1;margin-left:-4px}
+.side .nm{grid-column:2;grid-row:1;writing-mode:vertical-rl;margin:0;padding:8px 2px;max-height:130px}
+#sR .bk{grid-column:2;margin:0 -4px 0 0}
+#sR .nm{grid-column:1;transform:rotate(180deg)}
+.side .ml{grid-column:1/-1;margin:0}
+.side .bk .c{width:16px;height:42px;border-width:2px 2px 2px 0;border-radius:0 4px 4px 0;margin:calc(min(18px,72px / (var(--n) - 1)) - 42px) 0 0}
+#sR .bk .c{border-width:2px 0 2px 2px;border-radius:4px 0 0 4px}
+.side .bk .c:first-child{margin:0}
+.side .mt .c.mn.lc{margin-left:-6px}.side .mt .c.mn.lc:first-child{margin-left:0}
+.side .stg{writing-mode:horizontal-tb}
+#sR .stg{bottom:auto;top:calc(100% + 1px);transform:translateX(-50%) rotate(180deg)}
+.mid .ctr{align-self:stretch}
+#ring{flex:1;height:auto;min-height:230px}
+.mine{justify-content:center;min-height:48px}
+#mine .c.sm{width:32px;height:46px;font-size:14px}
+#mine .c.sm.lc{font-size:14px}
+#play .mt{margin:0;gap:0}
+#mine .mt .c{margin-left:-10px}#mine .mt .c:first-child{margin-left:0}
 /* HP miring: posisi meja diatur ulang (gaya sama dengan HP tegak). Hanya untuk layar pendek mendatar. */
 @media (orientation:landscape) and (max-height:520px){
 main:has(#play:not([hidden])){padding:0}
 main:has(#play:not([hidden])) #game{padding-bottom:0}
 /* Kiri: kursi kiri (hanya kalau ada), tengah: meja (lawan atas, tumpukan); kanan: emoji, status giliran, tombol, kartu turun kita, tangan. */
-#play .tb{display:grid;grid-template-columns:150px minmax(0,1fr) clamp(230px,38vw,380px);grid-template-rows:auto auto auto auto auto 1fr auto auto;grid-template-areas:"sl top qe" "sl ctr st" "sl ctr act" "sl ctr sp" "sl ctr again" "sl ctr mine" "sl ctr hand" "sr sr hand";gap:4px 8px;align-items:start}
+#play .tb{display:grid;grid-template-columns:70px minmax(0,1fr) clamp(230px,38vw,380px);grid-template-rows:auto auto 1fr auto auto auto auto auto;grid-template-areas:"sl top qe" "sl ctr st" "sl ctr mine" "sl ctr sp" "sl ctr act" "sl ctr again" "sl ctr hand" "sr sr hand";gap:4px 8px;align-items:start}
 #play .tb:has(#sL:empty){grid-template-columns:0 minmax(0,1fr) clamp(230px,38vw,380px);column-gap:0}#play .mid{display:contents}
 #play #st{grid-area:st;margin:0;padding:2px 4px;text-align:center;font-size:14px}
 #qe #mb{position:absolute;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top))}
-#sT{grid-area:top;padding-top:0}
-#sT>div{display:grid;grid-template-columns:auto auto;justify-content:center;column-gap:10px;align-items:start;justify-items:center}
-#sT .bk{grid-column:1;grid-row:1}
-#sT .nm{grid-column:1;grid-row:2}
-#sT .ml{grid-column:2;grid-row:1/span 2;justify-content:flex-start;margin:0}
-#sL{grid-area:sl;width:auto}
-#sR{grid-area:sr;width:auto;text-align:left}
-#sR>div{display:grid;grid-template-columns:auto auto 1fr;column-gap:8px;align-items:center}
-#sR .nm{grid-column:1;grid-row:1}
-#sR .bk{grid-column:2;grid-row:1}
-#sR .ml{grid-column:3;grid-row:1;justify-content:flex-start;margin:0}
-.side .bk{flex-direction:row}
-.side .bk .c{margin-top:0;margin-left:-18px}
-.side .bk .c:first-child{margin-left:0}
-#mine{grid-area:mine;min-height:0;align-content:flex-start}
-#mine .c.sm{width:24px;height:34px;font-size:9px}
-#mine .c.sm.lc{width:26px;height:36px;font-size:11px}
+#sT{grid-area:top;justify-self:stretch}
+#sT>div{grid-template-columns:auto max-content;justify-content:center}
+#sL{grid-area:sl;width:auto;align-self:center}
+#sR{grid-area:sr;width:auto;text-align:left;align-self:end}
+#sR>div{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;row-gap:3px;justify-content:start;align-items:end}
+#sR .nm{grid-column:1;grid-row:1;writing-mode:horizontal-tb;transform:none;justify-self:start;padding:2px 8px}
+#sR .bk{grid-column:1;grid-row:2;flex-direction:row;justify-content:flex-start;margin:0 0 -8px}
+#sR .bk .c{width:30px;height:22px;border-width:2px 2px 0;border-radius:4px 4px 0 0;margin:0 0 0 calc(min(16px,64px / (var(--n) - 1)) - 30px)}
+#sR .bk .c:first-child{margin:0}
+#sR .ml{grid-column:2;grid-row:1/span 2;justify-content:flex-start;align-self:center;margin:0}
+#sR .stg{top:auto;bottom:calc(100% + 1px);transform:translateX(-50%)}
+#mine{grid-area:mine;min-height:0;align-content:center;align-self:stretch;gap:3px 6px}
+#mine .c.sm{width:32px;height:44px;font-size:15px}
+#mine .c.sm.lc{font-size:15px}
 #play .ctr{grid-area:ctr;align-self:stretch}
 #ring{flex:1;height:auto;min-height:120px}
 #dirw{grid-area:ctr;height:auto!important;top:0;bottom:0}
@@ -444,8 +474,8 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <div class="mid"><div id="sL" class="seat side"></div>
 <div class="ctr"><div id="ring" class="ring"><div id="pile" class="pc"></div><button id="deck" class="c back lg" aria-label="Cabut kartu"></button></div><div id="info" class="lab"></div><div id="dkn" class="lab"></div></div>
 <div id="sR" class="seat side"></div></div>
-<div id="mine" class="mine"></div>
 <div id="bar" class="bar"></div><div class="msg" id="st"></div><div class="lab" id="tmr" style="font-weight:700;font-size:14px" hidden></div>
+<div id="mine" class="mine"></div>
 <div id="ct" class="lab" hidden></div>
 <div id="sp" class="setp" hidden><div id="spi"></div><button class="pri" id="bs">Set sekarang</button><div class="lab" style="margin-top:6px">atau cabut kartu</div></div>
 <div class="act"><button class="pri" id="bd" hidden>Cabut kartu</button><button class="pri" id="bl" hidden>Turunkan</button><button class="pri" id="bx" hidden>Buang</button><button class="pri sec" id="bsk" hidden></button></div>
@@ -465,7 +495,7 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 <script src="js/skinart.js?v=6"></script>
 <script src="js/setfx.js?v=8"></script>
 <script src="js/suara.js?v=3"></script>
-<script src="js/ui.js?v=37"></script>
+<script src="js/ui.js?v=40"></script>
 <script src="js/spin.js?v=12"></script>
 <script src="js/toko.js?v=11"></script>
 <script src="js/inv.js?v=11"></script>
