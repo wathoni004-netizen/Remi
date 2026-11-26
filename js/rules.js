@@ -23,11 +23,11 @@ const all=(cs,need)=>{if(!cs.length)return !need;const[a,...r]=cs;for(const k of
 const full=(cs,hs)=>cs.length>=3&&all(cs,!hs);
 const hasSeri=L=>(L||[]).some(m=>isSeri(m.split(",")));
 const srt=cs=>cs.slice().sort((a,b)=>suit(a).localeCompare(suit(b))||rank(a)-rank(b));
-const part=cs=>{if(!cs.length)return{v:0,m:[]};const[a,...r]=cs;let p0=part(r),b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)){const p=part(r.filter(c=>!x.includes(c))),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}return b};
-const partF=(cs,ok)=>{if(!cs.length)return{v:0,m:[]};const[a,...r]=cs;const p0=partF(r,ok);let b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)&&ok(m)){const p=partF(r.filter(c=>!x.includes(c)),ok),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}return b};
-const finalLay=(hand,hasSeri)=>{const q=srt(hand),any=()=>true;if(hasSeri)return partF(q,any);
+const part=(cs,M=new Map)=>{if(!cs.length)return{v:0,m:[]};const key=cs.join();if(M.has(key))return M.get(key);const[a,...r]=cs;let p0=part(r,M),b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)){const p=part(r.filter(c=>!x.includes(c)),M),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}M.set(key,b);return b};
+const partF=(cs,ok,M=new Map)=>{if(!cs.length)return{v:0,m:[]};const key=cs.join();if(M.has(key))return M.get(key);const[a,...r]=cs;const p0=partF(r,ok,M);let b={v:p0.v-pts(a),m:p0.m};for(const k of[2,3])for(const x of sub(r,k)){const m=[a,...x];if(meld(m)&&ok(m)){const p=partF(r.filter(c=>!x.includes(c)),ok,M),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}}M.set(key,b);return b};
+const finalLay=(hand,hasSeri)=>{const q=srt(hand),any=()=>true,M=new Map;if(hasSeri)return partF(q,any,M);
  let b={v:-q.reduce((t,c)=>t+pts(c),0),m:[]};
- for(const k of[3,4])for(const m of sub(q,k))if(meld(m)&&isSeri(m)){const p=partF(q.filter(c=>!m.includes(c)),any),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}
+ for(const k of[3,4])for(const m of sub(q,k))if(meld(m)&&isSeri(m)){const p=partF(q.filter(c=>!m.includes(c)),any,M),v=meldPts(m)+p.v;if(v>b.v)b={v,m:[m,...p.m]}}
  return b};
 const runOrd=m=>{const x=nj(m),jk=m.filter(isJ),r=x.map(rank),e=Math.max(...r),mn=Math.min(...r),n=m.length,lo=e<=10?2:11,hi=e<=10?10:13;for(let t=lo;t+n-1<=hi;t++)if(t<=mn&&t+n-1>=e){const o=[];for(let v=t;v<t+n;v++)o.push(x.find(y=>rank(y)===v)||jk.shift());return o}return m};
 const AM={};

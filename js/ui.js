@@ -142,6 +142,7 @@ function render(){
  else{const n=nm(st.turn);let m=st.msg||"";if(m.startsWith(n+" "))m=m.slice(n.length+1);s="Giliran "+esc(n)+(m?" · "+esc(m):"")}// nama tidak dobel: "Giliran Andi · cabut"
  $("#st").innerHTML=s;
 
+ {const sk=!done&&!mine&&!window.BOT&&hostId()===uid&&!live(st.turn);$("#bsk").hidden=!sk;if(sk)$("#bsk").textContent="Lewati giliran "+nm(st.turn)}
  $("#bd").hidden=!(mine&&ph==="draw");$("#bd").textContent=st.deck.length?"Cabut kartu":"Selesai";$("#sp").hidden=!cs;$("#bs").hidden=!(cs&&sopt.length===1);
  $("#setc").hidden=sopt.length<2;
  $("#setc").innerHTML=sopt.length<2?"":'<span class="lab" style="width:100%">Pilih kartu set:</span>'+sopt.map(c=>`<button class="pri" data-sc="${c}">Set ${lbl(c)}</button>`).join("");
@@ -161,6 +162,7 @@ $("#hand").onclick=e=>{if(noclick)return;const b=e.target.closest("[data-c]");if
 $("#pile").onclick=e=>{const b=e.target.closest("[data-c]");if(b)go("take",b.dataset.c)};
 $("#bd").onclick=()=>go("draw");$("#deck").onclick=()=>go("draw");
 $("#bs").onclick=()=>go("set");
+$("#bsk").onclick=skip;
 if(!$("#setc")){const d=document.createElement("div");d.id="setc";d.className="act";d.hidden=true;$("#bs").after(d)}
 $("#setc").onclick=e=>{const b=e.target.closest("[data-sc]");if(b)go("set",b.dataset.sc)};
 $("#bl").onclick=()=>go("lay",sel.slice());

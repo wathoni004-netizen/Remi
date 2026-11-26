@@ -84,7 +84,7 @@ Lalu salin **google-services.json** ke `C:\KartuRemi\Remi-main\apk\android\app\`
 
 **Perlu APK baru**: ganti ikon/nama, plugin native baru (misal tombol Kembali = `@capacitor/app`, notifikasi, pembelian), atau kalau update otomatis bermasalah. Caranya:
 1. Download ZIP terbaru, lalu timpa semua isi `Remi-main` **kecuali** folder `apk\android` (folder itu tidak ada di ZIP, jadi aman).
-2. `cd C:\KartuRemi\Remi-main\apk`, lalu `npm install` (mengambil plugin baru kalau ada), lalu `npm run siap`. Nomor `versionCode` dinaikkan otomatis lewat angka `VC` di `apk\salin.js` (sekarang 3; Claude menaikkannya tiap APK baru).
+2. `cd C:\KartuRemi\Remi-main\apk`, lalu `npm install` (mengambil plugin baru kalau ada), lalu `npm run siap`. Nomor `versionCode` dinaikkan otomatis lewat angka `VC` di `apk\salin.js` (sekarang 4; Claude menaikkannya tiap APK baru).
 3. Ulangi langkah F dengan keystore yang **sama**.
 
 ## Kalau update rusak (game layar putih)

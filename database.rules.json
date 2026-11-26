@@ -5,7 +5,7 @@
     ".read": "auth != null",
     "players": {
      "$uid": {
-      ".write": "auth != null && auth.uid === $uid",
+      ".write": "auth != null && auth.uid === $uid && (data.exists() || root.child('rooms').child($room).child('state').child('status').val() !== 'play' || ((!root.child('rooms').child($room).child('state').child('host').exists() || !root.child('rooms').child($room).child('players').child(root.child('rooms').child($room).child('state').child('host').val()).child('t').exists() || root.child('rooms').child($room).child('players').child(root.child('rooms').child($room).child('state').child('host').val()).child('t').val() < now - 180000) && (!root.child('rooms').child($room).child('state').child('turn').exists() || !root.child('rooms').child($room).child('players').child(root.child('rooms').child($room).child('state').child('turn').val()).child('t').exists() || root.child('rooms').child($room).child('players').child(root.child('rooms').child($room).child('state').child('turn').val()).child('t').val() < now - 180000)))",
       ".validate": "newData.hasChildren(['name','t']) && newData.child('name').isString() && newData.child('name').val().length <= 16 && newData.child('t').isNumber()",
       "name": {
        ".validate": "newData.isString() && newData.val().length <= 16"
@@ -37,7 +37,7 @@
      }
     },
     "state": {
-     ".write": "auth != null && root.child('rooms').child($room).child('players').child(auth.uid).exists() && (!data.exists() || data.child('status').val() !== 'play' || data.child('turn').val() === auth.uid || data.child('host').val() === auth.uid || !root.child('rooms').child($room).child('players').child(data.child('host').val()).exists())",
+     ".write": "auth != null && root.child('rooms').child($room).child('players').child(auth.uid).exists() && (!data.exists() || data.child('host').val() === auth.uid || (data.child('status').val() === 'play' && data.child('turn').val() === auth.uid) || (!data.child('host').exists() || !root.child('rooms').child($room).child('players').child(data.child('host').val()).child('t').exists() || root.child('rooms').child($room).child('players').child(data.child('host').val()).child('t').val() < now - 180000))",
      ".validate": "newData.hasChildren(['status']) && newData.child('status').isString()",
      "status": {
       ".validate": "newData.val() === 'lobby' || newData.val() === 'play' || newData.val() === 'done'"

@@ -81,7 +81,7 @@ $("#jb").onclick=async()=>{
  try{localStorage.setItem("rn",name);localStorage.setItem("rr",room)}catch(e){}
  // Skin Kartu (equip.kartu) dan Meja (equip.meja) yang dipasang ikut ke data pemain agar terlihat semua orang; hanya akun Google.
  let ck="",mk="";try{const g=auth&&auth.currentUser;if(g&&!g.isAnonymous){const v=await db.get("users/"+uid),k=v&&v.equip&&v.equip.kartu,m=v&&v.equip&&v.equip.meja;if(k&&KSK.get(k)&&v.skins&&v.skins[k])ck=k;if(m&&MJK.get(m)&&v.skins&&v.skins[m])mk=m}}catch(e){}
- try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign({name,t:Date.now(),j:Date.now()},Object.assign(ck?{ck}:{},mk?{mk}:{})))}catch(e){return msg("Gagal masuk: "+(e.message||e.code))}
+ try{await db.doc(`rooms/${room}/players/${uid}`).set(Object.assign({name,t:Date.now(),j:Date.now()},Object.assign(ck?{ck}:{},mk?{mk}:{})))}catch(e){const x=e.message||e.code;return msg(/permission/i.test(x)?"Game di ruang ini sedang berjalan. Coba lagi setelah ronde selesai.":"Gagal masuk: "+x)}
  $("#home").hidden=true;$("#join").hidden=true;$("#game").hidden=false;
  db.collection(`rooms/${room}/chat`).onSnapshot(onChat,()=>{});
  db.collection(`rooms/${room}/players`).onSnapshot(s=>{players={};s.docs.forEach(d=>players[d.id]=d.data());got.p=1;idleCheck();render()},()=>msg("Koneksi terputus, muat ulang halaman."));
@@ -153,7 +153,7 @@ const CHN=30,hh=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"
 let clSig="";
 function chatList(){
  const cr=Math.max((st&&st.cr)||0,!st||st.status==="lobby"?Date.now()-3e5:0),L=[];
- for(const i in chat){const c=chat[i];if(!c)continue;(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
+ for(const i in chat){const c=chat[i];if(!c)continue;Object.values(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}
  return L.sort((a,b)=>a.t-b.t)}
 function drawChat(){
  const L=chatList(),P=Object.values(Object.fromEntries(L.filter(m=>m.t>Date.now()-1e4).map(m=>[m.i,m])));
@@ -171,7 +171,7 @@ function onChat(sn){
 let lastSend=0;
 function sendChat(x){
  x=String(x||"").trim().slice(0,40);if(!x||!room||window.BOT||Date.now()-lastSend<700)return;lastSend=Date.now();
- const c=chat[uid]||{},cr=(st&&st.cr)||0,t=Date.now(),h=[...(c.h||(c.x?[{x:c.x,t:c.t}]:[])).filter(m=>m.t>cr),{x,t}].slice(-CHN);
+ const c=chat[uid]||{},cr=(st&&st.cr)||0,t=Date.now(),h=[...Object.values(c.h||(c.x?[{x:c.x,t:c.t}]:[])).filter(m=>m&&m.t>cr),{x,t}].slice(-CHN);
  Promise.resolve(db.doc(`rooms/${room}/chat/${uid}`).set({n:(players[uid]||{}).name||"?",x,t,h})).catch(e=>msg("Chat gagal: "+(e.message||e.code)))}
 setInterval(drawChat,5000);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(b){sendChat(b.dataset.e);if(window.SND)SND("emo")}});
@@ -194,7 +194,7 @@ async function award(){
  if(window.BOT||!st||st.status!=="done"||!g||g.isAnonymous||!(st.order||[]).includes(uid))return;
  const win=st.winner===uid,k=room+":"+(st.gen||0)+":"+(st.hist||[]).length,kn=Math.max(0,Math.floor(((st.sc||{})[uid]||0)/2)),sx=st.sx;
  try{if(localStorage.getItem("aw")===k)return;localStorage.setItem("aw",k)}catch(e){}
- try{const v=(await db.get("users/"+uid))||{},o=v.st||{};rhSave(v).catch(()=>{}),ns={m:(o.m||0)+1,w:(o.w||0)+(win?1:0),s:(o.s||0)+(win&&sx?1:0)};if(!win){await db.doc("users/"+uid).set(Object.assign({},v,{st:ns}));window.GG=pfLv(ns);return}const t=new Date(),dy=t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate(),h=v.hr&&v.hr.d===dy?v.hr:{d:dy,b:0,m:0},j=sx&&isJ(sx),gb=sx&&!j&&h.b<10?1:0,gm=j&&h.m<5?1:0;await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+gb,merah:(v.merah||0)+gm,koin:(v.koin||0)+kn,hr:{d:dy,b:h.b+gb,m:h.m+gm},st:ns}));window.GG=pfLv(ns);msg("🎉 Menang ronde! "+(gm?"+1 kartu merah, ":gb?"+1 kartu biru, ":sx?"batas kartu hari ini tercapai, ":"")+"+"+kn+" koin")}
+ try{const v=(await db.get("users/"+uid))||{},o=v.st||{},ns={m:(o.m||0)+1,w:(o.w||0)+(win?1:0),s:(o.s||0)+(win&&sx?1:0)};if(!win){await db.doc("users/"+uid).set(Object.assign({},v,{st:ns}));rhSave(v).catch(()=>{});window.GG=pfLv(ns);return}const t=new Date(),dy=t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate(),h=v.hr&&v.hr.d===dy?v.hr:{d:dy,b:0,m:0},j=sx&&isJ(sx),gb=sx&&!j&&h.b<10?1:0,gm=j&&h.m<5?1:0;await db.doc("users/"+uid).set(Object.assign({},v,{biru:(v.biru||0)+gb,merah:(v.merah||0)+gm,koin:(v.koin||0)+kn,hr:{d:dy,b:h.b+gb,m:h.m+gm},st:ns}));rhSave(v).catch(()=>{});window.GG=pfLv(ns);msg("🎉 Menang ronde! "+(gm?"+1 kartu merah, ":gb?"+1 kartu biru, ":sx?"batas kartu hari ini tercapai, ":"")+"+"+kn+" koin")}
  catch(e){try{localStorage.removeItem("aw")}catch(_){}}
 }
 // Riwayat (akun Google): users/{uid}/rh = 10 game terakhir, terbaru di depan. Satu game = rangkaian ronde dengan hist yang sama;

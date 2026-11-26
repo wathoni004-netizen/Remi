@@ -28,6 +28,12 @@ function fin(s,by,c){
  save(s);
 }
 
+// Giliran pemain yang keluar / putus > 3 menit bisa dilewati host; kartunya tetap di tangan.
+function skip(){
+ if(!st||st.status!=="play"||st.turn===uid||hostId()!==uid||live(st.turn))return;
+ const s=JSON.parse(JSON.stringify(st));
+ s.msg=nm(s.turn)+" tidak aktif, giliran dilewati";s.turn=nxt(s,s.turn,1);s.phase="draw";s.eat="";save(s)}
+
 function go(k,a){
  if(!st||st.status!=="play"||st.turn!==uid)return;
  const s=JSON.parse(JSON.stringify(st)),h=s.hands[uid],O=s.order,me=nm(uid);
