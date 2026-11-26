@@ -1,5 +1,5 @@
 {
- "v": 28,
+ "v": 29,
  "files": [
   "index.html",
   "js/apk.js",
@@ -11,6 +11,7 @@
   "js/kartuskin.js",
   "js/mejaskin.js",
   "js/net.js",
+  "js/panduan.js",
   "js/profil.js",
   "js/rules.js",
   "js/setfx.js",
@@ -19,6 +20,7 @@
   "js/suara.js",
   "js/toko.js",
   "js/ui.js",
+  "js/waktu.js",
   "img/lbl-e.webp",
   "img/lbl-k.webp",
   "img/lbl-l.webp",

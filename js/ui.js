@@ -121,7 +121,7 @@ function render(){
  const canTake=mine&&ph==="draw"&&st.pile.length>=1;
  // Pemain yang siap men-set ditandai garis merah dan tab SET di namanya (CSS .rdy .nm, .stg), tanpa banner.
  const used=Object.values(st.laid||{}).flat().flatMap(m=>m.split(",")),rd=done?[]:O.filter(i=>i!==uid&&ready(st.hands[i]||[],used,hasSeri((st.laid||{})[i])));
- const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${window.medal?medal((players[i]||{}).g,14):""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn",0,kf(i))).join("")}</div>`:`<div class="bk">${`<span class="c back sm${kb(i)}"></span>`.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
+ const seat=i=>`<div class="${st.turn===i&&!done?"on":""}${rd.includes(i)?" rdy":""}"><span class="nm">${rd.includes(i)?'<b class="stg">SET</b>':""}${window.titik?titik(i):""}${window.medal?medal((players[i]||{}).g,14):""}${esc(nm(i))} · ${st.hands[i].length}</span>${done?`<div class="ml">${st.hands[i].map(c=>card(c,"span",0,"mn",0,kf(i))).join("")}</div>`:`<div class="bk">${`<span class="c back sm${kb(i)}"></span>`.repeat(Math.min(st.hands[i].length,14))}</div>`}<div class="ml">${laid(i)}</div></div>`;
  // Kursi diputar dari posisi kita: pemain berikutnya (urutan order) di kanan, lalu atas, lalu kiri.
  const k0=O.indexOf(uid),op=k0<0?O:[...O.slice(k0+1),...O.slice(0,k0)],pos=op.length<2?[0,op[0],0]:op.length===2?[op[1],0,op[0]]:[op[2],op[1],op[0]];
  SP=pos;$("#sL").innerHTML=pos[0]?seat(pos[0]):"";$("#sT").innerHTML=pos[1]?seat(pos[1]):"";$("#sR").innerHTML=pos[2]?seat(pos[2]):"";
