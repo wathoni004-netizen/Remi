@@ -93,7 +93,7 @@ const S={
  glass:t=>{nz(t,.35,{ft:"highpass",f:4500,v:.2});for(let i=0;i<10;i++)tone(t+R(0,.25),R(2800,6500),R(.06,.2),{v:.04})},
  poof:t=>nz(t,.22,{ft:"lowpass",f:900,f2:200,v:.2,a:.02}),
  // Tombol menu
- ui:t=>{tone(t,620,.06,{w:"triangle",to:920,v:.09});nz(t,.025,{ft:"highpass",f:3000,v:.06})},
+ ui:t=>{tone(t,620,.05,{w:"triangle",to:920,v:.025});nz(t,.02,{ft:"highpass",f:3000,v:.012})},
  // Event: meteor meluncur, pecah tiap naik tingkat (lv), ledakan (q = 0 kristal .. 4 Kolektor), kartu terbuka
  evspin:t=>{S.rocket(t,.9);S.vortex(t+.5,3.2);S.twinkle(t+1,2.5)},
  evpecah:(t,lv)=>{S.crack(t);S.ping(t+.03,lv+1);S.ping(t+.1,lv+3)},
