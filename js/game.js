@@ -1,11 +1,12 @@
 // Arah putaran: st.dir 1 = kanan (berlawanan arah jarum jam), -1 = kiri. Berbalik setiap ronde yang berakhir dengan set.
 const nxt=(s,i,k)=>{const O=s.order,n=O.length;return O[((O.indexOf(i)+k*(s.dir||1))%n+n)%n]};
 
+// Urutan duduk: host selalu nomor 1, lalu susunan host / ronde sebelumnya (st.order), sisanya menurut waktu masuk (j), bukan waktu aktif (t).
+const urut=ids=>{const O=(st&&st.order)||[],h=hostId(),ix=i=>{if(i===h)return -1;const k=O.indexOf(i);return k<0?9:k},jt=i=>(players[i]||{}).j||(players[i]||{}).t||0;return ids.sort((a,b)=>ix(a)-ix(b)||jt(a)-jt(b))};
 function start(){
  // Hanya host (pembuat ruang) yang bisa memulai; di ruang tunggu semua pemain harus sudah Siap.
  if(hostId()!==uid)return;
- // Urutan duduk: ronde lanjutan mempertahankan urutan ronde sebelumnya; selebihnya menurut waktu masuk (j), bukan waktu aktif (t).
- const H0=(st&&st.hist)||[],nx=st&&st.status==="done",jt=i=>players[i].j||players[i].t,ix=i=>{const k=nx?(st.order||[]).indexOf(i):-1;return k<0?9:k},ids=Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length)).sort((a,b)=>ix(a)-ix(b)||jt(a)-jt(b)).slice(0,4);
+ const H0=(st&&st.hist)||[],nx=st&&st.status==="done",ids=urut(Object.keys(players).filter(i=>live(i)&&(!nx||players[i].rd===H0.length))).slice(0,4);
  if(ids.length<2||(!nx&&!ids.every(isOk)))return;
  const d=mk(),hands={};ids.forEach(i=>hands[i]=d.splice(0,7));
  // host, gen, dan kk ikut disimpan: host tetap, tanda Siap direset untuk ruang tunggu berikutnya, daftar kick tidak hilang.

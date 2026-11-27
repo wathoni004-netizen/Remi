@@ -21,6 +21,28 @@ button.pri:disabled{opacity:.4}
 .pl{padding:5px 12px;border:1px solid var(--bd);border-radius:999px;font-size:14px}
 .pl.on{border-color:var(--ac);outline:2px solid var(--ac)}
 .pl b{margin-left:8px;color:var(--mut)}
+/* Ruang tunggu (desain Boss, desain-ruang-tunggu/ruang-tunggu.svg): selalu gelap, tanpa bingkai kotak. */
+body:has(#game:not([hidden]) #lobby:not([hidden])){--bg:#14201a;--sf:#1e2c25;--tx:#f2efe4;--mut:#9fb0a6;--ac:#4cc58a;--rd:#ff7a6b;--bd:#35493f;color-scheme:dark;color:var(--tx);background:linear-gradient(#1b2b22,#0d1510) fixed}
+main:has(#game:not([hidden]) #lobby:not([hidden])) h1{display:none}
+#lobby.box{background:none;border:0;padding:0;max-width:440px;margin:0 auto 10px}
+.jr{text-align:center;text-transform:uppercase;letter-spacing:4px;font-weight:700;font-size:14px;color:var(--mut);margin:2px 0 8px}
+.kk{max-width:290px;margin:0 auto;padding:8px 0 4px;border:1px solid var(--bd);border-radius:16px;background:var(--sf);text-align:center}.kk small{display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--mut)}.kk .rc{margin:0}
+#lobby .kl{color:var(--rd)!important}
+.mj{position:relative;width:100%;max-width:400px;aspect-ratio:1080/970;margin:6px auto 0}
+.mj>img{position:absolute;left:17.5%;top:13%;width:65%;pointer-events:none}
+.kr{display:flex;flex-direction:column;align-items:center;gap:3px;width:112px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;cursor:pointer}
+.mj .kr{position:absolute;margin-left:-56px}.mj .s0,.mj .s3{left:18%}.mj .s1,.mj .s2{left:82%}.mj .s0,.mj .s1{top:1%}.mj .s2,.mj .s3{top:68%}
+.kr.bisa{touch-action:none;cursor:grab}
+.kr .av{position:relative;width:52px;height:52px;box-shadow:0 5px 12px rgba(0,0,0,.45)}
+.kr .av b{position:absolute;right:-6px;top:-5px;width:20px;height:20px;border-radius:50%;background:#e8b923;color:#14201a;font-size:12px;line-height:20px;text-align:center}
+.kr .kx{position:absolute;left:-10px;top:-7px;width:22px;height:22px;padding:0;border:1px solid var(--bd);border-radius:50%;background:#0b120e;color:#ff7a6b;font-size:11px;line-height:1}
+.kr .kn{max-width:112px;box-sizing:border-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:2px 10px;border-radius:999px;background:#0b120e;color:#fff;font-size:13px;font-weight:700}
+.kr .ks{padding:1px 9px;border-radius:999px;background:var(--sf);font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mut)}.kr .ks.ok{color:var(--ac)}.kr .ks.h{color:#e8b923}
+.kr.ko{cursor:default}.kr.ko .av{border:2px dashed var(--mut);color:var(--mut);box-shadow:none}
+.kr.angkat{z-index:9;opacity:.9;pointer-events:none}.kr.tj .av{box-shadow:0 0 0 3px #fff,0 0 16px 5px #e8b923}
+.mjt{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px}
+.mjh{text-align:center;font-size:12px;color:var(--mut);margin:6px 0}
+
 .sm{min-width:34px;padding:5px 2px;font-size:14px}
 .sl{outline:2px solid var(--ac);transform:translateY(-6px)}
 .mt{display:inline-flex;gap:2px;margin:4px 6px 0 0}
@@ -45,6 +67,8 @@ button.pri.sec{background:transparent!important;color:var(--tx)!important;border
 .qb{padding:4px 10px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(255,255,255,.12);font-size:20px;line-height:1.2;color:#fff}
 .cb{display:inline-block;background:rgba(0,0,0,.35);border-radius:999px;padding:3px 10px;margin:2px;color:#fff;font-size:13px}
 #ct{text-align:center}
+/* Pop-up chat melayang (tinggi 0, tumbuh ke atas) supaya meja tidak tergeser. HP miring sudah absolute di bawah. */
+@media (orientation:portrait),(min-height:521px){#play #ct{height:0;margin-top:-6px;position:relative;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;pointer-events:none}}
 #chatbox,#mbox{background:#1f5c3a;border-color:#1f5c3a;color:#fff;position:fixed;left:8px;right:8px;bottom:80px;z-index:20;max-width:480px;margin:0 auto;max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow-y:auto;box-shadow:0 6px 24px rgba(0,0,0,.45)}
 #cf{position:fixed;right:14px;bottom:14px;z-index:21;width:56px;height:56px;border:0;border-radius:50%;background:#e8b923;font-size:26px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 .ud{display:none;position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:50%;background:#c0392b;border:2px solid #fff}
@@ -306,6 +330,8 @@ main:has(#play:not([hidden])) h1{display:none}
 .side .nm{grid-column:2;grid-row:1;writing-mode:vertical-rl;margin:0;padding:8px 2px;max-height:130px}
 #sR .bk{grid-column:2;margin:0 -4px 0 0}
 #sR .nm{grid-column:1;transform:rotate(180deg)}
+/* Kartu turun melebarkan kolom grid: nama dan punggung kartu tidak boleh ikut melar. */
+#sL>div{grid-template-columns:auto 1fr}#sR>div{grid-template-columns:1fr auto}#sL .nm,#sL .bk{justify-self:start}#sR .nm,#sR .bk{justify-self:end}
 .side .ml{grid-column:1/-1;margin:0}
 .side .bk .c{width:16px;height:42px;border-width:2px 2px 2px 0;border-radius:0 4px 4px 0;margin:calc(min(18px,72px / (var(--n) - 1)) - 42px) 0 0}
 #sR .bk .c{border-width:2px 0 2px 2px;border-radius:4px 0 0 4px}
@@ -441,7 +467,7 @@ main:not(:has(#play:not([hidden]))) :is(#pg,#kp,#iv,#tw) .mw{align-content:start
 #lobby:has(.rc){display:grid;grid-template-columns:1fr 1fr;column-gap:16px;grid-auto-flow:row dense;align-items:center}
 #lobby:has(.rc)>*{grid-column:2;margin:4px 0}
 #lobby:has(.rc)>:nth-child(-n+3){grid-column:1}
-#lobby .rc{margin:0}
+#lobby .rc{margin:0;font-size:24px}#lobby.box{max-width:none}#lobby:has(.rc)>:nth-child(n){grid-column:2}#lobby:has(.rc)>.mjw{grid-column:1;grid-row:1/span 7}#lobby .mj{max-width:min(100%,330px)}#lobby .jr{margin:0}#lobby .kk{width:100%;padding:2px 0}
 main:has(#lobby:not([hidden])) h1{display:none}
 main:has(#lobby:not([hidden])) #game{padding-bottom:0}
 /* Masuk ruang & ruang tunggu: kotak di tengah layar, tidak menempel di atas. */
@@ -521,15 +547,15 @@ main:has(#home:not([hidden]),#pg:not([hidden]),#kp:not([hidden]),#iv:not([hidden
 </main>
 <script src="js/rules.js?v=6"></script>
 <script src="js/apk.js?v=6"></script>
-<script src="js/net.js?v=41"></script>
-<script src="js/game.js?v=12"></script>
+<script src="js/net.js?v=42"></script>
+<script src="js/game.js?v=13"></script>
 <script src="js/kartuskin.js?v=3"></script>
 <script src="js/mejaskin.js?v=1"></script>
 <script src="js/skinart.js?v=7"></script>
 <script src="js/setfx.js?v=9"></script>
 <script src="js/kraken.js?v=1"></script>
 <script src="js/suara.js?v=6"></script>
-<script src="js/ui.js?v=43"></script>
+<script src="js/ui.js?v=44"></script>
 <script src="js/spin.js?v=15"></script>
 <script src="js/toko.js?v=11"></script>
 <script src="js/inv.js?v=11"></script>

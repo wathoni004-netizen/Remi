@@ -1,4 +1,4 @@
-async function leave(){if(window.BOT)return location.reload();try{localStorage.removeItem("rn");localStorage.removeItem("rr")}catch(e){}try{await db.doc(`rooms/${room}/players/${uid}`).set({name:(players[uid]||{}).name||"Pemain",t:0})}catch(e){}location.reload()}
+async function leave(){if(window.BOT)return location.reload();try{localStorage.removeItem("rr")}catch(e){}try{await db.doc(`rooms/${room}/players/${uid}`).set({name:(players[uid]||{}).name||"Pemain",t:0})}catch(e){}location.reload()}
 let auth,M,db,uid,room="",players={},st=null,sel=[],ord=[],auto=true,AC=null,snd=true,chat={},chatInit=false,wasMine=false,sig="",wasDone=false,drag=null,pend=false,noclick=false,kickOut=false;
 // Pemain di-kick: st.kk[id] = nilai j pemain saat di-kick. Masuk ulang membuat j baru, jadi tidak lagi cocok (tanpa bergantung jam).
 const kicked=i=>!!(st&&st.kk&&players[i]&&st.kk[i]!=null&&st.kk[i]===(players[i].j||0));
@@ -184,7 +184,7 @@ function plMenu(i){
   p.textContent="Kirim email yang terbuka ke "+EML+". Kalau aplikasi email tidak terbuka, kirim manual dengan menyebut kode ruang "+room.toUpperCase()+" dan nama pemain.";
   o.querySelector(".act").innerHTML='<button class="pri" data-a="x">Tutup</button>'};
  document.body.append(o)}
-document.addEventListener("click",e=>{if(e.target.closest("[data-kick]"))return;if(e.target.closest("[data-ub]")){blk.clear();return setBlk()}const x=e.target.closest("[data-pl]");if(x)plMenu(x.dataset.pl)});
+document.addEventListener("click",e=>{if(noclick||e.target.closest("[data-kick]"))return;if(e.target.closest("[data-ub]")){blk.clear();return setBlk()}const x=e.target.closest("[data-pl]");if(x)plMenu(x.dataset.pl)});
 function chatList(){
  const cr=Math.max((st&&st.cr)||0,!st||st.status==="lobby"?Date.now()-3e5:0),L=[];
  for(const i in chat){const c=chat[i];if(!c||blk.has(i))continue;Object.values(c.h||[{x:c.x,t:c.t}]).forEach(m=>{if(m&&m.x&&m.t>cr)L.push({i,n:c.n,x:m.x,t:m.t})})}

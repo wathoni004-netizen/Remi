@@ -56,6 +56,31 @@ const laid=i=>((st.laid||{})[i]||[]).map(m=>`<span class="mt">${m.split(",").map
 // Tombol Kick: hanya untuk host, hanya di ruang tunggu / setelah ronde (tidak saat bermain, karena giliran pemain itu akan macet).
 function kickBtn(i){return !window.BOT&&hostId()===uid&&i!==uid&&st?`<button class="pri sec" data-kick="${i}" style="flex:none;margin-left:6px;padding:0 8px;font-size:12px;border-radius:999px">Kick</button>`:""}
 
+// Meja ruang tunggu (desain Boss): kursi 1 kiri atas (host), 2 kanan atas, 3 kanan bawah, 4 kiri bawah. Host menggeser pemain ke kursi lain untuk bertukar.
+// Ruang tunggu = semua pemain aktif; antarronde = peserta ronde tadi saja (st.order dipakai skor dan statistik, isinya tidak boleh berubah).
+const dudukL=()=>urut(st&&st.status==="done"?(st.order||[]).slice():Object.keys(players).filter(live));
+let geser=null;
+function meja(L,status){
+ const hs=hostId()===uid&&!window.BOT;
+ const kursi=(i,k,c)=>{const h=i===hostId(),[t,w]=status(i),bisa=hs&&!h;
+  return `<div class="kr ${c}${bisa?" bisa":""}" data-pl="${esc(i)}"${bisa?` data-seret="${esc(i)}"`:""}><span class="av">${esc(String(nm(i)).slice(0,1).toUpperCase())}<b>${k+1}</b>${bisa&&live(i)?`<button class="kx" data-kick="${esc(i)}" aria-label="Kick">✕</button>`:""}</span><span class="kn">${window.medal?medal((players[i]||{}).g,14):""}${esc(nm(i))}</span><span class="ks ${w}">${t}</span></div>`};
+ const isi=[0,1,2,3].map(k=>L[k]?kursi(L[k],k,"s"+k):`<div class="kr ko s${k}"><span class="av">+</span><span class="ks">Kosong</span></div>`).join("");
+ return `<div class="mjw"><div class="mj"><img src="img/meja-tunggu.svg" alt="">${isi}</div>${L.length>4?`<div class="mjt">${L.slice(4).map((i,k)=>kursi(i,k+4,"")).join("")}</div>`:""}${hs&&L.length>2?'<div class="mjh">Geser pemain untuk tukar posisi · nomor 1 jalan duluan</div>':""}</div>`}
+// Geser-tukar. Kursi baru diangkat setelah jari bergerak 10px, supaya ketukan biasa tetap membuka menu pemain (blokir/lapor).
+{const LB=$("#lobby"),kena=e=>{const t=document.elementFromPoint(e.clientX,e.clientY),k=t&&t.closest("#lobby [data-seret]");return k&&k!==geser.el?k:null},tandai=k=>{LB.querySelectorAll(".tj").forEach(x=>x.classList.remove("tj"));if(k)k.classList.add("tj")};
+ LB.addEventListener("pointerdown",e=>{const el=e.target.closest("[data-seret]");if(!el||geser||e.target.closest("[data-kick]"))return;geser={el,i:el.dataset.seret,x:e.clientX,y:e.clientY,pid:e.pointerId,on:false}});
+ addEventListener("pointermove",e=>{if(!geser||e.pointerId!==geser.pid)return;const dx=e.clientX-geser.x,dy=e.clientY-geser.y;
+  if(!geser.on){if(Math.hypot(dx,dy)<10)return;geser.on=true;geser.el.classList.add("angkat")}
+  geser.el.style.translate=dx+"px "+dy+"px";tandai(kena(e))});
+ const lepas=(e,batal)=>{if(!geser||e.pointerId!==geser.pid)return;
+  const g=geser,t=g.on&&!batal?kena(e):null;geser=null;
+  if(!g.on)return;// ketukan: jangan render, supaya klik tetap sampai ke kursi
+  noclick=true;setTimeout(()=>{noclick=false},60);
+  if(t&&hostId()===uid){const L=dudukL(),a=L.indexOf(g.i),b=L.indexOf(t.dataset.seret);
+   if(a>=0&&b>=0){[L[a],L[b]]=[L[b],L[a]];beep("sel");save({...(st||{status:"lobby",hist:[],host:uid,gen:0}),order:L.slice(0,4)})}}
+  render()};
+ addEventListener("pointerup",e=>lepas(e,false));addEventListener("pointercancel",e=>lepas(e,true))}
+
 // Animasi kartu (FLIP): posisi kartu sebelum render dicatat, lalu kartu yang pindah meluncur dari posisi lama.
 const REDUCE=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 const FXSEL="#hand [data-fx],#pile [data-fx],#mine [data-fx]";
@@ -92,17 +117,18 @@ function render(){
  // Pemain yang di-kick host: beri tahu lalu keluar dari ruang.
  if(!kickOut&&st&&kicked(uid)){kickOut=true;alert("Kamu dikeluarkan dari ruang oleh host.");leave();return}
  if(drag&&drag.on){pend=true;return}
+ if(geser&&geser.on)return;
  $("#ky").hidden=!(st&&st.status==="play"&&hostId()===uid);
  const lob=$("#lobby"),pl=$("#play");
  const fxB=snapFx();
  {const H0=(st&&st.hist)||[],ss=st&&st.status,sh=H0.length&&ss==="done"&&players[uid]&&players[uid].rd===H0.length;$("#score").hidden=!sh;if(sh)$("#score").innerHTML=scoreHtml(H0);$("#msc").innerHTML=H0.length?scoreHtml(H0):'<div class="mut">Belum ada catatan poin</div>'}
  if(!st||st.status==="lobby"){
-  const ids=Object.keys(players).filter(live).sort((a,b)=>players[a].t-players[b].t);
+  const ids=dudukL();
   pl.hidden=true;lob.hidden=false;
   // Hanya host (pembuat ruang) yang bisa mulai; pemain lain menekan Siap dulu.
   const hs=hostId()===uid,allOk=ids.every(isOk),me=isOk(uid);
   const RC=room.toUpperCase(),lk=location.origin+location.pathname+"?r="+encodeURIComponent(room);
-  lob.innerHTML=`<div class="rc">${esc(RC)}</div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div><div class="row" style="margin:10px 0">${ids.map(i=>`<span class="pl" data-pl="${esc(i)}">${esc(players[i].name)}${i===hostId()?" 👑":isOk(i)?" ✅":""}${kickBtn(i)}</span>`).join("")}</div><div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs||!me?"":`<div class="mut">Menunggu host memulai game…</div>`}<div class="act"><button class="pri sec" id="kmn">‹ Menu</button><button class="pri sec" id="kx4">Keluar ruang</button></div>`;
+  lob.innerHTML=`<div class="jr">Ruang tunggu</div><div class="kk"><small>Kode ruang</small><div class="rc">${esc(RC)}</div></div><div class="act"><button class="pri sec" data-cp="${esc(lk)}">Salin link</button><a class="pri wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("Ayo main Kartu Remi! Kode ruang: "+RC+" "+lk)}">Bagikan WA</a></div>${meja(ids,i=>i===hostId()?["Host","h"]:isOk(i)?[ids.indexOf(i)>3?"Penonton":"Siap","ok"]:["Belum siap",""])}<div class="act">${hs?`<button class="pri" id="sb" ${ids.length<2||!allOk?"disabled":""}>${ids.length<2?"Menunggu teman masuk…":!allOk?"Menunggu semua siap…":"Mulai game"}</button>`:`<button class="pri${me?" sec":""}" id="rb">${me?"Batal siap":"Siap"}</button>`}</div>${hs||!me?"":`<div class="mut">Menunggu host memulai game…</div>`}<div class="act"><button class="pri sec" id="kmn">‹ Menu</button><button class="pri sec kl" id="kx4">Keluar ruang</button></div>`;
   $("#kmn").onclick=keMenu;
   $("#kx4").onclick=async()=>{if(await ask("Keluar dari ruang?"))leave()};
   if(hs)$("#sb").onclick=start;
@@ -113,7 +139,7 @@ function render(){
  if(st.status==="done"&&players[uid]&&players[uid].rd===HH.length){
   const rd=Object.keys(players).filter(i=>live(i)&&players[i].rd===HH.length).sort((a,b)=>players[a].t-players[b].t),wt=Object.keys(players).filter(i=>live(i)&&players[i].rd!==HH.length&&(st.order||[]).includes(i));
   pl.hidden=true;lob.hidden=false;
-  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl" data-pl="${esc(i)}">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:`<span class="mut" style="flex:1">Menunggu host memulai ronde baru…</span>`}<button class="pri sec" id="kx">Keluar</button></div><div class="act"><button class="pri sec" id="kmn">‹ Menu</button></div>`;
+  lob.innerHTML=`<div class="mut">Ronde ${HH.length} selesai</div><div class="row" style="margin:10px 0">${rd.map(i=>`<span class="pl" data-pl="${esc(i)}">${esc(players[i].name)}${kickBtn(i)}</span>`).join("")}</div>${wt.length?`<div class="mut">Belum memilih: ${wt.map(i=>esc(players[i].name)).join(", ")}</div>`:""}${meja(dudukL(),i=>i===hostId()?["Host","h"]:rd.includes(i)?["Lanjut","ok"]:["Belum pilih",""])}<div class="act">${hostId()===uid?`<button class="pri" id="sb" ${rd.length<2?"disabled":""}>${rd.length<2?"Menunggu teman lanjut…":"Mulai ronde baru"}</button>`:`<span class="mut" style="flex:1">Menunggu host memulai ronde baru…</span>`}<button class="pri sec" id="kx">Keluar</button></div><div class="act"><button class="pri sec" id="kmn">‹ Menu</button></div>`;
   $("#kmn").onclick=keMenu;
   if($("#sb"))$("#sb").onclick=start;$("#kx").onclick=leave;return}
  lob.hidden=true;pl.hidden=false;
