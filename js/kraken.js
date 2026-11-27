@@ -1,6 +1,9 @@
-// Efek Set skin Kraken (L05): panggung sendiri 360x520, 5,6 detik. Suara: SC.L05 di suara.js. Dipanggil dari playSetFx (setfx.js).
+// Efek Set skin Kraken (L05): panggung sendiri 360x520, 5,6 detik. Titik hantam (180,95) ditaruh tepat di kursi korban,
+// pangkal laut mengarah ke pen-set (sama seperti skin lain); tanpa kursi (pratinjau Inventori) tampil dalam kotak 330px. Suara: SC.L05 di suara.js. Dipanggil dari playSetFx (setfx.js).
 // Dibuat dari draf di desain-skin/ (tentakel meliuk, laut, hujan, petir, percikan dihitung per bingkai di canvas).
 (()=>{
+// Kanvas lebih luas dari panggung: x -220..580, y -200..960 (1,25 piksel per satuan).
+const siap=cv=>{const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(1.25,0,0,1.25,275,250);return g};
 const PETA=[[0,0],[1500,2300],[2300,3300],[2600,3600],[3800,5600],[4000,5900]];
 const petakan=(v,a,b)=>{let i=1;while(i<PETA.length-1&&v>PETA[i][a])i++;const p=PETA[i-1],q=PETA[i];return p[b]+(v-p[a])*(q[b]-p[b])/(q[a]-p[a])};
 const W=ms=>petakan(ms,0,1),Wbalik=ms=>petakan(ms,1,0);
@@ -41,13 +44,13 @@ function satu(g,c,t){
 // Permukaan laut: puncak lancip yang berjalan + garis buih
 function laut(g,t,dasar,amp,lebar,laju,warnaAir,geser){
  const y=x=>{const f=((x+t*laju+geser)%lebar+lebar)%lebar/lebar;return dasar-amp*Math.pow(Math.abs(Math.sin(Math.PI*f)),3)};
- g.beginPath();g.moveTo(-10,540);for(let x=-10;x<=370;x+=5)g.lineTo(x,y(x));g.lineTo(370,540);g.closePath();
+ g.beginPath();g.moveTo(-220,1000);for(let x=-220;x<=580;x+=5)g.lineTo(x,y(x));g.lineTo(580,1000);g.closePath();
  g.fillStyle=warnaAir;g.fill();g.strokeStyle="#081a33";g.lineWidth=2.5;g.stroke();
- g.beginPath();for(let x=-10;x<=370;x+=5){const v=y(x)+4;x>-10?g.lineTo(x,v):g.moveTo(x,v)}
+ g.beginPath();for(let x=-220;x<=580;x+=5){const v=y(x)+4;x>-220?g.lineTo(x,v):g.moveTo(x,v)}
  g.strokeStyle="#cfeaf0";g.lineWidth=4;g.setLineDash([26,14,8,18]);g.lineDashOffset=t*laju*.7;g.stroke();g.setLineDash([]);
 }
 const naik=t=>kunci([[0,560],[500,505],[1300,455],[2600,470],[3300,500],[3800,580]],t); // tinggi air
-return{gambar(cv,t){const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(cv.width/360,0,0,cv.height/520,0,0);const a=naik(t);
+return{gambar(cv,t){const g=siap(cv);const a=naik(t);
  laut(g,t,a-22,26,130,.07,"#1a4466",0);
  SEMUA.forEach(c=>satu(g,c,t));
  laut(g,t,a+14,30,155,.12,"#1d4a70",60);laut(g,t,a+46,24,115,.17,"#12304f",20)}}})();
@@ -66,7 +69,7 @@ function ledak(g,t,T0,lama,n,x,y,laju,berat,warna,r,seed){
 }
 function bintang(g,x,y,z,c){g.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,q=i%2?z*.25:z;g.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q)}g.closePath();g.fillStyle=c;g.fill()}
 function gambar(cv,t){
- const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(cv.width/360,0,0,cv.height/520,0,0);
+ const g=siap(cv);
  // hujan badai
  const hujan=Math.min(1,t/300)*Math.min(1,Math.max(0,(3700-t)/500));
  if(hujan>0){g.strokeStyle="rgba(170,215,255,"+(.35*hujan)+")";g.lineWidth=1.2;g.beginPath();
@@ -86,9 +89,8 @@ function gambar(cv,t){
  ledak(g,t,1950,700,22,60,490,150,400,["#cfeaf0"],4,41);ledak(g,t,2150,700,22,310,490,150,400,["#cfeaf0"],4,71);
  // jejak cambukan
  if(t>2380&&t<2620){g.globalAlpha=1-Math.abs(t-2500)/120;g.strokeStyle="#ffd6f2";g.lineCap="round";[0,1,2].forEach(i=>{g.lineWidth=5-i*1.4;g.beginPath();g.arc(120+i*14,300,190-i*18,-2.3,-1.15);g.stroke()});g.globalAlpha=1}
- // HANTAMAN: kilat putih, garis ledak, air, emas, tinta
+ // HANTAMAN: garis ledak, air, emas, tinta
  const h=t-2520;
- if(h>0&&h<130){g.fillStyle="rgba(255,255,255,"+(.8*(1-h/130))+")";g.fillRect(0,0,360,520)}
  if(h>0&&h<420){const u=h/420;g.strokeStyle="#fff2a8";g.lineCap="round";g.lineWidth=5*(1-u);g.beginPath();
   for(let i=0;i<18;i++){const a=i*.349,r1=30+u*170,r2=r1+50*(1-u)+10;g.moveTo(180+Math.cos(a)*r1,90+Math.sin(a)*r1);g.lineTo(180+Math.cos(a)*r2,90+Math.sin(a)*r2)}g.stroke()}
  [0,130,270].forEach((d,i)=>{const u=(h-d)/500;if(u>0&&u<1){g.globalAlpha=1-u;g.beginPath();g.ellipse(180,100,u*210,u*95,0,0,7);g.lineWidth=7*(1-u)+1;g.strokeStyle=["#fff","#8fe6ff","#ffd24a"][i];g.stroke();g.globalAlpha=1}});
@@ -106,22 +108,33 @@ const NASKAH=[
  ["kilat",950,300,[{opacity:0},{opacity:.7,offset:.2},{opacity:0}]],
  ["kartu",1100,900,[{opacity:0,transform:"translateY(40px) rotate(0)"},{opacity:1,transform:"translateY(-60px) rotate(180deg)",offset:.3},{opacity:1,transform:"translateY(-300px) rotate(720deg) scale(.7)"}]],
  ["seru",450,950,[{opacity:0,transform:"scale(3) rotate(-14deg)"},{opacity:1,transform:"scale(1) rotate(-5deg)",offset:.2,easing:"ease-out"},{opacity:1,transform:"scale(1.1) rotate(-2deg)",offset:.8},{opacity:0,transform:"scale(1.6)"}]],
+ ["kilat",2520,130,[{opacity:.8},{opacity:0}]],
  ["cipratan",2540,600,[{opacity:1,transform:"scale(.2) rotate(0)"},{opacity:1,transform:"scale(1.15) rotate(12deg)",offset:.4},{opacity:0,transform:"scale(1.4) rotate(20deg)"}]],
  ["riak",2560,800,[{opacity:1,transform:"scale(.15)"},{opacity:0,transform:"scale(1.5)"}]],
  ["pen",2650,1100,[{opacity:0,transform:"scale(2.4)"},{opacity:1,transform:"scale(1)",offset:.2},{opacity:1,transform:"translateY(-10px)",offset:.8},{opacity:0,transform:"translateY(-50px)"}]],
  ["st",2520,650,[0,-18,16,-13,11,-8,6,-3,0].map(x=>({transform:`translate(${x}px,${-x/2}px)`}))]
 ];
 let css=document.createElement("style");
-css.textContent=".sfx.krk{align-items:flex-end;background:rgba(2,5,16,.62)}.krk .st{position:relative;width:360px;height:520px;flex:none;transform-origin:50% 100%;clip-path:inset(-100vmax -100vmax 0)}.krk .st>*{position:absolute;pointer-events:none}.krk .fx{opacity:0}.krk .gelap{inset:-100vmax;background:#020510}.krk .kilat{inset:-100vmax;background:#fff6cf}.krk .kepala{width:330px;left:15px;top:105px}.krk .petir{width:230px;left:65px;top:-30px}.krk .kartu{width:90px;height:120px;left:135px;top:340px}.krk canvas{left:0;top:0;width:360px;height:520px}.krk .cipratan{width:250px;left:55px;top:-30px}.krk .riak{width:320px;left:20px;top:-45px}.krk .nm{left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:10px;background:#000a;color:#fff;font-weight:700;white-space:nowrap}.krk .korban{top:70px}.krk .oleh{bottom:8px;background:#e8b923;color:#14201a;z-index:2}.krk .seru{left:0;width:100%;top:330px;text-align:center;font:900 italic 54px Impact,sans-serif;color:#ffd24a;-webkit-text-stroke:2px #3b0a50;text-shadow:0 5px 0 #3b0a50,0 0 24px #ff7ae0}.krk .pen{left:0;width:100%;top:150px;text-align:center;font:900 52px sans-serif;color:#ff5a4f;text-shadow:0 3px 0 #000}";
+css.textContent=".sfx.krk{background:rgba(2,5,16,.45)}.krk .dunia{position:absolute;inset:0;overflow:hidden}.krk .dunia.kotak{position:relative;inset:auto;height:330px;flex:none;border-radius:12px;background:#1f5c3a}.krk .st{position:absolute;width:360px;height:520px;transform-origin:180px 95px}.krk .st>*,.krk .dunia>:not(.st){position:absolute;pointer-events:none}.krk .fx{opacity:0}.krk .gelap{inset:-100vmax;background:#020510}.krk .kilat{inset:-100vmax;background:#fff6cf}.krk .kepala{width:330px;left:15px;top:105px}.krk .petir{width:230px;left:65px;top:-30px}.krk .kartu{width:90px;height:120px;left:135px;top:340px}.krk canvas{left:-220px;top:-200px;width:800px;height:1160px;max-width:none}.krk .bar{left:0;width:100%;height:28px;background:#000;z-index:3}.krk .cipratan{width:250px;left:55px;top:-30px}.krk .riak{width:320px;left:20px;top:-45px}.krk .nm{transform:translate(-50%,-50%);z-index:4;padding:5px 14px;border-radius:10px;background:#000a;color:#fff;font-weight:700;white-space:nowrap}.krk .oleh{background:#e8b923;color:#14201a}.krk .seru{z-index:4;left:0;width:100%;text-align:center;font:900 italic 54px Impact,sans-serif;color:#ffd24a;-webkit-text-stroke:2px #3b0a50;text-shadow:0 5px 0 #3b0a50,0 0 24px #ff7ae0}.krk .kotak .seru{font-size:38px}.krk .kotak .pen{font-size:34px}.krk .pen{z-index:4;left:0;width:100%;text-align:center;font:900 52px sans-serif;color:#ff5a4f;text-shadow:0 3px 0 #000}";
 document.head.appendChild(css);
-window.KRK=(oleh,korban,pen)=>{
+// A = posisi pen-set, V = posisi korban (piksel layar); kosong = kotak pratinjau.
+window.KRK=(oleh,korban,pen,A,V)=>{
  const ov=document.createElement("div");ov.className="sfx krk";
- const g=(c,f)=>`<img class="fx ${c}" src="img/${f}?v=1" alt="">`,cv=c=>`<canvas class="${c}" width="720" height="1040"></canvas>`;
- ov.innerHTML=`<div class="st"><div class="nm korban"></div><div class="fx gelap"></div>${g("kepala","kr-kepala.webp")}${g("petir","kr-petir.svg")}<div class="fx kilat"></div>${g("kartu","kr-kartu.svg")}${g("riak","kr-riak.svg")}${cv("tentakel")}${g("cipratan","kr-cipratan.svg")}${cv("pesta")}<div class="fx seru">KRAKEN!</div><div class="fx pen"></div><div class="nm oleh"></div></div>`;
+ const g=(c,f)=>`<img class="fx ${c}" src="img/${f}?v=1" alt="">`,cv=c=>`<canvas class="${c}" width="1000" height="1450"></canvas>`;
+ const kotak=!(A&&V&&Math.hypot(V.x-A.x,V.y-A.y)>40),bar="<div class=\"bar\" style=\"top:0\"></div><div class=\"bar\" style=\"bottom:0\"></div>";
+ ov.innerHTML=`<div class="dunia${kotak?" kotak":""}"><div class="st"><div class="fx gelap"></div>${g("kepala","kr-kepala.webp")}${g("petir","kr-petir.svg")}<div class="fx kilat"></div>${g("kartu","kr-kartu.svg")}${g("riak","kr-riak.svg")}${cv("tentakel")}${g("cipratan","kr-cipratan.svg")}${cv("pesta")}</div>${kotak?bar:""}<div class="nm korban"></div><div class="nm oleh"></div><div class="fx seru">KRAKEN!</div><div class="fx pen"></div></div>`;
  const q=c=>ov.querySelector("."+c),st=q("st");
  q("korban").textContent=korban;q("oleh").textContent=oleh;q("pen").textContent=pen;
- st.style.transform="scale("+Math.min(1.25,innerWidth/360,innerHeight/540)+")";
  document.body.appendChild(ov);
+ const dunia=q("dunia");
+ let L=innerWidth,T=innerHeight;
+ if(kotak){L=Math.min(380,innerWidth-16);T=330;dunia.style.width=L+"px";dunia.style.transform="scale("+Math.min(1,(innerHeight-16)/330)+")";V={x:L/2,y:60};A={x:L/2,y:285}}
+ // Panggung: titik hantam di V, diputar dan diskalakan supaya pangkalnya ke arah A.
+ const dx=V.x-A.x,dy=V.y-A.y,s=Math.hypot(dx,dy)/425,sk=kotak?s:Math.min(1.4,Math.max(.6,s));
+ st.style.left=(V.x-180)+"px";st.style.top=(V.y-95)+"px";st.style.transform="rotate("+Math.atan2(dx,-dy)+"rad) scale("+sk+")";
+ const taruh=(c,p)=>{const e=q(c),w=e.offsetWidth/2+4;e.style.left=Math.min(L-w,Math.max(w,p.x))+"px";e.style.top=Math.min(T-20,Math.max(kotak?44:20,p.y))+"px"};
+ taruh("korban",V);taruh("oleh",A);
+ q("seru").style.top=(V.y+A.y)/2-(kotak?10:30)+"px";q("pen").style.top=(V.y<T/2?V.y+(kotak?26:34):V.y-(kotak?66:90))+"px";
  ov.animate([{opacity:0},{opacity:1}],{duration:200});
  NASKAH.forEach(([id,t,d,kf])=>(id==="st"?ov:q(id)).animate(kf,{delay:W(t),duration:W(t+d)-W(t)}));
  let raf=0,t0=0;

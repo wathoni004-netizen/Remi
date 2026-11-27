@@ -1,5 +1,5 @@
 {
- "v": 40,
+ "v": 41,
  "files": [
   "index.html",
   "js/apk.js",
@@ -89,7 +89,7 @@
   "snd/zap2.ogg"
  ],
  "h": {
-  "index.html": "226892688f5c8578",
+  "index.html": "7ef4477723328c39",
   "js/apk.js": "69b5a9b154447547",
   "js/bot.js": "07dd78bb75feeb9e",
   "js/event.js": "ef7fe63e170c1a43",
@@ -97,13 +97,13 @@
   "js/info.js": "2cb0833a7ef197e1",
   "js/inv.js": "70ed1422e1b07523",
   "js/kartuskin.js": "e7e3827bd72dbba7",
-  "js/kraken.js": "ee89c2c2ebdc707b",
+  "js/kraken.js": "cc7fab754ce7e63c",
   "js/mejaskin.js": "3cec3e91f4b934a2",
   "js/net.js": "eb27abd6be81ac46",
   "js/panduan.js": "d47d418d581b27c6",
   "js/profil.js": "06958bb04c23a21d",
   "js/rules.js": "c8e2b9c3bb1c5684",
-  "js/setfx.js": "859dc537f76bbe6d",
+  "js/setfx.js": "e7b03e37be312095",
   "js/skinart.js": "a4392727956bcf8e",
   "js/spin.js": "69fb61373ecbf800",
   "js/suara.js": "a5454f222d9d0e6b",

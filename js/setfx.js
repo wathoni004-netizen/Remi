@@ -21,7 +21,7 @@ function seatC(i){const e=i===uid?($("#hand")||$("#mine")):i?[$("#sL"),$("#sT"),
 function playSetFx(sk,by,vic,b,vname){
  const T=SFXT[sk&&sk.t];if(!T)return;
  // Skin Kraken punya panggung efek sendiri (kraken.js).
- if(sk.k==="L05"&&window.KRK){try{SNDset(sk);KRK(by===uid?"Kamu":nm(by),String(vname||nm(vic)),"−"+b)}catch(e){console.error(e)}return}
+ if(sk.k==="L05"&&window.KRK){try{SNDset(sk);KRK(by===uid?"Kamu":nm(by),String(vname||nm(vic)),"−"+b,seatC(by),seatC(vic))}catch(e){console.error(e)}return}
  const ov=document.createElement("div");ov.className="sfx";
  const w=Math.min(380,innerWidth-16),vn=String(vname||nm(vic)),h=Math.ceil(vn.length/2);
  const A=seatC(by),V=seatC(vic),dx=V&&A?V.x-A.x:0,dy=V&&A?V.y-A.y:0,ds=Math.hypot(dx,dy),tb=ds>40;
