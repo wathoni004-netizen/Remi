@@ -154,6 +154,8 @@ const SC={
  L02:[[0,"~dark",3.6],[0,fl,{v:.5}],[400,"impactBell_heavy_001",{pk:false,v:.5,r:.6}],[400,"~shine",1.4],[500,"thrusterFire_000",{pk:false,v:.45,r:.7,d:1.4}],...finL(1900)],
  L03:[[0,"~dark",3.4],[300,"impactBell_heavy_000",{pk:false,v:.55,r:.45}],[300,"~void",1.7],[600,"cloth1",{pk:false,v:.5,r:.7}],[1100,"slime_000",{v:.5,r:.6}],[1100,"~vortex",.8],...finL(2000)],
  L04:[[0,"~dark",3.8],[100,"handleCoins",{pk:false,v:.5}],[640,"impactBell_heavy_001",{v:.6,r:1.2}],[700,"~twinkle",1],[900,"powerUp3",{pk:false,v:.5,r:.7}],[1700,"laserLarge_002",{pk:false,v:.7,r:.5}],[1700,"~beam",1],...finL(1900)],
+ // Kraken (kraken.js): waktu mengikuti panggungnya (5,6 detik)
+ L05:[[0,"~dark",5.2],[300,"~growl"],[900,"~growl"],[1380,"explosionCrunch_003",{v:.8}],[1690,"knifeSlice",{v:.8}],[2610,"slime_000",{v:.8,r:.8}],[3300,"knifeSlice",{v:.9,r:.55}],[3520,"lowFrequency_explosion_000",{v:1}],[3520,"impactPunch_heavy_000",{v:1}],[3540,"explosionCrunch_003",{v:.7,r:.8}],[3530,"~bigboom"],[3700,"impactBell_heavy_000",{v:.55}],[3900,"~twinkle",1.4]],
  // KOLEKTOR: paling megah, gema panjang, kaca/kristal pecah
  K01:[[0,"~dark",4.2],[0,"cloth3",{pk:false,v:.5}],[500,"spaceEngineLow_002",{pk:false,v:.6,r:.7,d:1.5}],[500,"~fall",1.5],[1990,"impactPunch_heavy_000",{v:1,r:.6}],[2000,"impactMining_000",{v:.8,r:.7}],...finK(2000)],
  K02:[[0,"~dark",5],[0,fl,{v:.5}],[520,"impactBell_heavy_000",{pk:false,v:.5,r:.4}],[520,"spaceEngineLow_002",{pk:false,v:.8,r:.6,d:1.85}],[900,"~vortex",1.4],[1250,"phaseJump1",{v:.4,r:.6}],[1600,"phaseJump1",{v:.45,r:.5}],[1900,"phaseJump1",{v:.5,r:.4}],...finK(2350),[2350,"explosionCrunch_004",{v:1,r:.6}],[2350,"thrusterFire_000",{pk:false,v:.5,r:.5,d:2}]]};

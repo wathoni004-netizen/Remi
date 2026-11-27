@@ -121,7 +121,7 @@ function render(){
  {const sg=st.status+"|"+st.deck.length+"|"+st.pile.length+"|"+st.turn+"|"+ph+"|"+Object.values(st.laid||{}).reduce((a,v)=>a+v.length,0);
   // Suara: aksi terakhir (dari st.msg) di semua HP; Set dengan skin: fanfare setelah efek lemparan selesai.
   if(sig&&sg!==sig){const m=st.msg||"",a=/ buang /.test(m)?"drop":/ makan /.test(m)?"take":/ turun/.test(m)?"lay":/ cabut$/.test(m)?"draw":"tick";
-   if(done&&!wasDone){if(st.sx&&st.sk)setTimeout(()=>beep("set"),500+({S:3000,E:3800,L:4600,K:5000}[st.sk.t]||0));else beep(st.sx?"set":"win")}
+   if(done&&!wasDone){if(st.sx&&st.sk)setTimeout(()=>beep("set"),500+(st.sk.k==="L05"?5600:{S:3000,E:3800,L:4600,K:5000}[st.sk.t]||0));else beep(st.sx?"set":"win")}
    else if(!done){beep(a);if(mine&&!wasMine){setTimeout(()=>beep("turn"),220);buzz()}}}
   sig=sg;wasDone=done;wasMine=!done&&mine;
   document.title=(!done&&mine?"🔔 Giliranmu! · ":"")+"Kartu Remi"}

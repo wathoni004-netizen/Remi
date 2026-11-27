@@ -6,15 +6,15 @@ const card=(k,w)=>{const d=SKA.get(k);return{key:k,n:d.n,t:d.tn,w,col:d.c[0]}};
 // Hasil tanpa skin (kunci ZONK) diganti koin, sekitar 30% harga kartunya (Toko: biru 50, merah 650). Menaikkan merah di atas 357 membuka celah beli biru -> tukar -> spin yang untung terus bila tukar jadi 10:2 lagi.
 const KB={biru:15,merah:200};
 const ZK=w=>({key:"ZONK",n:"Koin",t:"Zonk",w,col:"#e8b923"});
-// Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (4 skin); Zonk 70. Zonk = tanpa skin, diganti koin. Kolektor tidak ada di Spin (event terbatas).
+// Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (5 skin); Zonk 70. Zonk = tanpa skin, diganti koin. Kolektor tidak ada di Spin (event terbatas).
 const P1=[],P2=[],ids=t=>SKA.list.filter(d=>d.t===t).map(d=>d.k);
 ids("S").forEach(k=>{P1.push(card(k,5/12));P2.push(card(k,15/12))});
 ids("E").forEach(k=>P2.push(card(k,14/6)));
-ids("L").forEach(k=>P2.push(card(k,1/4)));
+ids("L").forEach(k=>P2.push(card(k,1/ids("L").length)));
 P1.push(ZK(95));P2.push(ZK(70));
 const POOL={biru:P1,merah:P2};
 const ROWS={biru:[["#4ac68c","Spesial","12 skin","5%"],["#e8b923","Koin","+15 koin","95%"]],
- merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","4 skin","1%"],["#e8b923","Koin","+200 koin","70%"]]};
+ merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","5 skin","1%"],["#e8b923","Koin","+200 koin","70%"]]};
 const NM={biru:"Spin Biasa",merah:"Spin Legenda"};
 let U={koin:0,biru:0,merah:0,skins:{}},tab="biru",busy=false;
 const tambah=n=>Math.min(999999,(U.koin||0)+n); // batas sama dengan Rules
