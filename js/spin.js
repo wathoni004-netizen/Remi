@@ -1,25 +1,29 @@
 // Spin Skin: kartu biru/merah -> skin. Data di users/{uid} = {biru,merah,skins:{kunci:true}}; hanya akun Google yang boleh menyimpan (lihat Rules).
-// Satu tulisan penuh per aksi (kurangi kartu + tambah skin sekaligus) supaya saldo tidak setengah tersimpan.
+// Satu tulisan penuh per aksi (kurangi kartu + tambah skin/koin sekaligus) supaya saldo tidak setengah tersimpan.
 (()=>{
 const LV={Spesial:2,Epik:3,Legenda:4,Kolektor:4,Zonk:1};
 const card=(k,w)=>{const d=SKA.get(k);return{key:k,n:d.n,t:d.tn,w,col:d.c[0]}};
-const ZK=w=>({key:"ZONK",n:"Zonk",t:"Zonk",w,col:"#8a8f8c"});
-// Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (4 skin); Zonk 70. Zonk = kartu hangus tanpa skin. Kolektor tidak ada di Spin (event terbatas).
+// Hasil tanpa skin (kunci ZONK) diganti koin, sekitar 30% harga kartunya (Toko: biru 50, merah 650). Menaikkan merah di atas 357 membuka celah beli biru -> tukar -> spin yang untung terus bila tukar jadi 10:2 lagi.
+const KB={biru:15,merah:200};
+const ZK=w=>({key:"ZONK",n:"Koin",t:"Zonk",w,col:"#e8b923"});
+// Peluang (persen) mengikuti gacha Mobile Legends: Elite Box (Spesial 5%, sisanya hangus) dan Epic Box (Epik 15%, Spesial 15%, hangus 70%); Legenda dibuat sangat langka (1%, di ML hanya lewat pity 200 core). Tiap skin dalam satu tier sama besar. biru = Spesial 5 (12 skin); Zonk 95. merah = Spesial 15 (12 skin); Epik 14 (6 skin); Legenda 1 (4 skin); Zonk 70. Zonk = tanpa skin, diganti koin. Kolektor tidak ada di Spin (event terbatas).
 const P1=[],P2=[],ids=t=>SKA.list.filter(d=>d.t===t).map(d=>d.k);
 ids("S").forEach(k=>{P1.push(card(k,5/12));P2.push(card(k,15/12))});
 ids("E").forEach(k=>P2.push(card(k,14/6)));
 ids("L").forEach(k=>P2.push(card(k,1/4)));
 P1.push(ZK(95));P2.push(ZK(70));
 const POOL={biru:P1,merah:P2};
-const ROWS={biru:[["#4ac68c","Spesial","12 skin","5%"],["#8a8f8c","Zonk","tanpa skin","95%"]],
- merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","4 skin","1%"],["#8a8f8c","Zonk","tanpa skin","70%"]]};
+const ROWS={biru:[["#4ac68c","Spesial","12 skin","5%"],["#e8b923","Koin","+15 koin","95%"]],
+ merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","4 skin","1%"],["#e8b923","Koin","+200 koin","70%"]]};
 const NM={biru:"Spin Biasa",merah:"Spin Legenda"};
-let U={biru:0,merah:0,skins:{}},tab="biru",busy=false;
+let U={koin:0,biru:0,merah:0,skins:{}},tab="biru",busy=false;
+const tambah=n=>Math.min(999999,(U.koin||0)+n); // batas sama dengan Rules
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#spm").textContent=t||""};
 const pick=p=>{let r=Math.random()*100,a=0;for(const c of p){a+=c.w;if(r<a)return c}return p[p.length-1]};
-const ZF='<div style="position:absolute;inset:6px 8px;border-radius:8px;background:#222a26;border:3px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 16px/1 system-ui">✕</div>';
-const face=c=>`<div class="sks">${c.key==="ZONK"?ZF:SKA.svg(c.key)}</div>`;
+const COIN=(d,f)=>`<div style="width:${d}px;height:${d}px;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#e8b923 55%,#a97c0d);border:${Math.max(2,d/14|0)}px solid #8a6408;color:#5a3d00;display:flex;align-items:center;justify-content:center;font:900 ${f}px/1 system-ui">${KB[tab]}</div>`;
+const ZF=()=>`<div style="position:absolute;inset:6px 8px;border-radius:8px;background:#2b2410;border:3px solid #8a6408;display:flex;align-items:center;justify-content:center">${COIN(34,12)}</div>`;
+const face=c=>`<div class="sks">${c.key==="ZONK"?ZF():SKA.svg(c.key)}</div>`;
 function strip(win){const a=[];for(let i=0;i<32;i++)a.push(pick(POOL[tab]));if(win)a[24]=win;$("#spt").innerHTML=a.map(face).join("")}
 function counts(){$("#spcb").textContent=U.biru||0;$("#spcm").textContent=U.merah||0}
 function info(){$("#spq").innerHTML=`<div class="mut" style="font-weight:700;letter-spacing:.08em;margin-bottom:4px">PELUANG · ${NM[tab]}</div>`+ROWS[tab].map(r=>`<div style="display:flex;align-items:center;gap:10px;min-height:32px"><span style="width:12px;height:12px;border-radius:3px;background:${r[0]}"></span><b style="width:64px;font-size:14px">${r[1]}</b><span class="mut" style="flex:1;font-size:12px">${r[2]}</span><b>${r[3]}</b></div>`).join("")}
@@ -31,7 +35,7 @@ function setTab(k){
  const t=$("#spt");t.style.transition="none";t.style.transform="translateX(0)";info()}
 async function open(){
  $("#home").hidden=true;$("#kp").hidden=false;$("#spq").hidden=true;
- U={biru:0,merah:0,skins:{}};sm("");
+ U={koin:0,biru:0,merah:0,skins:{}};sm("");
  if(isG()){try{const v=await db.get("users/"+uid);if(v)U=Object.assign(U,v);U.skins=SKA.migrate(U.skins)}catch(e){sm("Gagal memuat: "+(e.code||e.message))}}
  else sm("Masuk dengan Google di Profil agar kartu dan skin tersimpan.");
  counts();setTab("biru")}
@@ -45,7 +49,7 @@ async function spin(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U[tab]||0)<1)return sm("Kartu "+(tab==="biru"?"biru":"merah")+" tidak cukup.");
- const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!U.skins[w.key],nu=Object.assign({},U,{skins:z?U.skins:Object.assign({},U.skins,{[w.key]:true})});nu[tab]=U[tab]-1;
+ const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!U.skins[w.key],nu=Object.assign({},U,{skins:z?U.skins:Object.assign({},U.skins,{[w.key]:true})});nu[tab]=U[tab]-1;if(z)nu.koin=tambah(KB[tab]);
  busy=true;sm("");
  if(!await put(nu)){busy=false;return}
  U=nu;counts();$("#spr").textContent="Memutar…";
@@ -57,6 +61,7 @@ async function spin10(){
  const own=Object.assign({},U.skins),R=[];
  for(let i=0;i<10;i++){const w=pick(POOL[tab]),z=w.key==="ZONK",dup=!z&&!!own[w.key];if(!z)own[w.key]=true;R.push({w,z,dup})}
  const nu=Object.assign({},U,{skins:own});nu[tab]=U[tab]-10;
+ const zn=R.filter(r=>r.z).length;if(zn)nu.koin=tambah(zn*KB[tab]);
  busy=true;sm("");
  if(!await put(nu)){busy=false;return}
  U=nu;counts();
@@ -64,31 +69,31 @@ async function spin10(){
  for(let i=0;i<10;i++){
   $("#spr").textContent="Putaran "+(i+1)+" / 10";
   await new Promise(f=>roll(R[i].w,f,1.5));
-  $("#spr").innerHTML=`<b style="color:${R[i].w.col}">${R[i].z?"Zonk":R[i].w.n+" · skin "+R[i].w.t}</b>`;
+  $("#spr").innerHTML=`<b style="color:${R[i].w.col}">${R[i].z?"+"+KB[tab]+" koin":R[i].w.n+" · skin "+R[i].w.t}</b>`;
   await new Promise(f=>setTimeout(f,700))}
  busy=false;reveal10(R)}
 function reveal10(R){
  const o=$("#spo"),nw=R.filter(r=>!r.z&&!r.dup).length,zk=R.filter(r=>r.z).length;
- const ZS='<div style="width:36px;height:50px;box-sizing:border-box;border-radius:6px;background:#222a26;border:2px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 14px/1 system-ui">✕</div>';
- const cell=r=>{const c=r.w.col;return `<div style="width:56px;display:flex;flex-direction:column;align-items:center;gap:12px"><div class="sks" style="width:36px;height:50px;border-radius:6px;box-shadow:0 0 10px ${r.z?"transparent":c}">${r.z?ZS:SKA.svg(r.w.key,"ska sm")}</div><span style="font-size:10px;font-weight:800;color:${r.z?"#8a8f8c":r.dup?"#9fb0a6":c}">${r.z?"ZONK":r.dup?"ULANG":"BARU"}</span></div>`};
- o.innerHTML=`<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px"><div style="font-size:22px;font-weight:900;letter-spacing:.1em;animation:skPop .5s ease-out both">HASIL 10x</div><div style="display:grid;grid-template-columns:repeat(5,56px);gap:16px 6px;animation:skFade .5s ease-out .2s both">${R.map(cell).join("")}</div><div style="font-size:14px;color:#d9e7de;text-align:center">${nw} skin baru · ${R.length-nw-zk} ulang · ${zk} zonk</div><button class="skl" id="spl" style="animation-delay:.6s">Lanjut</button></div>`;
+ const ZS=`<div style="width:36px;height:50px;box-sizing:border-box;border-radius:6px;background:#2b2410;border:2px solid #8a6408;display:flex;align-items:center;justify-content:center">${COIN(28,10)}</div>`;
+ const cell=r=>{const c=r.w.col;return `<div style="width:56px;display:flex;flex-direction:column;align-items:center;gap:12px"><div class="sks" style="width:36px;height:50px;border-radius:6px;box-shadow:0 0 10px ${r.z?"transparent":c}">${r.z?ZS:SKA.svg(r.w.key,"ska sm")}</div><span style="font-size:10px;font-weight:800;color:${r.z?"#e8b923":r.dup?"#9fb0a6":c}">${r.z?"KOIN":r.dup?"ULANG":"BARU"}</span></div>`};
+ o.innerHTML=`<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px"><div style="font-size:22px;font-weight:900;letter-spacing:.1em;animation:skPop .5s ease-out both">HASIL 10x</div><div style="display:grid;grid-template-columns:repeat(5,56px);gap:16px 6px;animation:skFade .5s ease-out .2s both">${R.map(cell).join("")}</div><div style="font-size:14px;color:#d9e7de;text-align:center">${nw} skin baru · ${R.length-nw-zk} ulang · +${zk*KB[tab]} koin</div><button class="skl" id="spl" style="animation-delay:.6s">Lanjut</button></div>`;
  o.hidden=false;$("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
- $("#spr").textContent="10x: "+nw+" skin baru, "+zk+" zonk";
+ $("#spr").textContent="10x: "+nw+" skin baru, +"+zk*KB[tab]+" koin";
  const best=Math.max(...R.map(r=>r.z?0:LV[r.w.t]));if(window.SND)SND("rev"+best);if(navigator.vibrate)navigator.vibrate(best>=4?[60,40,60,40,120]:best>=3?[60,40,60]:30)}
 async function swap(){
  if(busy)return;
  if(!isG())return sm("Masuk dengan Google dulu (Profil).");
  if((U.biru||0)<10)return sm("Kartu biru belum cukup, perlu 10.");
- const nu=Object.assign({},U,{biru:U.biru-10,merah:(U.merah||0)+2});
- if(await put(nu)){U=nu;counts();sm("Berhasil: 10 kartu biru jadi 2 kartu merah.")}}
+ const nu=Object.assign({},U,{biru:U.biru-10,merah:(U.merah||0)+1});
+ if(await put(nu)){U=nu;counts();sm("Berhasil: 10 kartu biru jadi 1 kartu merah.")}}
 // Layar hadiah: makin langka makin mewah (Biasa: balik kartu; Spesial: + kilau; Epik: + sinar & cincin; Legenda: + kilatan, getar, kilap).
 function reveal(w,dup){
  const l=LV[w.t],c=w.col,G=[240,280,340,400][l-1],o=$("#spo");
  let h="";
  if(w.key==="ZONK"){
-  o.innerHTML=`<div style="position:relative;width:150px;height:210px;box-sizing:border-box;border-radius:14px;background:#222a26;border:5px solid #5b625e;color:#8a8f8c;display:flex;align-items:center;justify-content:center;font:800 64px/1 system-ui;animation:skShake .5s ease-in-out .6s 1">✕</div><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;animation:skPop .5s ease-out .4s both"><div style="font-size:26px;font-weight:900;letter-spacing:.12em;color:#8a8f8c">ZONK</div><div style="font-size:14px;color:#d9e7de">Kartu hangus, tidak dapat skin</div></div><button class="skl" id="spl">Lanjut</button>`;
+  o.innerHTML=`<div style="position:relative;animation:skFlip .9s ease-out both">${COIN(150,46)}</div><div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;animation:skPop .5s ease-out .4s both"><div style="font-size:26px;font-weight:900;letter-spacing:.12em;color:#e8b923">+${KB[tab]} KOIN</div><div style="font-size:14px;color:#d9e7de">Tidak dapat skin, diganti koin</div></div><button class="skl" id="spl">Lanjut</button>`;
   o.hidden=false;$("#spl").onclick=()=>{o.hidden=true;o.innerHTML=""};
-  $("#spr").innerHTML=`<b style="color:#8a8f8c">Zonk · tidak dapat skin</b>`;
+  $("#spr").innerHTML=`<b style="color:#e8b923">+${KB[tab]} koin</b>`;
   if(window.SND)SND("rev0");if(navigator.vibrate)navigator.vibrate(30);return}
  if(l===4)h+=`<div class="skx" style="top:0;left:0;right:0;bottom:0;background:#fff7d6;animation:skFlash .9s ease-out both"></div>`;
  if(l>=3){
