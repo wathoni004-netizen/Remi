@@ -14,7 +14,7 @@ ids("L").forEach(k=>P2.push(card(k,1/ids("L").length)));
 P1.push(ZK(95));P2.push(ZK(70));
 const POOL={biru:P1,merah:P2};
 const ROWS={biru:[["#4ac68c","Spesial","12 skin","5%"],["#e8b923","Koin","+15 koin","95%"]],
- merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","6 skin","1%"],["#e8b923","Koin","+200 koin","70%"]]};
+ merah:[["#4ac68c","Spesial","12 skin","15%"],["#a56bff","Epik","6 skin","14%"],["#ff9d2e","Legenda","4 skin","1%"],["#e8b923","Koin","+200 koin","70%"]]};
 const NM={biru:"Spin Biasa",merah:"Spin Legenda"};
 let U={koin:0,biru:0,merah:0,skins:{}},tab="biru",busy=false;
 const tambah=n=>Math.min(999999,(U.koin||0)+n); // batas sama dengan Rules

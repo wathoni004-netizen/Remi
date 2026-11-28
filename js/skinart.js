@@ -1,5 +1,5 @@
 // Gambar bingkai tiap skin (SVG vektor, kanvas 300x400, kartu di x50-250 y60-340; gambar boleh meluber keluar kartu).
-// 24 skin: Spesial S01-S12, Epik E01-E06, Legenda L01-L04, Kolektor K01-K02. Boleh dipasang di slot 2-10/KQJ/As/Joker, kecuali Kolektor (hanya As dan Joker).
+// 24 skin: Spesial S01-S12, Epik E01-E06, Legenda L01-L04, Kolektor K01-K02, L05 (Kraken), L06 (Megalodon). Boleh dipasang di slot 2-10/KQJ/As/Joker, kecuali Kolektor (hanya As dan Joker).
 // v = nomor variasi efek Set (0-9) di setfx.js untuk tier skin itu; S11 dan S12 belum punya efek (sementara memakai v 0).
 const SKA=(()=>{
 let SN=0;
@@ -54,9 +54,9 @@ const L=[
 ["L03","Gerhana","L",5,["#e8e0ff","#8a7aff","#ffffff"],FL3,r=>burst(r,28,90,150,Y2,38)+burst(r,24,70,116,Y3,34)+circ(150,200,70,Y2,'opacity=".55"')+circ(150,200,56,"#05030a",`stroke="${Y3}" stroke-width="6"`)+ell(150,200,64,64,0,Y1,4,'opacity=".8"')+glow(192,162,14,"#fff")+sparks(r,8,Y3,6)],
 ["L04","Raja","L",8,["#ffd24a","#b23cff","#fff6b0"],FL4,r=>burst(r,26,100,150,Y1,40)+burst(r,22,76,118,Y2,34)+poly([[84,262],[92,160],[124,206],[150,142],[176,206],[208,160],[216,262]],Y2,'stroke="#7a3a00" stroke-width="5" stroke-linejoin="round"')+`<rect x="84" y="262" width="132" height="20" rx="5" fill="${YD}" stroke="#7a3a00" stroke-width="5"/>`+circ(150,236,9,"#ff3d2e")+circ(112,238,6,"#4fd2ff")+circ(188,238,6,"#4fff9b")+star(92,160,8,"#fff")+star(208,160,8,"#fff")+star(150,142,9,"#fff")+sparks(r,8,Y3,6)],
 // Kraken: gambar berkas (dari Illustrator), bukan bentuk kode; lihat svg() di bawah. Efek Set-nya di kraken.js.
-["L05","Kraken","L",8,["#8a5ad0","#ffb326","#cfeaf0"],null,null],
+["L05","Kraken","K",8,["#8a5ad0","#ffb326","#cfeaf0"],null,null],
 // Megalodon: gambar berkas; efek Set-nya di megalodon.js.
-["L06","Megalodon","L",9,["#12e8e8","#0a2a6a","#f4fbff"],null,null],
+["L06","Megalodon","K",9,["#12e8e8","#0a2a6a","#f4fbff"],null,null],
 // ---------- KOLEKTOR (hanya As dan Joker) ----------
 ["K01","Ditindih","K",4,["#cfd2e8", "#ffffff", "#9aa3c7"],FK,r=>[0,1,2,3,4,5,6,7].map(i=>bolt(r,150,300,150+Math.cos(i*.8+.2)*150,300+Math.sin(i*.8+.2)*90,4,16,"#fff",2.5)).join("")+ell(150,300,120,34,0,"#fff",5,'opacity=".8"')+ell(150,300,80,22,0,"#9aa3c7",5)+`<g transform="rotate(-9 150 130)"><rect x="40" y="26" width="220" height="250" rx="18" fill="#f4f6ff" stroke="#9aa3c7" stroke-width="10"/><rect x="58" y="44" width="184" height="214" rx="10" fill="none" stroke="#7a85b5" stroke-width="3"/><text x="150" y="190" text-anchor="middle" font-size="100" fill="#7a85b5">♛</text></g>`+[[40,290,9],[262,282,8],[94,346,7],[220,350,10]].map(k=>rock(k[0],k[1],k[2])).join("")+sparks(r,7,"#fff",6)],
 ["K02","Big Bang","K",9,["#ff4f4f", "#ffd24a", "#4fff9b", "#4fd2ff", "#a56bff"],FK,r=>burst(r,28,90,148,"#5a4bff",34)+burst(r,24,76,138,"#b23cff",32)+burst(r,22,62,118,"#ff5a1e",28)+burst(r,20,50,98,Y2,24)+burst(r,18,38,76,"#ffe14f",18)+ell(150,200,78,22,-26,"#a56bff",9,'transform-origin="150 200"')+ell(150,200,78,22,-26,Y2,6)+ell(150,200,78,22,-26,"#ffe14f",3)+glow(150,200,46,"#ffd24a")+circ(150,200,15,"#fff")+Array.from({length:12},(_,i)=>{const a=r()*N,q=78+r()*60;return rock(CX+Math.cos(a)*q,CY+Math.sin(a)*q*.9,3+r()*5)}).join("")+sparks(r,6,"#ffe14f",7)]

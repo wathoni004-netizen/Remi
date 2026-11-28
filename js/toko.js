@@ -1,7 +1,7 @@
-// Toko: beli kartu spin, skin Set, skin Kartu (kartuskin.js), dan skin Meja (mejaskin.js) dengan koin. Data di users/{uid} (sama dengan spin.js). Kolektor tidak dijual (event terbatas).
+// Toko: beli kartu spin, skin Set, skin Kartu (kartuskin.js), dan skin Meja (mejaskin.js) dengan koin. Data di users/{uid} (sama dengan spin.js). Kolektor event tidak dijual; kecuali Kraken (L05) dan Megalodon (L06), 10x harga Legenda.
 // Harga kartu = nilai rata-rata hadiahnya (lihat peluang di spin.js); harga skin Set = target jumlah ronde menang x ~100 koin (Spesial 10, Epik 30, Legenda 90 ronde); skin Kartu dan Meja 1,5x (keputusan Boss 22 Nov).
 (()=>{
-const PR={biru:50,merah:650},PS={S:1000,E:3000,L:9000},LV={S:1,E:2,L:3},P=d=>PS[d.t]*(SKA.get(d.k)?1:1.5);
+const PR={biru:50,merah:650},PS={S:1000,E:3000,L:9000},LV={S:1,E:2,L:3,K:4},JUAL={L05:1,L06:1},P=d=>JUAL[d.k]?PS.L*10:PS[d.t]*(SKA.get(d.k)?1:1.5);
 let U={koin:0,biru:0,merah:0,skins:{}},busy=false;
 const isG=()=>!!auth&&!!auth.currentUser&&!auth.currentUser.isAnonymous;
 const sm=t=>{$("#twm").textContent=t||""};
@@ -9,7 +9,7 @@ const counts=()=>{$("#twk").textContent=(U.koin||0).toLocaleString("id-ID");$("#
 function tile(d,art){const own=!!(U.skins||{})[d.k];return `<button class="tci${own?" own":""}" data-k="${d.k}" aria-label="${d.n}, ${d.tn}, ${P(d)} koin"><div class="sk">${art}${SKA.tag(d.t,"lbl lbs")}</div><span>${d.n}</span>${own?"<span>✓</span>":`<span class="tpr"><i></i>${P(d).toLocaleString("id-ID")}</span>`}</button>`}
 const hd=t=>`<div style="width:100%;font-weight:800;font-size:13px;color:#e8b923">${t}</div>`;
 function list(){
- const srt=(a,b)=>LV[a.t]-LV[b.t],ds=SKA.list.filter(d=>PS[d.t]).sort(srt),ks=KSK.list.slice().sort(srt),ms=MJK.list.slice().sort(srt);
+ const srt=(a,b)=>LV[a.t]-LV[b.t],ds=SKA.list.filter(d=>PS[d.t]||JUAL[d.k]).sort(srt),ks=KSK.list.slice().sort(srt),ms=MJK.list.slice().sort(srt);
  $("#tsk").innerHTML=hd("Skin Set")+ds.map(d=>tile(d,SKA.svg(d.k))).join("")+hd("Skin Kartu")+ks.map(d=>tile(d,KSK.thumb(d.k))).join("")+hd("Skin Meja")+ms.map(d=>tile(d,MJK.thumb(d.k))).join("")}
 async function open(){
  $("#home").hidden=true;$("#tw").hidden=false;U={koin:0,biru:0,merah:0,skins:{}};sm("");
